@@ -13,7 +13,7 @@ namespace KFS.src.Domain.IService
         public Task<ResponseDto> GetProducts();
         public Task<ResponseDto> GetProductById(Guid id);
         public Task<ResponseDto> CreateProduct(ProductCreate req);
-        public Task<ResponseDto> UpdateProduct(Product product);
+        public Task<ResponseDto> UpdateProduct(ProductUpdate req, Guid id);
         public Task<ResponseDto> DeleteProduct(Guid id);
     }
 }

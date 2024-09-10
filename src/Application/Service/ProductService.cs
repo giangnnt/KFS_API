@@ -152,12 +152,31 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public async Task<ResponseDto> UpdateProduct(Product product)
+        public async Task<ResponseDto> UpdateProduct(ProductUpdate req, Guid id)
         {
             var response = new ResponseDto();
             try
             {
+                //get product by id
+                var product = await _productRepository.GetProductById(id);
+                //map product
+                var mappedProduct = _mapper.Map(req, product);
+                if (req.CategoryId != null)
+                {
+                    var Category = await _categoryRepository.GetCategoryById(req.CategoryId.Value);
+                    mappedProduct.CategoryId = req.CategoryId.Value;
+                    mappedProduct.Category = Category;
+                    if (Category == null)
+                    {
+                        response.StatusCode = 404;
+                        response.Message = "Category not found";
+                        response.IsSuccess = false;
+                        return response;
+                    }
+                }
+                //update product
                 var result = await _productRepository.UpdateProduct(product);
+                //check resultF
                 if (result)
                 {
                     response.StatusCode = 200;

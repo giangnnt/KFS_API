@@ -39,6 +39,12 @@ namespace KFS.src.Application.Dto.ProductDtos
             .ForMember(dest => dest.Category, opt => opt.Ignore())
             .ForMember(dest => dest.Gender, opt => opt.Ignore())
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<ProductUpdate, Product>()
+            .ForMember(dest => dest.CategoryId, opt => opt.Ignore())
+            .ForMember(dest => dest.Category, opt => opt.Ignore())
+            .ForMember(dest => dest.CartItems, opt => opt.Ignore())
+            .ForMember(dest => dest.OrderItems, opt => opt.Ignore())
+            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
         }
     }
 }
