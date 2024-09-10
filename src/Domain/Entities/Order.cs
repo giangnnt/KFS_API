@@ -19,7 +19,11 @@ namespace KFS.src.Domain.Entities
         public DateTime EstimatedDeliveryDate { get; set; }
         public string? Note { get; set; }
         public string Currency { get; set; } = "VND";
+        public OrderStatusEnum Status { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+        public User User { get; set; } = null!;
+        public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+        public Payment? Payment { get; set; }
     }
 }

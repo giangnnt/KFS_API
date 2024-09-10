@@ -17,5 +17,7 @@ namespace KFS.src.Domain.Entities
         public string Address { get; set; } = null!;
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+        public List<Cart> Carts { get; set; } = new List<Cart>();
+        public List<Order> Orders { get; set; } = new List<Order>();        
     }
 }
