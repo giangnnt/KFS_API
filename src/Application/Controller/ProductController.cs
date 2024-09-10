@@ -64,11 +64,11 @@ namespace KFS.src.Application.Controller
         }
 
         [HttpPut("update/{id}")]
-        public async Task<IActionResult> UpdateProduct([FromBody] Product product,int id)
+        public async Task<IActionResult> UpdateProduct([FromBody] ProductUpdate req, Guid id)
         {
             try
             {
-                var result = await _productService.UpdateProduct(product);
+                var result = await _productService.UpdateProduct(req, id);
                 return Ok(result);
             }
             catch (Exception ex)

@@ -38,7 +38,7 @@ namespace KFS.src.Infrastucture.Context
             );
             modelBuilder.Entity<Product>(entity =>
             {
-                entity.Property(entity => entity.Gender).HasConversion(v => v.ToString(), v => (GenderEnum)Enum.Parse(typeof(GenderEnum), v));
+                entity.Property(entity => entity.Gender).HasConversion(v => v.ToString(), v => v != null ? (GenderEnum)Enum.Parse(typeof(GenderEnum), v) : default);
             });
         }
     }
