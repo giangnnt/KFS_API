@@ -23,7 +23,9 @@ namespace KFS.src.Infrastucture.Repository
         }
         public async Task<Domain.Entities.Product> GetProductById(Guid id)
         {
-            return await _context.Products.FirstOrDefaultAsync(x => x.Id == id) ?? throw new Exception("Product not found");
+            return await _context.Products
+            .Include(x => x.Category)
+            .FirstOrDefaultAsync(x => x.Id == id) ?? throw new Exception("Product not found");
         }
         public async Task<bool> CreateProduct(Domain.Entities.Product product)
         {

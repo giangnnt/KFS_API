@@ -94,6 +94,7 @@ namespace KFS.src.Application.Service
             try
             {
                 var result = await _productRepository.GetProductById(id);
+                var mappedProduct = _mapper.Map<ProductDto>(result);
                 if (result != null)
                 {
                     response.StatusCode = 200;
@@ -101,7 +102,7 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = true;
                     response.Result = new ResultDto
                     {
-                        Data = result
+                        Data = mappedProduct
                     };
                     return response;
                 }
