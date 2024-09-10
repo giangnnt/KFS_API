@@ -18,5 +18,6 @@ namespace KFS.src.Domain.Entities
         public string TransactionId { get; set; } = null!;
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+        public Order Order { get; set; } = null!;
     }
 }
