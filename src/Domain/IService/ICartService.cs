@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Azure;
+using KFS.src.Application.Dto.CartDtos;
 using KFS.src.Application.Dto.ResponseDtos;
 
 namespace KFS.src.Domain.IService
@@ -11,7 +12,7 @@ namespace KFS.src.Domain.IService
     {
         Task<ResponseDto> GetCarts();
         Task<ResponseDto> GetCartById(Guid id);
-        Task<ResponseDto> CreateCart();
+        Task<ResponseDto> CreateCart(CartCreate req);
         Task<ResponseDto> UpdateCart(Guid id);
         Task<ResponseDto> DeleteCart(Guid id);
         Task<ResponseDto> AddProductToCart(Guid cartId, Guid productId);

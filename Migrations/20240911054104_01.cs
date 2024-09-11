@@ -27,23 +27,30 @@ namespace KFS.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Users",
+                name: "Permission",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Avatar = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Slug = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.PrimaryKey("PK_Permission", x => x.Slug);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Role",
+                columns: table => new
+                {
+                    RoleId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Role", x => x.RoleId);
                 });
 
             migrationBuilder.CreateTable(
@@ -61,7 +68,7 @@ namespace KFS.Migrations
                     Color = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FeedingVolumn = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FilterRate = table.Column<float>(type: "real", nullable: true),
-                    Gender = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Gender = table.Column<string>(type: "nvarchar(20)", nullable: true),
                     Inventory = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -79,6 +86,56 @@ namespace KFS.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PermissionRole",
+                columns: table => new
+                {
+                    PermissionsSlug = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    RolesRoleId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PermissionRole", x => new { x.PermissionsSlug, x.RolesRoleId });
+                    table.ForeignKey(
+                        name: "FK_PermissionRole_Permission_PermissionsSlug",
+                        column: x => x.PermissionsSlug,
+                        principalTable: "Permission",
+                        principalColumn: "Slug",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PermissionRole_Role_RolesRoleId",
+                        column: x => x.RolesRoleId,
+                        principalTable: "Role",
+                        principalColumn: "RoleId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RoleId = table.Column<int>(type: "int", nullable: false),
+                    Avatar = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Users_Role_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "Role",
+                        principalColumn: "RoleId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Carts",
                 columns: table => new
                 {
@@ -87,7 +144,7 @@ namespace KFS.Migrations
                     TotalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     TotalItem = table.Column<int>(type: "int", nullable: false),
                     Currency = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(20)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -217,10 +274,27 @@ namespace KFS.Migrations
                 columns: new[] { "Id", "Description", "Name" },
                 values: new object[,]
                 {
-                    { new Guid("182628a9-f9f4-4ca2-87f6-265b5623838c"), null, "Thuần chủng nhập khẩu" },
-                    { new Guid("3089a596-d52b-4a6c-be5f-b5891a24e44d"), null, "Lai F1" },
-                    { new Guid("f81c15ec-0227-4f44-a0ea-8abcde4403e1"), null, "Thuần Việt" }
+                    { new Guid("3d4fc185-049d-4a96-851b-1d320e7dbba8"), null, "Lai F1" },
+                    { new Guid("5f18bf0c-7199-462c-b023-3ccf1fd9f806"), null, "Thuần Việt" },
+                    { new Guid("9a17dcf5-1426-45ee-a32e-c23ee5fe40d9"), null, "Thuần chủng nhập khẩu" }
                 });
+
+            migrationBuilder.InsertData(
+                table: "Role",
+                columns: new[] { "RoleId", "Description", "Name" },
+                values: new object[,]
+                {
+                    { 1, null, "ADMIN" },
+                    { 2, null, "MANAGER" },
+                    { 3, null, "STAFF" },
+                    { 4, null, "CUSTOMER" },
+                    { 5, null, "GUEST" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "Id", "Address", "Avatar", "CreatedAt", "Email", "FullName", "Password", "Phone", "RoleId", "UpdatedAt" },
+                values: new object[] { new Guid("c5ca2d56-9e04-449b-9719-a218e2a13109"), "HCM", null, new DateTime(2024, 9, 11, 12, 41, 3, 881, DateTimeKind.Local).AddTicks(7915), "giangnnt260703@gmail.com", "Truong Giang", "$2a$11$E.4SaxvujoCNxLTfEZj/q.FSPFwVetw97SSlWXALHJCK/NWjNLY2.", "0123456789", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
 
             migrationBuilder.CreateIndex(
                 name: "IX_CartItems_CartId",
@@ -259,9 +333,19 @@ namespace KFS.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_PermissionRole_RolesRoleId",
+                table: "PermissionRole",
+                column: "RolesRoleId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Products_CategoryId",
                 table: "Products",
                 column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_RoleId",
+                table: "Users",
+                column: "RoleId");
         }
 
         /// <inheritdoc />
@@ -277,6 +361,9 @@ namespace KFS.Migrations
                 name: "Payments");
 
             migrationBuilder.DropTable(
+                name: "PermissionRole");
+
+            migrationBuilder.DropTable(
                 name: "Carts");
 
             migrationBuilder.DropTable(
@@ -286,10 +373,16 @@ namespace KFS.Migrations
                 name: "Orders");
 
             migrationBuilder.DropTable(
+                name: "Permission");
+
+            migrationBuilder.DropTable(
                 name: "Categories");
 
             migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "Role");
         }
     }
 }

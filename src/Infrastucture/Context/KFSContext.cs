@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using KFS.src.Application.Constant;
 using KFS.src.Application.Enum;
 using KFS.src.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -38,7 +39,70 @@ namespace KFS.src.Infrastucture.Context
             );
             modelBuilder.Entity<Product>(entity =>
             {
-                entity.Property(entity => entity.Gender).HasConversion(v => v.ToString(), v => v != null ? (GenderEnum)Enum.Parse(typeof(GenderEnum), v) : default);
+                entity.Property(entity => entity.Gender).HasConversion(v => v.ToString(), v => v != null ? (GenderEnum)Enum.Parse(typeof(GenderEnum), v) : default)
+                .HasColumnType("nvarchar(20)");
+            });
+            // Seed the Role table
+            modelBuilder.Entity<Role>().HasData(
+                new Role
+                {
+                    RoleId = RoleConst.ADMIN_ID,
+                    Name = RoleConst.ADMIN
+                },
+                new Role
+                {
+                    RoleId = RoleConst.MANAGER_ID,
+                    Name = RoleConst.MANAGER
+                },
+                new Role
+                {
+                    RoleId = RoleConst.STAFF_ID,
+                    Name = RoleConst.STAFF
+                },
+                new Role
+                {
+                    RoleId = RoleConst.CUSTOMER_ID,
+                    Name = RoleConst.CUSTOMER
+                },
+                new Role
+                {
+                    RoleId = RoleConst.GUEST_ID,
+                    Name = RoleConst.GUEST
+                }
+            );
+            // Seed the User table
+            modelBuilder.Entity<User>().HasData(
+                new User
+                {
+                    Id = Guid.Parse("00000000-0000-0000-0000-000000000001"),
+                    FullName = "Truong Giang",
+                    Email = "giangnnt260703@gmail.com",
+                    RoleId = RoleConst.ADMIN_ID,
+                    Password = BCrypt.Net.BCrypt.HashPassword("123456"),
+                    Phone = "0123456789",
+                    Address = "HCM",
+                    CreatedAt = DateTime.Now,
+                }
+                // new User
+                // {
+                //     Id = Guid.NewGuid(),
+                //     FullName = "Jane Smith",
+                //     Email
+                // },
+                // new User
+                // {
+                //     Id = Guid.NewGuid(),
+                //     FullName = "Mike Johnson"
+                // }
+            );
+            modelBuilder.Entity<Cart>(entity =>
+            {
+                entity.Property(entity => entity.Status)
+                .HasConversion(
+                    v => v.ToString(), 
+                    v => v != null ? (CartStatusEnum)Enum.Parse(typeof(CartStatusEnum), v) : default)
+                .HasColumnType("nvarchar(20)");
+
             });
         }
     }
