@@ -28,6 +28,9 @@ namespace KFS.src.Application.Service
             var response = new ResponseDto();
             try
             {
+                //map product
+                var mappedProduct = _mapper.Map<Product>(req);
+                //check if category id is empty
                 if (req.CategoryId == Guid.Empty)
                 {
                     response.StatusCode = 400;
@@ -35,9 +38,13 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
                     return response;
                 }
+                //get category by id
                 var Category = await _categoryRepository.GetCategoryById(req.CategoryId);
-                var mappedProduct = _mapper.Map<Product>(req);
-                mappedProduct.Category = Category;
+                //map category
+                if (Category != null)
+                {
+                    mappedProduct.Category = Category;
+                }
                 var result = await _productRepository.CreateProduct(mappedProduct);
                 if (result)
                 {

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KFS.Migrations
 {
     [DbContext(typeof(KFSContext))]
-    [Migration("20240910065254_01")]
+    [Migration("20240911054104_01")]
     partial class _01
     {
         /// <inheritdoc />
@@ -38,8 +38,9 @@ namespace KFS.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<int>("TotalItem")
                         .HasColumnType("int");
@@ -107,17 +108,17 @@ namespace KFS.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("182628a9-f9f4-4ca2-87f6-265b5623838c"),
+                            Id = new Guid("9a17dcf5-1426-45ee-a32e-c23ee5fe40d9"),
                             Name = "Thuần chủng nhập khẩu"
                         },
                         new
                         {
-                            Id = new Guid("3089a596-d52b-4a6c-be5f-b5891a24e44d"),
+                            Id = new Guid("3d4fc185-049d-4a96-851b-1d320e7dbba8"),
                             Name = "Lai F1"
                         },
                         new
                         {
-                            Id = new Guid("f81c15ec-0227-4f44-a0ea-8abcde4403e1"),
+                            Id = new Guid("5f18bf0c-7199-462c-b023-3ccf1fd9f806"),
                             Name = "Thuần Việt"
                         });
                 });
@@ -247,6 +248,23 @@ namespace KFS.Migrations
                     b.ToTable("Payments");
                 });
 
+            modelBuilder.Entity("KFS.src.Domain.Entities.Permission", b =>
+                {
+                    b.Property<string>("Slug")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Slug");
+
+                    b.ToTable("Permission");
+                });
+
             modelBuilder.Entity("KFS.src.Domain.Entities.Product", b =>
                 {
                     b.Property<Guid>("Id")
@@ -275,7 +293,7 @@ namespace KFS.Migrations
                         .HasColumnType("real");
 
                     b.Property<string>("Gender")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<int>("Inventory")
                         .HasColumnType("int");
@@ -304,6 +322,53 @@ namespace KFS.Migrations
                     b.HasIndex("CategoryId");
 
                     b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("KFS.src.Domain.Entities.Role", b =>
+                {
+                    b.Property<int>("RoleId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RoleId"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("RoleId");
+
+                    b.ToTable("Role");
+
+                    b.HasData(
+                        new
+                        {
+                            RoleId = 1,
+                            Name = "ADMIN"
+                        },
+                        new
+                        {
+                            RoleId = 2,
+                            Name = "MANAGER"
+                        },
+                        new
+                        {
+                            RoleId = 3,
+                            Name = "STAFF"
+                        },
+                        new
+                        {
+                            RoleId = 4,
+                            Name = "CUSTOMER"
+                        },
+                        new
+                        {
+                            RoleId = 5,
+                            Name = "GUEST"
+                        });
                 });
 
             modelBuilder.Entity("KFS.src.Domain.Entities.User", b =>
@@ -338,16 +403,46 @@ namespace KFS.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("RoleId");
+
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("c5ca2d56-9e04-449b-9719-a218e2a13109"),
+                            Address = "HCM",
+                            CreatedAt = new DateTime(2024, 9, 11, 12, 41, 3, 881, DateTimeKind.Local).AddTicks(7915),
+                            Email = "giangnnt260703@gmail.com",
+                            FullName = "Truong Giang",
+                            Password = "$2a$11$E.4SaxvujoCNxLTfEZj/q.FSPFwVetw97SSlWXALHJCK/NWjNLY2.",
+                            Phone = "0123456789",
+                            RoleId = 1,
+                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        });
+                });
+
+            modelBuilder.Entity("PermissionRole", b =>
+                {
+                    b.Property<string>("PermissionsSlug")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("RolesRoleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("PermissionsSlug", "RolesRoleId");
+
+                    b.HasIndex("RolesRoleId");
+
+                    b.ToTable("PermissionRole");
                 });
 
             modelBuilder.Entity("KFS.src.Domain.Entities.Cart", b =>
@@ -432,6 +527,32 @@ namespace KFS.Migrations
                     b.Navigation("Category");
                 });
 
+            modelBuilder.Entity("KFS.src.Domain.Entities.User", b =>
+                {
+                    b.HasOne("KFS.src.Domain.Entities.Role", "Role")
+                        .WithMany("Users")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("PermissionRole", b =>
+                {
+                    b.HasOne("KFS.src.Domain.Entities.Permission", null)
+                        .WithMany()
+                        .HasForeignKey("PermissionsSlug")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("KFS.src.Domain.Entities.Role", null)
+                        .WithMany()
+                        .HasForeignKey("RolesRoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("KFS.src.Domain.Entities.Cart", b =>
                 {
                     b.Navigation("CartItems");
@@ -454,6 +575,11 @@ namespace KFS.Migrations
                     b.Navigation("CartItems");
 
                     b.Navigation("OrderItems");
+                });
+
+            modelBuilder.Entity("KFS.src.Domain.Entities.Role", b =>
+                {
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("KFS.src.Domain.Entities.User", b =>
