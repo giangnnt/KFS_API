@@ -13,7 +13,7 @@ namespace KFS.src.Domain.IService
         Task<ResponseDto> GetCarts();
         Task<ResponseDto> GetCartById(Guid id);
         Task<ResponseDto> CreateCart(CartCreate req);
-        Task<ResponseDto> UpdateCart(Guid id);
+        Task<ResponseDto> UpdateCart(CartUpdate req, Guid id);
         Task<ResponseDto> DeleteCart(Guid id);
         Task<ResponseDto> AddProductToCart(Guid cartId, Guid productId);
         Task<ResponseDto> RemoveProductFromCart(Guid cartId, Guid productId);

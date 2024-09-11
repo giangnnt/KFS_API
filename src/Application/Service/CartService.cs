@@ -18,7 +18,7 @@ namespace KFS.src.Application.Service
         private readonly ICartItemRepository _cartItemRepository;
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
-        public CartService(ICartRepository cartRepository, IProductRepository productRepository, ICartItemRepository cartItemRepository,IUserRepository userRepository, IMapper mapper)
+        public CartService(ICartRepository cartRepository, IProductRepository productRepository, ICartItemRepository cartItemRepository, IUserRepository userRepository, IMapper mapper)
         {
             _cartRepository = cartRepository;
             _productRepository = productRepository;
@@ -46,7 +46,7 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
                     return response;
                 }
-                var User =  await _userRepository.GetUserById(req.UserId);
+                var User = await _userRepository.GetUserById(req.UserId);
                 //map user
                 if (User != null)
                 {
@@ -74,29 +74,138 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public Task<ResponseDto> DeleteCart(Guid id)
+        public async Task<ResponseDto> DeleteCart(Guid id)
+        {
+            var response = new ResponseDto();
+            try
+            {
+                var result = await _cartRepository.DeleteCart(id);
+                if (result)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Cart deleted successfully";
+                    response.IsSuccess = true;
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Cart deletion failed";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public async Task<ResponseDto> GetCartById(Guid id)
+        {
+            var response = new ResponseDto();
+            try
+            {
+                var cart = await _cartRepository.GetCartById(id);
+                var mappedCart = _mapper.Map<CartDto>(cart);
+                if (cart != null)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Cart found";
+                    response.IsSuccess = true;
+                    response.Result = new ResultDto
+                    {
+                        Data = mappedCart
+                    };
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Cart not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public async Task<ResponseDto> GetCarts()
+        {
+            var response = new ResponseDto();
+            try
+            {
+                var carts = await _cartRepository.GetCarts();
+                var mappedCarts = _mapper.Map<List<CartDto>>(carts);
+                if (carts != null)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Carts found";
+                    response.IsSuccess = true;
+                    response.Result = new ResultDto
+                    {
+                        Data = mappedCarts
+                    };
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 404;
+                    response.Message = "No carts found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public async Task<ResponseDto> RemoveProductFromCart(Guid cartId, Guid productId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<ResponseDto> GetCartById(Guid id)
+        public async Task<ResponseDto> UpdateCart(CartUpdate req, Guid id)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<ResponseDto> GetCarts()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ResponseDto> RemoveProductFromCart(Guid cartId, Guid productId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ResponseDto> UpdateCart(Guid id)
-        {
-            throw new NotImplementedException();
+            var response = new ResponseDto();
+            try
+            {
+                var cart = await _cartRepository.GetCartById(id);
+                if (cart == null)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Cart not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                //map cart
+                var mappedCart = _mapper.Map(req, cart);
+                //update cart
+                var result = await _cartRepository.UpdateCart(mappedCart);
+                if (result)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Cart updated successfully";
+                    response.IsSuccess = true;
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Cart update failed";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch
+            {
+                throw;
+            }
         }
     }
 }
