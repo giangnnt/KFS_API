@@ -22,7 +22,6 @@ namespace KFS.src.Application.Dto.CartDtos
         public CartStatusEnum Status { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-        public UserDto User { get; set; } = null!;
         public List<CartItemDto> CartItems { get; set; } = new List<CartItemDto>();
     }
     public class CartProfile : Profile
@@ -30,7 +29,6 @@ namespace KFS.src.Application.Dto.CartDtos
         public CartProfile()
         {
             CreateMap<Cart, CartDto>()
-            .ForMember(dest => dest.User, opt => opt.MapFrom(src => src.User))
             .ForMember(dest => dest.CartItems, opt => opt.MapFrom(src => src.CartItems))
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<CartCreate, Cart>()
