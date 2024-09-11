@@ -57,12 +57,12 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCart(Guid id)
+        [HttpPut("update/{id}")]
+        public async Task<IActionResult> UpdateCart(CartUpdate req, Guid id)
         {
             try
             {
-                var result = await _cartService.UpdateCart(id);
+                var result = await _cartService.UpdateCart(req, id);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -70,7 +70,7 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
-        [HttpDelete("{id}")]
+        [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteCart(Guid id)
         {
             try

@@ -77,7 +77,7 @@ namespace KFS.src.Application.Controller
             }
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteProduct(Guid id)
         {
             try
