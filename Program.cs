@@ -13,6 +13,7 @@ builder.Services.AddControllers();
 // Add Repository
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
 // Add Service 
 builder.Services.AddScoped<IProductService, ProductService>();
 // Add Mapper
