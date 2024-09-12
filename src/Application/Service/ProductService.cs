@@ -134,7 +134,7 @@ namespace KFS.src.Application.Service
             {
                 var result = await _productRepository.GetProducts();
                 var mappedProduct = _mapper.Map<List<ProductDto>>(result);
-                if (result != null)
+                if (result != null && result.Count() > 0)
                 {
                     response.StatusCode = 200;
                     response.Message = "Products found";
