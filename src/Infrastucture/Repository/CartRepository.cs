@@ -35,6 +35,7 @@ namespace KFS.src.Infrastucture.Repository
 
         public async Task<Cart> GetCartById(Guid id)
         {
+
             return await _context.Carts
             .Include(x => x.CartItems)
             .FirstOrDefaultAsync(x => x.Id == id) ?? throw new Exception("Cart not found");
@@ -50,9 +51,23 @@ namespace KFS.src.Infrastucture.Repository
         public async Task<bool> UpdateCart(Cart cart)
         {
             cart.UpdatedAt = DateTime.Now;
-            _context.Carts.Update(cart);
+            _context.Carts.Update(cart); // Đánh dấu giỏ hàng là đã thay đổi
+        // Đảm bảo các mục giỏ hàng cũng được theo dõi
+        foreach (var item in cart.CartItems)
+        {
+            _context.Add(item);
+            _context.Entry(item).State = EntityState.Modified;
+        }
+        try
+        {
             int result = await _context.SaveChangesAsync();
             return result > 0;
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            // Xử lý lỗi đồng bộ nếu cần
+            return false;
+        }
         }
     }
 }

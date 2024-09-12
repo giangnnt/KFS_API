@@ -83,19 +83,19 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
-        // [HttpPost("{cartId}/products/{productId}")]
-        // public async Task<IActionResult> AddProductToCart(Guid cartId, Guid productId)
-        // {
-        //     try
-        //     {
-        //         var result = await _cartService.AddProductToCart(cartId, productId);
-        //         return Ok(result);
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         return BadRequest(ex.Message);
-        //     }
-        // }
+        [HttpPost("add-product")]
+        public async Task<IActionResult> AddProductToCart(CartAddProduct req)
+        {
+            try
+            {
+                var result = await _cartService.AddProductToCart(req);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         // [HttpDelete("{cartId}/products/{productId}")]
         // public async Task<IActionResult> RemoveProductFromCart(Guid cartId, Guid productId)
         // {

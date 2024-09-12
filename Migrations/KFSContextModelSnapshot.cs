@@ -56,6 +56,30 @@ namespace KFS.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Carts");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("37ab9331-f39a-4072-80ad-4adc3684fcec"),
+                            CreatedAt = new DateTime(2024, 9, 12, 21, 21, 50, 389, DateTimeKind.Local).AddTicks(6465),
+                            Currency = "VND",
+                            Status = "Active",
+                            TotalItem = 0,
+                            TotalPrice = 0m,
+                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UserId = new Guid("00000000-0000-0000-0000-000000000001")
+                        },
+                        new
+                        {
+                            Id = new Guid("da17c01a-de60-4b46-810e-f824a1936e14"),
+                            CreatedAt = new DateTime(2024, 9, 12, 21, 21, 50, 389, DateTimeKind.Local).AddTicks(6468),
+                            Currency = "VND",
+                            Status = "Completed",
+                            TotalItem = 0,
+                            TotalPrice = 0m,
+                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UserId = new Guid("00000000-0000-0000-0000-000000000001")
+                        });
                 });
 
             modelBuilder.Entity("KFS.src.Domain.Entities.CartItem", b =>
@@ -105,7 +129,7 @@ namespace KFS.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("9a17dcf5-1426-45ee-a32e-c23ee5fe40d9"),
+                            Id = new Guid("5f18bf0c-7199-462c-b023-3ccf1fd9f806"),
                             Name = "Thuần chủng nhập khẩu"
                         },
                         new
@@ -115,7 +139,7 @@ namespace KFS.Migrations
                         },
                         new
                         {
-                            Id = new Guid("5f18bf0c-7199-462c-b023-3ccf1fd9f806"),
+                            Id = new Guid("9a17dcf5-1426-45ee-a32e-c23ee5fe40d9"),
                             Name = "Thuần Việt"
                         });
                 });
@@ -305,7 +329,7 @@ namespace KFS.Migrations
                     b.Property<string>("Origin")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal?>("Price")
+                    b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Species")
@@ -319,6 +343,44 @@ namespace KFS.Migrations
                     b.HasIndex("CategoryId");
 
                     b.ToTable("Products");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("68ac40db-f025-409d-88d6-76cd26892c9b"),
+                            CategoryId = new Guid("5f18bf0c-7199-462c-b023-3ccf1fd9f806"),
+                            CreatedAt = new DateTime(2024, 9, 12, 21, 21, 50, 389, DateTimeKind.Local).AddTicks(6352),
+                            Description = "Description for Product 1",
+                            Gender = "Male",
+                            Inventory = 10,
+                            Name = "Product 1",
+                            Price = 100m,
+                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("79b6a852-35ff-4a75-b648-2f885fe50e2c"),
+                            CategoryId = new Guid("3d4fc185-049d-4a96-851b-1d320e7dbba8"),
+                            CreatedAt = new DateTime(2024, 9, 12, 21, 21, 50, 389, DateTimeKind.Local).AddTicks(6417),
+                            Description = "Description for Product 2",
+                            Gender = "Female",
+                            Inventory = 10,
+                            Name = "Product 2",
+                            Price = 200m,
+                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("337b5cf7-2f08-48e7-a05d-530884405a42"),
+                            CategoryId = new Guid("9a17dcf5-1426-45ee-a32e-c23ee5fe40d9"),
+                            CreatedAt = new DateTime(2024, 9, 12, 21, 21, 50, 389, DateTimeKind.Local).AddTicks(6421),
+                            Description = "Description for Product 3",
+                            Gender = "Male",
+                            Inventory = 10,
+                            Name = "Product 3",
+                            Price = 300m,
+                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        });
                 });
 
             modelBuilder.Entity("KFS.src.Domain.Entities.Role", b =>
@@ -415,12 +477,12 @@ namespace KFS.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("c5ca2d56-9e04-449b-9719-a218e2a13109"),
+                            Id = new Guid("00000000-0000-0000-0000-000000000001"),
                             Address = "HCM",
-                            CreatedAt = new DateTime(2024, 9, 11, 12, 41, 3, 881, DateTimeKind.Local).AddTicks(7915),
+                            CreatedAt = new DateTime(2024, 9, 12, 21, 21, 50, 389, DateTimeKind.Local).AddTicks(3747),
                             Email = "giangnnt260703@gmail.com",
                             FullName = "Truong Giang",
-                            Password = "$2a$11$E.4SaxvujoCNxLTfEZj/q.FSPFwVetw97SSlWXALHJCK/NWjNLY2.",
+                            Password = "$2a$11$Nbcz8f3m7VROikIdEYeXs.mlcBYLNFnQXg4VubSgrDGLSTkgnAfUe",
                             Phone = "0123456789",
                             RoleId = 1,
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)

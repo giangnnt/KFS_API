@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Azure;
 using KFS.src.Application.Dto.CartDtos;
 using KFS.src.Application.Dto.ResponseDtos;
+using KFS.src.Domain.Entities;
 
 namespace KFS.src.Domain.IService
 {
@@ -15,7 +16,7 @@ namespace KFS.src.Domain.IService
         Task<ResponseDto> CreateCart(CartCreate req);
         Task<ResponseDto> UpdateCart(CartUpdate req, Guid id);
         Task<ResponseDto> DeleteCart(Guid id);
-        Task<ResponseDto> AddProductToCart(Guid cartId, Guid productId);
+        Task<ResponseDto> AddProductToCart(CartAddProduct req);
         Task<ResponseDto> RemoveProductFromCart(Guid cartId, Guid productId);
     }
 }

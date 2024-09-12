@@ -33,9 +33,9 @@ namespace KFS.src.Infrastucture.Context
 
             // Seed the Category table
             modelBuilder.Entity<Category>().HasData(
-                new Category { Id = Guid.NewGuid(), Name = "Thuần chủng nhập khẩu" },
-                new Category { Id = Guid.NewGuid(), Name = "Lai F1" },
-                new Category { Id = Guid.NewGuid(), Name = "Thuần Việt" }
+                new Category { Id = Guid.Parse("5F18BF0C-7199-462C-B023-3CCF1FD9F806"), Name = "Thuần chủng nhập khẩu" },
+                new Category { Id = Guid.Parse("3D4FC185-049D-4A96-851B-1D320E7DBBA8"), Name = "Lai F1" },
+                new Category { Id = Guid.Parse("9A17DCF5-1426-45EE-A32E-C23EE5FE40D9"), Name = "Thuần Việt" }
             );
             modelBuilder.Entity<Product>(entity =>
             {
@@ -104,6 +104,57 @@ namespace KFS.src.Infrastucture.Context
                 .HasColumnType("nvarchar(20)");
 
             });
+            modelBuilder.Entity<Product>().HasData(
+                new Product
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Product 1",
+                    Description = "Description for Product 1",
+                    Price = 100,
+                    Inventory = 10,
+                    CategoryId = Guid.Parse("5F18BF0C-7199-462C-B023-3CCF1FD9F806"),
+                    Gender = GenderEnum.Male,
+                    CreatedAt = DateTime.Now
+                },
+                new Product
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Product 2",
+                    Description = "Description for Product 2",
+                    Price = 200,
+                    Inventory = 10,
+                    CategoryId = Guid.Parse("3D4FC185-049D-4A96-851B-1D320E7DBBA8"),
+                    Gender = GenderEnum.Female,
+                    CreatedAt = DateTime.Now
+                },
+                new Product
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Product 3",
+                    Description = "Description for Product 3",
+                    Price = 300,
+                    Inventory = 10,
+                    CategoryId = Guid.Parse("9A17DCF5-1426-45EE-A32E-C23EE5FE40D9"),
+                    Gender = GenderEnum.Male,
+                    CreatedAt = DateTime.Now
+                }
+            );
+            modelBuilder.Entity<Cart>().HasData(
+                new Cart
+                {
+                    Id = Guid.Parse("37ab9331-f39a-4072-80ad-4adc3684fcec"),
+                    UserId = Guid.Parse("00000000-0000-0000-0000-000000000001"),
+                    Status = CartStatusEnum.Active,
+                    CreatedAt = DateTime.Now
+                },
+                new Cart
+                {
+                    Id = Guid.Parse("da17c01a-de60-4b46-810e-f824a1936e14"),
+                    UserId = Guid.Parse("00000000-0000-0000-0000-000000000001"),
+                    Status = CartStatusEnum.Completed,
+                    CreatedAt = DateTime.Now
+                }
+            );
         }
     }
 }
