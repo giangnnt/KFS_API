@@ -12,10 +12,12 @@ namespace KFS.src.Domain.Entities
         public Guid UserId { get; set; }
         public decimal TotalPrice { get; set; }
         public int TotalItem { get; set; }
-        public PaymentMethodEnum PaymentMethod { get; set; }
         public string ShippingAddress { get; set; } = null!;
+        public string ContactNumber { get; set; } = null!;
+        public string ContactName { get; set; } = null!;
         public int ShippingFee { get; set; }
         public float Discount { get; set; }
+        public PaymentMethodEnum PaymentMethod { get; set; }
         public DateTime EstimatedDeliveryDate { get; set; }
         public string? Note { get; set; }
         public string Currency { get; set; } = "VND";

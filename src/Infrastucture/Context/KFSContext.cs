@@ -100,7 +100,7 @@ namespace KFS.src.Infrastucture.Context
             {
                 entity.Property(entity => entity.Status)
                 .HasConversion(
-                    v => v.ToString(), 
+                    v => v.ToString(),
                     v => v != null ? (CartStatusEnum)Enum.Parse(typeof(CartStatusEnum), v) : default)
                 .HasColumnType("nvarchar(20)");
 
