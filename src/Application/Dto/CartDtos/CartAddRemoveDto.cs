@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace KFS.src.Application.Dto.CartDtos
 {
-    public class CartAddProduct
+    public class CartAddRemoveDto
     {
         public Guid CartId { get; set; }
         public Guid ProductId { get; set; }

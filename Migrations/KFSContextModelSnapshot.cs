@@ -61,7 +61,7 @@ namespace KFS.Migrations
                         new
                         {
                             Id = new Guid("37ab9331-f39a-4072-80ad-4adc3684fcec"),
-                            CreatedAt = new DateTime(2024, 9, 12, 21, 21, 50, 389, DateTimeKind.Local).AddTicks(6465),
+                            CreatedAt = new DateTime(2024, 9, 13, 14, 3, 44, 473, DateTimeKind.Local).AddTicks(3356),
                             Currency = "VND",
                             Status = "Active",
                             TotalItem = 0,
@@ -72,7 +72,7 @@ namespace KFS.Migrations
                         new
                         {
                             Id = new Guid("da17c01a-de60-4b46-810e-f824a1936e14"),
-                            CreatedAt = new DateTime(2024, 9, 12, 21, 21, 50, 389, DateTimeKind.Local).AddTicks(6468),
+                            CreatedAt = new DateTime(2024, 9, 13, 14, 3, 44, 473, DateTimeKind.Local).AddTicks(3358),
                             Currency = "VND",
                             Status = "Completed",
                             TotalItem = 0,
@@ -347,9 +347,9 @@ namespace KFS.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("68ac40db-f025-409d-88d6-76cd26892c9b"),
+                            Id = new Guid("2a9394e2-52b3-46d5-8a33-af4d6020e440"),
                             CategoryId = new Guid("5f18bf0c-7199-462c-b023-3ccf1fd9f806"),
-                            CreatedAt = new DateTime(2024, 9, 12, 21, 21, 50, 389, DateTimeKind.Local).AddTicks(6352),
+                            CreatedAt = new DateTime(2024, 9, 13, 14, 3, 44, 473, DateTimeKind.Local).AddTicks(3283),
                             Description = "Description for Product 1",
                             Gender = "Male",
                             Inventory = 10,
@@ -359,9 +359,9 @@ namespace KFS.Migrations
                         },
                         new
                         {
-                            Id = new Guid("79b6a852-35ff-4a75-b648-2f885fe50e2c"),
+                            Id = new Guid("8657ed40-1b9d-44e2-800d-40bb1a20af98"),
                             CategoryId = new Guid("3d4fc185-049d-4a96-851b-1d320e7dbba8"),
-                            CreatedAt = new DateTime(2024, 9, 12, 21, 21, 50, 389, DateTimeKind.Local).AddTicks(6417),
+                            CreatedAt = new DateTime(2024, 9, 13, 14, 3, 44, 473, DateTimeKind.Local).AddTicks(3297),
                             Description = "Description for Product 2",
                             Gender = "Female",
                             Inventory = 10,
@@ -371,9 +371,9 @@ namespace KFS.Migrations
                         },
                         new
                         {
-                            Id = new Guid("337b5cf7-2f08-48e7-a05d-530884405a42"),
+                            Id = new Guid("f3b3b3b4-1b9d-44e2-800d-40bb1a20af98"),
                             CategoryId = new Guid("9a17dcf5-1426-45ee-a32e-c23ee5fe40d9"),
-                            CreatedAt = new DateTime(2024, 9, 12, 21, 21, 50, 389, DateTimeKind.Local).AddTicks(6421),
+                            CreatedAt = new DateTime(2024, 9, 13, 14, 3, 44, 473, DateTimeKind.Local).AddTicks(3302),
                             Description = "Description for Product 3",
                             Gender = "Male",
                             Inventory = 10,
@@ -479,10 +479,10 @@ namespace KFS.Migrations
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000001"),
                             Address = "HCM",
-                            CreatedAt = new DateTime(2024, 9, 12, 21, 21, 50, 389, DateTimeKind.Local).AddTicks(3747),
+                            CreatedAt = new DateTime(2024, 9, 13, 14, 3, 44, 473, DateTimeKind.Local).AddTicks(1053),
                             Email = "giangnnt260703@gmail.com",
                             FullName = "Truong Giang",
-                            Password = "$2a$11$Nbcz8f3m7VROikIdEYeXs.mlcBYLNFnQXg4VubSgrDGLSTkgnAfUe",
+                            Password = "$2a$11$yd13oInjw7fKU8sbznuO...qN9oV5e5pNs6Ie9q.PYu8R2V2HQatq",
                             Phone = "0123456789",
                             RoleId = 1,
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)

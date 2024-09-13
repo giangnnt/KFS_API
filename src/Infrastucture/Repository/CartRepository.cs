@@ -27,7 +27,7 @@ namespace KFS.src.Infrastucture.Repository
         public async Task<bool> DeleteCart(Guid id)
         {
             var cart = await _context.Carts.FirstOrDefaultAsync(x => x.Id == id);
-            if(cart == null) throw new Exception("Cart not found");
+            if (cart == null) throw new Exception("Cart not found");
             _context.Carts.Remove(cart);
             int result = await _context.SaveChangesAsync();
             return result > 0;
@@ -51,23 +51,29 @@ namespace KFS.src.Infrastucture.Repository
         public async Task<bool> UpdateCart(Cart cart)
         {
             cart.UpdatedAt = DateTime.Now;
-            _context.Carts.Update(cart); // Đánh dấu giỏ hàng là đã thay đổi
-        // Đảm bảo các mục giỏ hàng cũng được theo dõi
-        foreach (var item in cart.CartItems)
-        {
-            _context.Add(item);
-            _context.Entry(item).State = EntityState.Modified;
+            _context.Carts.Update(cart);
+
+            foreach (var item in cart.CartItems)
+            {
+                //if item is not in the database
+                if (_context.Entry(item).State == EntityState.Detached)
+                {
+                    _context.CartItems.Attach(item);
+                    _context.Entry(item).State = EntityState.Added;
+                }
+            }
+
+            try
+            {
+                int result = await _context.SaveChangesAsync();
+                return result > 0;
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return false;
+            }
         }
-        try
-        {
-            int result = await _context.SaveChangesAsync();
-            return result > 0;
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            // Xử lý lỗi đồng bộ nếu cần
-            return false;
-        }
-        }
+
+
     }
 }

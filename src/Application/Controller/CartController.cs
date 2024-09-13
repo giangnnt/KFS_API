@@ -84,7 +84,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [HttpPost("add-product")]
-        public async Task<IActionResult> AddProductToCart(CartAddProduct req)
+        public async Task<IActionResult> AddProductToCart(CartAddRemoveDto req)
         {
             try
             {
@@ -96,18 +96,18 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
-        // [HttpDelete("{cartId}/products/{productId}")]
-        // public async Task<IActionResult> RemoveProductFromCart(Guid cartId, Guid productId)
-        // {
-        //     try
-        //     {
-        //         var result = await _cartService.RemoveProductFromCart(cartId, productId);
-        //         return Ok(result);
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         return BadRequest(ex.Message);
-        //     }
-        // }
+        [HttpPost("remove-product")]
+        public async Task<IActionResult> RemoveProductFromCart(CartAddRemoveDto req)
+        {
+            try
+            {
+                var result = await _cartService.RemoveProductFromCart(req);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
