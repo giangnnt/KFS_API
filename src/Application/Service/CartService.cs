@@ -19,22 +19,24 @@ namespace KFS.src.Application.Service
         private readonly ICartItemRepository _cartItemRepository;
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
-        public CartService(ICartRepository cartRepository, IProductRepository productRepository, ICartItemRepository cartItemRepository, IUserRepository userRepository, IMapper mapper)
+        private readonly KFSContext _context;
+        public CartService(ICartRepository cartRepository, IProductRepository productRepository, ICartItemRepository cartItemRepository, IUserRepository userRepository, IMapper mapper, KFSContext context)
         {
             _cartRepository = cartRepository;
             _productRepository = productRepository;
             _cartItemRepository = cartItemRepository;
             _userRepository = userRepository;
             _mapper = mapper;
+            _context = context;
         }
-        public async Task<ResponseDto> AddProductToCart(CartAddProduct req)
+        public async Task<ResponseDto> AddProductToCart(CartAddRemoveDto req)
         {
             var response = new ResponseDto();
             try
             {
                 var cart = await _cartRepository.GetCartById(req.CartId);
                 var product = await _productRepository.GetProductById(req.ProductId);
-                
+
                 //check if any cart item exists
                 var cartItem = cart.CartItems.FirstOrDefault(x => x.ProductId == req.ProductId);
                 if (cartItem == null)
@@ -50,7 +52,6 @@ namespace KFS.src.Application.Service
                     //create new cart item
                     cartItem = new CartItem
                     {
-                        Id = Guid.NewGuid(),
                         CartId = req.CartId,
                         ProductId = req.ProductId,
                         Quantity = req.Quantity,
@@ -233,9 +234,64 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public async Task<ResponseDto> RemoveProductFromCart(Guid cartId, Guid productId)
+        public async Task<ResponseDto> RemoveProductFromCart(CartAddRemoveDto req)
         {
-            throw new NotImplementedException();
+            var response = new ResponseDto();
+            try
+            {
+                var cart = await _cartRepository.GetCartById(req.CartId);
+                var product = await _productRepository.GetProductById(req.ProductId);
+                //check if any cart item exists
+                var cartItem = cart.CartItems.FirstOrDefault(x => x.ProductId == req.ProductId);
+                if (cartItem == null)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Product not found in cart";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                //check if req uantity is equal to cart item quantity
+                if(req.Quantity == cartItem.Quantity)
+                {
+                    //remove cart item
+                    cart.CartItems.Remove(cartItem);
+                }
+
+                //check if quantity is greater than cart item quantity
+                if (req.Quantity > cartItem.Quantity)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Quantity is greater than cart item quantity";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                //update cart item
+                cartItem.Quantity -= req.Quantity;
+                cartItem.Price = product.Price * cartItem.Quantity;
+                //update cart
+                cart.TotalItem -= req.Quantity;
+                cart.TotalPrice -= product.Price * req.Quantity;
+                var result = await _cartRepository.UpdateCart(cart);
+                //check result
+                if (result)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Product removed from cart successfully";
+                    response.IsSuccess = true;
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Product removal from cart failed";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch
+            {
+                throw;
+            }
         }
 
         public async Task<ResponseDto> UpdateCart(CartUpdate req, Guid id)

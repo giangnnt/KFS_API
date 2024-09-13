@@ -39,6 +39,7 @@ namespace KFS.src.Infrastucture.Context
             );
             modelBuilder.Entity<Product>(entity =>
             {
+                entity.Property(entity => entity.Id).ValueGeneratedOnAdd();
                 entity.Property(entity => entity.Gender).HasConversion(v => v.ToString(), v => v != null ? (GenderEnum)Enum.Parse(typeof(GenderEnum), v) : default)
                 .HasColumnType("nvarchar(20)");
             });
@@ -107,7 +108,7 @@ namespace KFS.src.Infrastucture.Context
             modelBuilder.Entity<Product>().HasData(
                 new Product
                 {
-                    Id = Guid.NewGuid(),
+                    Id = Guid.Parse("2a9394e2-52b3-46d5-8a33-af4d6020e440"),
                     Name = "Product 1",
                     Description = "Description for Product 1",
                     Price = 100,
@@ -118,7 +119,7 @@ namespace KFS.src.Infrastucture.Context
                 },
                 new Product
                 {
-                    Id = Guid.NewGuid(),
+                    Id = Guid.Parse("8657ed40-1b9d-44e2-800d-40bb1a20af98"),
                     Name = "Product 2",
                     Description = "Description for Product 2",
                     Price = 200,
@@ -129,7 +130,7 @@ namespace KFS.src.Infrastucture.Context
                 },
                 new Product
                 {
-                    Id = Guid.NewGuid(),
+                    Id = Guid.Parse("f3b3b3b4-1b9d-44e2-800d-40bb1a20af98"),
                     Name = "Product 3",
                     Description = "Description for Product 3",
                     Price = 300,
