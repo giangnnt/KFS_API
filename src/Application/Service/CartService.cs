@@ -17,18 +17,14 @@ namespace KFS.src.Application.Service
     {
         private readonly ICartRepository _cartRepository;
         private readonly IProductRepository _productRepository;
-        private readonly ICartItemRepository _cartItemRepository;
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
-        private readonly KFSContext _context;
-        public CartService(ICartRepository cartRepository, IProductRepository productRepository, ICartItemRepository cartItemRepository, IUserRepository userRepository, IMapper mapper, KFSContext context)
+        public CartService(ICartRepository cartRepository, IProductRepository productRepository, IUserRepository userRepository, IMapper mapper)
         {
             _cartRepository = cartRepository;
             _productRepository = productRepository;
-            _cartItemRepository = cartItemRepository;
             _userRepository = userRepository;
             _mapper = mapper;
-            _context = context;
         }
         public async Task<ResponseDto> AddProductToCart(CartAddRemoveDto req)
         {
@@ -57,6 +53,7 @@ namespace KFS.src.Application.Service
                         ProductId = req.ProductId,
                         Quantity = req.Quantity,
                         Price = product.Price * req.Quantity,
+                        Product = product
                     };
                     cart.CartItems.Add(cartItem);
                 }
@@ -108,19 +105,20 @@ namespace KFS.src.Application.Service
             {
                 //map cart
                 var mappedCart = _mapper.Map<Cart>(req);
-                //check if user id is empty
-                if (req.UserId == Guid.Empty)
+                //check if user exist
+                var user = await _userRepository.GetUserById(req.UserId);
+                if (user == null)
                 {
-                    response.StatusCode = 400;
-                    response.Message = "User Id is required";
+                    response.StatusCode = 404;
+                    response.Message = "User not found";
                     response.IsSuccess = false;
                     return response;
                 }
-                var User = await _userRepository.GetUserById(req.UserId);
+                
                 //map user
-                if (User != null)
+                if (user != null)
                 {
-                    mappedCart.User = User;
+                    mappedCart.User = user;
                 }
                 var userCarts = await _cartRepository.GetCartByUserId(req.UserId);
                 //check if cart status is null
@@ -333,11 +331,10 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
                     return response;
                 }
-                //map cart
-                var mappedCart = _mapper.Map(req, cart);
+
                 if (req.Status == CartStatusEnum.Active)
                 {
-                    var userCarts = await _cartRepository.GetCartByUserId(cart.UserId);
+                    var userCarts = await _cartRepository.GetCarts();
                     //check if user has an active cart
                     foreach (var userCart in userCarts)
                     {
@@ -350,6 +347,10 @@ namespace KFS.src.Application.Service
                         }
                     }
                 }
+                
+                //map cart
+                var mappedCart = _mapper.Map(req, cart);
+                
                 //update cart
                 var result = await _cartRepository.UpdateCart(mappedCart);
                 if (result)
