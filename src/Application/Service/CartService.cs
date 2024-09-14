@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using KFS.src.Application.Dto.CartDtos;
 using KFS.src.Application.Dto.ResponseDtos;
+using KFS.src.Application.Enum;
 using KFS.src.Domain.Entities;
 using KFS.src.Domain.IRepository;
 using KFS.src.Domain.IService;
@@ -76,7 +77,7 @@ namespace KFS.src.Application.Service
                 //update cart
                 cart.TotalItem += req.Quantity;
                 cart.TotalPrice += product.Price * req.Quantity;
-                var result = await _cartRepository.UpdateCart(cart);
+                var result = await _cartRepository.AddRemoveCartItem(cart);
                 //check result
                 if (result)
                 {
@@ -121,6 +122,31 @@ namespace KFS.src.Application.Service
                 {
                     mappedCart.User = User;
                 }
+                var userCarts = await _cartRepository.GetCartByUserId(req.UserId);
+                //check if cart status is null
+                if (req.Status == 0)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Cart status is required";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                //check if user has an active cart
+                if (req.Status == CartStatusEnum.Active)
+                {
+                    //check if user has an active cart
+                    foreach (var userCart in userCarts)
+                    {
+                        if (userCart.Status == CartStatusEnum.Active)
+                        {
+                            response.StatusCode = 400;
+                            response.Message = "User already has an active cart";
+                            response.IsSuccess = false;
+                            return response;
+                        }
+                    }
+                }
+                mappedCart.Status = req.Status;
                 var result = await _cartRepository.CreateCart(mappedCart);
                 if (result)
                 {
@@ -251,7 +277,7 @@ namespace KFS.src.Application.Service
                     return response;
                 }
                 //check if req uantity is equal to cart item quantity
-                if(req.Quantity == cartItem.Quantity)
+                if (req.Quantity == cartItem.Quantity)
                 {
                     //remove cart item
                     cart.CartItems.Remove(cartItem);
@@ -309,6 +335,21 @@ namespace KFS.src.Application.Service
                 }
                 //map cart
                 var mappedCart = _mapper.Map(req, cart);
+                if (req.Status == CartStatusEnum.Active)
+                {
+                    var userCarts = await _cartRepository.GetCartByUserId(cart.UserId);
+                    //check if user has an active cart
+                    foreach (var userCart in userCarts)
+                    {
+                        if (userCart.Status == CartStatusEnum.Active)
+                        {
+                            response.StatusCode = 400;
+                            response.Message = "User already has an active cart";
+                            response.IsSuccess = false;
+                            return response;
+                        }
+                    }
+                }
                 //update cart
                 var result = await _cartRepository.UpdateCart(mappedCart);
                 if (result)

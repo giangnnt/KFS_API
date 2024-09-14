@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using KFS.src.Application.Enum;
+using KFS.src.Domain.Entities;
 
-namespace KFS.src.Domain.Entities
+namespace KFS.src.Application.Dto.OrderDtos
 {
-    public class Order
+    public class OrderDto
     {
         public Guid Id { get; set; }
         public Guid UserId { get; set; }
@@ -24,7 +25,6 @@ namespace KFS.src.Domain.Entities
         public OrderStatusEnum Status { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-        public User User { get; set; } = null!;
         public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
         public Payment? Payment { get; set; }
     }

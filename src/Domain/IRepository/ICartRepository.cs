@@ -13,5 +13,7 @@ namespace KFS.src.Domain.IRepository
         Task<bool> CreateCart(Cart cart);
         Task<bool> UpdateCart(Cart cart);
         Task<bool> DeleteCart(Guid id);
+        Task<IEnumerable<Cart>> GetCartByUserId(Guid userId);
+        Task<bool> AddRemoveCartItem(Cart cart);
     }
 }
