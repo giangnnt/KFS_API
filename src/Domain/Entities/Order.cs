@@ -16,9 +16,9 @@ namespace KFS.src.Domain.Entities
         public string ContactNumber { get; set; } = null!;
         public string ContactName { get; set; } = null!;
         public int ShippingFee { get; set; }
-        public float Discount { get; set; }
+        public int Discount { get; set; }
         public PaymentMethodEnum PaymentMethod { get; set; }
-        public DateTime EstimatedDeliveryDate { get; set; }
+        public string? EstimatedDeliveryDate { get; set; }
         public string? Note { get; set; }
         public string Currency { get; set; } = "VND";
         public OrderStatusEnum Status { get; set; }

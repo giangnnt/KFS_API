@@ -33,7 +33,8 @@ namespace KFS.src.Application.Dto.CartDtos
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<CartCreate, Cart>()
             .ForMember(dest => dest.User, opt => opt.Ignore())
-            .ForMember(dest => dest.CartItems, opt => opt.Ignore());
+            .ForMember(dest => dest.CartItems, opt => opt.Ignore())
+            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<CartUpdate, Cart>()
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
         }

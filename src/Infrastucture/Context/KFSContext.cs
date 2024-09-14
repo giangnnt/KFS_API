@@ -31,80 +31,20 @@ namespace KFS.src.Infrastucture.Context
         {
             base.OnModelCreating(modelBuilder);
 
-            // Seed the Category table
+            //seed category
             modelBuilder.Entity<Category>().HasData(
                 new Category { Id = Guid.Parse("5F18BF0C-7199-462C-B023-3CCF1FD9F806"), Name = "Thuần chủng nhập khẩu" },
                 new Category { Id = Guid.Parse("3D4FC185-049D-4A96-851B-1D320E7DBBA8"), Name = "Lai F1" },
                 new Category { Id = Guid.Parse("9A17DCF5-1426-45EE-A32E-C23EE5FE40D9"), Name = "Thuần Việt" }
             );
+            //config product
             modelBuilder.Entity<Product>(entity =>
             {
                 entity.Property(entity => entity.Id).ValueGeneratedOnAdd();
                 entity.Property(entity => entity.Gender).HasConversion(v => v.ToString(), v => v != null ? (GenderEnum)Enum.Parse(typeof(GenderEnum), v) : default)
                 .HasColumnType("nvarchar(20)");
             });
-            // Seed the Role table
-            modelBuilder.Entity<Role>().HasData(
-                new Role
-                {
-                    RoleId = RoleConst.ADMIN_ID,
-                    Name = RoleConst.ADMIN
-                },
-                new Role
-                {
-                    RoleId = RoleConst.MANAGER_ID,
-                    Name = RoleConst.MANAGER
-                },
-                new Role
-                {
-                    RoleId = RoleConst.STAFF_ID,
-                    Name = RoleConst.STAFF
-                },
-                new Role
-                {
-                    RoleId = RoleConst.CUSTOMER_ID,
-                    Name = RoleConst.CUSTOMER
-                },
-                new Role
-                {
-                    RoleId = RoleConst.GUEST_ID,
-                    Name = RoleConst.GUEST
-                }
-            );
-            // Seed the User table
-            modelBuilder.Entity<User>().HasData(
-                new User
-                {
-                    Id = Guid.Parse("00000000-0000-0000-0000-000000000001"),
-                    FullName = "Truong Giang",
-                    Email = "giangnnt260703@gmail.com",
-                    RoleId = RoleConst.ADMIN_ID,
-                    Password = BCrypt.Net.BCrypt.HashPassword("123456"),
-                    Phone = "0123456789",
-                    Address = "HCM",
-                    CreatedAt = DateTime.Now,
-                }
-                // new User
-                // {
-                //     Id = Guid.NewGuid(),
-                //     FullName = "Jane Smith",
-                //     Email
-                // },
-                // new User
-                // {
-                //     Id = Guid.NewGuid(),
-                //     FullName = "Mike Johnson"
-                // }
-            );
-            modelBuilder.Entity<Cart>(entity =>
-            {
-                entity.Property(entity => entity.Status)
-                .HasConversion(
-                    v => v.ToString(),
-                    v => v != null ? (CartStatusEnum)Enum.Parse(typeof(CartStatusEnum), v) : default)
-                .HasColumnType("nvarchar(20)");
-
-            });
+            //seed product
             modelBuilder.Entity<Product>().HasData(
                 new Product
                 {
@@ -140,6 +80,70 @@ namespace KFS.src.Infrastucture.Context
                     CreatedAt = DateTime.Now
                 }
             );
+            //seed role
+            modelBuilder.Entity<Role>().HasData(
+                new Role
+                {
+                    RoleId = RoleConst.ADMIN_ID,
+                    Name = RoleConst.ADMIN
+                },
+                new Role
+                {
+                    RoleId = RoleConst.MANAGER_ID,
+                    Name = RoleConst.MANAGER
+                },
+                new Role
+                {
+                    RoleId = RoleConst.STAFF_ID,
+                    Name = RoleConst.STAFF
+                },
+                new Role
+                {
+                    RoleId = RoleConst.CUSTOMER_ID,
+                    Name = RoleConst.CUSTOMER
+                },
+                new Role
+                {
+                    RoleId = RoleConst.GUEST_ID,
+                    Name = RoleConst.GUEST
+                }
+            );
+            //seed user
+            modelBuilder.Entity<User>().HasData(
+                new User
+                {
+                    Id = Guid.Parse("00000000-0000-0000-0000-000000000001"),
+                    FullName = "Truong Giang",
+                    Email = "giangnnt260703@gmail.com",
+                    RoleId = RoleConst.ADMIN_ID,
+                    Password = BCrypt.Net.BCrypt.HashPassword("123456"),
+                    Phone = "0123456789",
+                    Address = "HCM",
+                    CreatedAt = DateTime.Now,
+                }
+                // new User
+                // {
+                //     Id = Guid.NewGuid(),
+                //     FullName = "Jane Smith",
+                //     Email
+                // },
+                // new User
+                // {
+                //     Id = Guid.NewGuid(),
+                //     FullName = "Mike Johnson"
+                // }
+            );
+            //config cart
+            modelBuilder.Entity<Cart>(entity =>
+            {
+                entity.Property(entity => entity.Status)
+                .HasConversion(
+                    v => v.ToString(),
+                    v => v != null ? (CartStatusEnum)Enum.Parse(typeof(CartStatusEnum), v) : default)
+                .HasColumnType("nvarchar(20)");
+
+            });
+            //seed cart
             modelBuilder.Entity<Cart>().HasData(
                 new Cart
                 {
@@ -156,6 +160,30 @@ namespace KFS.src.Infrastucture.Context
                     CreatedAt = DateTime.Now
                 }
             );
+            //config cart item
+            modelBuilder.Entity<CartItem>(entity =>
+            {
+                entity.Property(entity => entity.Id).ValueGeneratedOnAdd();
+            });
+            //config order item
+            modelBuilder.Entity<OrderItem>(entity =>
+            {
+                entity.Property(entity => entity.Id).ValueGeneratedOnAdd();
+            });
+            //config order
+            modelBuilder.Entity<Order>(entity =>
+            {
+                entity.Property(entity => entity.Id).ValueGeneratedOnAdd();
+                entity.Property(entity => entity.Status)
+                .HasConversion(
+                    v => v.ToString(),
+                    v => v != null ? (OrderStatusEnum)Enum.Parse(typeof(OrderStatusEnum), v) : default);
+                
+                entity.Property(entity => entity.PaymentMethod)
+                .HasConversion(
+                    v => v.ToString(),
+                    v => v != null ? (PaymentMethodEnum)Enum.Parse(typeof(PaymentMethodEnum), v) : default);
+            });
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using KFS.src.Application.Dto.ProductDtos;
 using KFS.src.Domain.Entities;
 
 namespace KFS.src.Application.Dto.CartItemDtos
@@ -14,7 +15,7 @@ namespace KFS.src.Application.Dto.CartItemDtos
         public Guid ProductId { get; set; }
         public int Quantity { get; set; }
         public decimal Price { get; set; }
-        public Product Product { get; set; } = null!;
+        public ProductDto Product { get; set; } = null!;
     }
     public class CartItemProfile : Profile
     {
