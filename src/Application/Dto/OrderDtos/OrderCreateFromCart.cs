@@ -13,11 +13,9 @@ namespace KFS.src.Application.Dto.OrderDtos
         public string ShippingAddress { get; set; } = null!;
         public string ContactNumber { get; set; } = null!;
         public string ContactName { get; set; } = null!;
-        public int ShippingFee { get; set; }
         public float Discount { get; set; }
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public PaymentMethodEnum PaymentMethod { get; set; }
-        public string? EstimatedDeliveryDate { get; set; }
         public string? Note { get; set; }
         public string Currency { get; set; } = "VND";
     }

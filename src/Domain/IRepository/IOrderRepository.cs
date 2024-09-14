@@ -13,5 +13,6 @@ namespace KFS.src.Domain.IRepository
         Task<bool> CreateOrder(Order order);
         Task<bool> UpdateOrder(Order order);
         Task<bool> DeleteOrder(Guid orderId);
+        Task<IEnumerable<Order>> GetOrderByUserId(Guid userId);
     }
 }
