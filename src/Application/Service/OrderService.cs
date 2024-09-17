@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using KFS.src.Application.Dto.OrderDtos;
 using KFS.src.Application.Dto.ResponseDtos;
+using KFS.src.Application.Dto.VNPay;
 using KFS.src.Application.Enum;
 using KFS.src.Domain.Entities;
 using KFS.src.Domain.IRepository;
@@ -18,13 +19,17 @@ namespace KFS.src.Application.Service
         private readonly IOrderRepository _orderRepository;
         private readonly IUserRepository _userRepository;
         private readonly ICartRepository _cartRepository;
+        private readonly IVNPayService _vNPayService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper _mapper;
-        public OrderService(IOrderRepository orderRepository, IMapper mapper, IUserRepository userRepository, ICartRepository cartRepository)
+        public OrderService(IOrderRepository orderRepository, IMapper mapper, IUserRepository userRepository, ICartRepository cartRepository, IVNPayService vNPayService, IHttpContextAccessor httpContextAccessor)
         {
             _orderRepository = orderRepository;
             _mapper = mapper;
             _userRepository = userRepository;
             _cartRepository = cartRepository;
+            _vNPayService = vNPayService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<ResponseDto> AcceptOrder(Guid id)
@@ -127,35 +132,69 @@ namespace KFS.src.Application.Service
                 //set order status
                 mappedOrder.Status = OrderStatusEnum.Pending;
 
+                //set id order 
+                mappedOrder.Id = Guid.NewGuid();
+
                 //create order
                 var result = await _orderRepository.CreateOrder(mappedOrder);
 
-                //set cart status to completed
-                cart.Status = CartStatusEnum.Completed;
-                var result1 = await _cartRepository.UpdateCart(cart);
-                if (!result1)
+                string data = String.Empty;
+                var httpContext = _httpContextAccessor.HttpContext;
+                //check payment method
+                if (mappedOrder.PaymentMethod == PaymentMethodEnum.VNPAY)
                 {
-                    response.StatusCode = 400;
-                    response.Message = "Cart status update failed";
-                    response.IsSuccess = false;
-                    return response;
+                    //check context
+                    if (httpContext == null)
+                    {
+                        response.StatusCode = 500;
+                        response.Message = "HttpContext is null";
+                        response.IsSuccess = false;
+                        return response;
+                    }
+
+                    //create payment url
+                    var paymentUrl = _vNPayService.CreatePaymentUrl(httpContext, new VNPayRequestModel
+                    {
+                        Amount = (double)mappedOrder.TotalPrice,
+                        CreateDate = DateTime.Now,
+                        Description = "Payment for order" + mappedOrder.Id.ToString(),
+                        FullName = mappedOrder.ContactName,
+                        OrderId = mappedOrder.Id
+                    });
+                    data = paymentUrl;
+                }
+                else
+                {
+                    data = "COD";
                 }
 
                 //check result
                 if (result)
                 {
+                    //set cart status to completed
+                    cart.Status = CartStatusEnum.Completed;
                     response.StatusCode = 201;
                     response.Message = "Order created successfully";
                     response.IsSuccess = true;
-                    return response;
+                    response.Result = new ResultDto
+                    {
+                        Data = data
+                    };
                 }
                 else
                 {
+                    //set cart status to Deactive
+                    cart.Status = CartStatusEnum.Deactive;
                     response.StatusCode = 400;
                     response.Message = "Order creation failed";
                     response.IsSuccess = false;
-                    return response;
+                    response.Result = new ResultDto
+                    {
+                        Data = data
+                    };
                 }
+                var result1 = await _cartRepository.UpdateCart(cart);
+                return response;
             }
             catch
             {

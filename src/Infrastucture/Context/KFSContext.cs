@@ -173,7 +173,6 @@ namespace KFS.src.Infrastucture.Context
             //config order
             modelBuilder.Entity<Order>(entity =>
             {
-                entity.Property(entity => entity.Id).ValueGeneratedOnAdd();
                 entity.Property(entity => entity.Status)
                 .HasConversion(
                     v => v.ToString(),

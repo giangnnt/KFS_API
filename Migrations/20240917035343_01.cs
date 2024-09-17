@@ -298,23 +298,23 @@ namespace KFS.Migrations
                 columns: new[] { "Id", "Age", "CategoryId", "Color", "CreatedAt", "Description", "FeedingVolumn", "FilterRate", "Gender", "Inventory", "Length", "Name", "Origin", "Price", "Species", "UpdatedAt" },
                 values: new object[,]
                 {
-                    { new Guid("2a9394e2-52b3-46d5-8a33-af4d6020e440"), null, new Guid("5f18bf0c-7199-462c-b023-3ccf1fd9f806"), null, new DateTime(2024, 9, 14, 19, 7, 44, 105, DateTimeKind.Local).AddTicks(9735), "Description for Product 1", null, null, "Male", 10, null, "Product 1", null, 100m, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { new Guid("8657ed40-1b9d-44e2-800d-40bb1a20af98"), null, new Guid("3d4fc185-049d-4a96-851b-1d320e7dbba8"), null, new DateTime(2024, 9, 14, 19, 7, 44, 105, DateTimeKind.Local).AddTicks(9752), "Description for Product 2", null, null, "Female", 10, null, "Product 2", null, 200m, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { new Guid("f3b3b3b4-1b9d-44e2-800d-40bb1a20af98"), null, new Guid("9a17dcf5-1426-45ee-a32e-c23ee5fe40d9"), null, new DateTime(2024, 9, 14, 19, 7, 44, 105, DateTimeKind.Local).AddTicks(9756), "Description for Product 3", null, null, "Male", 10, null, "Product 3", null, 300m, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { new Guid("2a9394e2-52b3-46d5-8a33-af4d6020e440"), null, new Guid("5f18bf0c-7199-462c-b023-3ccf1fd9f806"), null, new DateTime(2024, 9, 17, 10, 53, 42, 869, DateTimeKind.Local).AddTicks(5409), "Description for Product 1", null, null, "Male", 10, null, "Product 1", null, 100m, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { new Guid("8657ed40-1b9d-44e2-800d-40bb1a20af98"), null, new Guid("3d4fc185-049d-4a96-851b-1d320e7dbba8"), null, new DateTime(2024, 9, 17, 10, 53, 42, 869, DateTimeKind.Local).AddTicks(5425), "Description for Product 2", null, null, "Female", 10, null, "Product 2", null, 200m, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { new Guid("f3b3b3b4-1b9d-44e2-800d-40bb1a20af98"), null, new Guid("9a17dcf5-1426-45ee-a32e-c23ee5fe40d9"), null, new DateTime(2024, 9, 17, 10, 53, 42, 869, DateTimeKind.Local).AddTicks(5427), "Description for Product 3", null, null, "Male", 10, null, "Product 3", null, 300m, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
                 });
 
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "Address", "Avatar", "CreatedAt", "Email", "FullName", "Password", "Phone", "RoleId", "UpdatedAt" },
-                values: new object[] { new Guid("00000000-0000-0000-0000-000000000001"), "HCM", null, new DateTime(2024, 9, 14, 19, 7, 44, 221, DateTimeKind.Local).AddTicks(8222), "giangnnt260703@gmail.com", "Truong Giang", "$2a$11$m0p68IwFAjeFLK/zQeey2Os.v/vc/ub6K0nx.c8K0YBy5kjVcKdOm", "0123456789", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
+                values: new object[] { new Guid("00000000-0000-0000-0000-000000000001"), "HCM", null, new DateTime(2024, 9, 17, 10, 53, 42, 986, DateTimeKind.Local).AddTicks(9056), "giangnnt260703@gmail.com", "Truong Giang", "$2a$11$IRIaZR3oIDRa8pszu7q2ReKaA/C398dVRtCoo5zbFZwZxwxPUGTne", "0123456789", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
 
             migrationBuilder.InsertData(
                 table: "Carts",
                 columns: new[] { "Id", "CreatedAt", "Currency", "Status", "TotalItem", "TotalPrice", "UpdatedAt", "UserId" },
                 values: new object[,]
                 {
-                    { new Guid("37ab9331-f39a-4072-80ad-4adc3684fcec"), new DateTime(2024, 9, 14, 19, 7, 44, 222, DateTimeKind.Local).AddTicks(378), "VND", "Active", 0, 0m, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new Guid("00000000-0000-0000-0000-000000000001") },
-                    { new Guid("da17c01a-de60-4b46-810e-f824a1936e14"), new DateTime(2024, 9, 14, 19, 7, 44, 222, DateTimeKind.Local).AddTicks(384), "VND", "Completed", 0, 0m, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new Guid("00000000-0000-0000-0000-000000000001") }
+                    { new Guid("37ab9331-f39a-4072-80ad-4adc3684fcec"), new DateTime(2024, 9, 17, 10, 53, 42, 987, DateTimeKind.Local).AddTicks(1419), "VND", "Active", 0, 0m, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new Guid("00000000-0000-0000-0000-000000000001") },
+                    { new Guid("da17c01a-de60-4b46-810e-f824a1936e14"), new DateTime(2024, 9, 17, 10, 53, 42, 987, DateTimeKind.Local).AddTicks(1430), "VND", "Completed", 0, 0m, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new Guid("00000000-0000-0000-0000-000000000001") }
                 });
 
             migrationBuilder.CreateIndex(
