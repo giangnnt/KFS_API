@@ -7,12 +7,13 @@ namespace KFS.src.Application.Dto.VNPay
 {
     public class VNPayResponseModel
     {
+        public string PaymentId { get; set; } = null!;
         public bool Success { get; set; }
+        public string TransactionStatus { get; set; } = null!;
+        public string OrderId { get; set; } = null!;
+        public string Amount { get; set; } = null!;
         public string PaymentMethod { get; set; } = null!;
         public string OrderDesription { get; set; } = null!;
-        public string OrderId { get; set; } = null!;
-        public string PaymentId { get; set; } = null!;
-        public string TransactionId { get; set; } = null!;
         public string Token { get; set; } = null!;
         public string VnPayResponseCode { get; set; } = null!;
     }

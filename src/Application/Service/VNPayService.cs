@@ -22,7 +22,7 @@ namespace KFS.src.Application.Service
             vnpay.AddRequestData("vnp_Version", _config["VNPay:Version"]);
             vnpay.AddRequestData("vnp_Command", _config["VNPay:Command"]);
             vnpay.AddRequestData("vnp_TmnCode", _config["VNPay:TmnCode"]);
-            vnpay.AddRequestData("vnp_Amount", request.Amount.ToString());
+            vnpay.AddRequestData("vnp_Amount", (request.Amount*100).ToString());
             vnpay.AddRequestData("vnp_CreateDate", request.CreateDate.ToString("yyyyMMddHHmmss"));
             vnpay.AddRequestData("vnp_CurrCode", _config["VNPay:CurrCode"]);
             vnpay.AddRequestData("vnp_IpAddr", Utils.GetIpAddress(context));
@@ -30,7 +30,7 @@ namespace KFS.src.Application.Service
             vnpay.AddRequestData("vnp_OrderInfo", "Payment for order" + request.OrderId.ToString());
             vnpay.AddRequestData("vnp_OrderType", "billpayment");
             vnpay.AddRequestData("vnp_ReturnUrl", _config["VNPay:PaymentBackReturnUrl"]);
-            vnpay.AddRequestData("vnp_TxnRef", tick);
+            vnpay.AddRequestData("vnp_TxnRef", request.OrderId.ToString());
             var paymentUrl = vnpay.CreateRequestUrl(_config["VNPay:BaseUrl"], _config["VNPay:HashSecret"]);
             return paymentUrl;
         }
@@ -56,12 +56,13 @@ namespace KFS.src.Application.Service
             {
                 return new VNPayResponseModel
                 {
-                    Success = true,
-                    PaymentMethod = "VNPay",
-                    OrderDesription = "Payment for order" + orderId,
-                    OrderId = orderId,
                     PaymentId = vnpTranId,
-                    TransactionId = vnpTranId,
+                    Success = vnpResponseCode == "00",
+                    TransactionStatus = vnp_TransactionStatus,
+                    OrderId = orderId,
+                    Amount = vnp_Amount,
+                    PaymentMethod = "VNPay",
+                    OrderDesription = "Payment for order " + orderId,
                     Token = vnp_SecureHash,
                     VnPayResponseCode = vnpResponseCode
                 };
@@ -70,12 +71,13 @@ namespace KFS.src.Application.Service
             {
                 return new VNPayResponseModel
                 {
-                    Success = false,
-                    PaymentMethod = "VNPay",
-                    OrderDesription = "Payment for order" + orderId,
-                    OrderId = orderId,
                     PaymentId = vnpTranId,
-                    TransactionId = vnpTranId,
+                    Success = vnpResponseCode == "00",
+                    TransactionStatus = vnp_TransactionStatus,
+                    OrderId = orderId,
+                    Amount = vnp_Amount,
+                    PaymentMethod = "VNPay",
+                    OrderDesription = "Payment for order " + orderId,
                     Token = vnp_SecureHash,
                     VnPayResponseCode = vnpResponseCode
                 };

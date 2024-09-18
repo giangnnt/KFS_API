@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using AutoMapper;
 using KFS.src.Application.Dto.OrderItemDtos;
+using KFS.src.Application.Dto.PaymentDtos;
 using KFS.src.Application.Enum;
 using KFS.src.Domain.Entities;
 
@@ -31,7 +32,7 @@ namespace KFS.src.Application.Dto.OrderDtos
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public List<OrderItemDto> OrderItems { get; set; } = new List<OrderItemDto>();
-        public Payment? Payment { get; set; }
+        public PaymentDto? Payment { get; set; }
     }
     public class OrderProfile : Profile
     {

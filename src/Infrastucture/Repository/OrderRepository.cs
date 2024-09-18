@@ -37,6 +37,7 @@ namespace KFS.src.Infrastucture.Repository
         {
             return await _context.Orders
             .Include(x => x.OrderItems)
+            .Include(x => x.Payment)
             .FirstOrDefaultAsync(x => x.Id == orderId) ?? throw new Exception("Order not found");   
         }
 
@@ -52,6 +53,7 @@ namespace KFS.src.Infrastucture.Repository
         {
             return await _context.Orders
             .Include(x => x.OrderItems)
+            .Include(x => x.Payment)
             .ToListAsync();
         }
 

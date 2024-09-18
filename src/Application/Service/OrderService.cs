@@ -11,6 +11,7 @@ using KFS.src.Domain.Entities;
 using KFS.src.Domain.IRepository;
 using KFS.src.Domain.IService;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.VisualBasic;
 
 namespace KFS.src.Application.Service
 {
@@ -20,9 +21,11 @@ namespace KFS.src.Application.Service
         private readonly IUserRepository _userRepository;
         private readonly ICartRepository _cartRepository;
         private readonly IVNPayService _vNPayService;
+        private readonly IPaymentRepository _paymentRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
+
         private readonly IMapper _mapper;
-        public OrderService(IOrderRepository orderRepository, IMapper mapper, IUserRepository userRepository, ICartRepository cartRepository, IVNPayService vNPayService, IHttpContextAccessor httpContextAccessor)
+        public OrderService(IOrderRepository orderRepository, IMapper mapper, IUserRepository userRepository, ICartRepository cartRepository, IVNPayService vNPayService, IHttpContextAccessor httpContextAccessor, IPaymentRepository paymentRepository)
         {
             _orderRepository = orderRepository;
             _mapper = mapper;
@@ -30,6 +33,7 @@ namespace KFS.src.Application.Service
             _cartRepository = cartRepository;
             _vNPayService = vNPayService;
             _httpContextAccessor = httpContextAccessor;
+            _paymentRepository = paymentRepository;
         }
 
         public async Task<ResponseDto> AcceptOrder(Guid id)
@@ -113,18 +117,11 @@ namespace KFS.src.Application.Service
                 //set cart to order
                 mappedOrder = _mapper.Map(cart, mappedOrder);
 
-                //check payment method
-                if (req.PaymentMethod == PaymentMethodEnum.COD)
-                {
-                    mappedOrder.ShippingFee = 30;
-                }
-                if (req.PaymentMethod == PaymentMethodEnum.VNPAY)
-                {
-                    mappedOrder.ShippingFee = 0;
-                }
-
                 //set estimated delivery date
                 mappedOrder.EstimatedDeliveryDate = "3 days";
+
+                //set shipping fee
+                mappedOrder.ShippingFee = 30000;
 
                 //calculate total price
                 mappedOrder.TotalPrice = cart.TotalPrice + mappedOrder.ShippingFee - ((decimal)req.Discount / 100 * cart.TotalPrice);
@@ -135,44 +132,24 @@ namespace KFS.src.Application.Service
                 //set id order 
                 mappedOrder.Id = Guid.NewGuid();
 
-                //create order
-                var result = await _orderRepository.CreateOrder(mappedOrder);
-
                 string data = String.Empty;
-                var httpContext = _httpContextAccessor.HttpContext;
-                //check payment method
-                if (mappedOrder.PaymentMethod == PaymentMethodEnum.VNPAY)
-                {
-                    //check context
-                    if (httpContext == null)
-                    {
-                        response.StatusCode = 500;
-                        response.Message = "HttpContext is null";
-                        response.IsSuccess = false;
-                        return response;
-                    }
 
-                    //create payment url
-                    var paymentUrl = _vNPayService.CreatePaymentUrl(httpContext, new VNPayRequestModel
-                    {
-                        Amount = (double)mappedOrder.TotalPrice,
-                        CreateDate = DateTime.Now,
-                        Description = "Payment for order" + mappedOrder.Id.ToString(),
-                        FullName = mappedOrder.ContactName,
-                        OrderId = mappedOrder.Id
-                    });
-                    data = paymentUrl;
-                }
-                else
+                //check payment method
+                if (req.PaymentMethod == PaymentMethodEnum.COD)
                 {
                     data = "COD";
                 }
+                if (req.PaymentMethod == PaymentMethodEnum.VNPAY)
+                {
+                    data = GeneratePaymentUrl(mappedOrder);
+                }
+
+                //create order
+                var result = await _orderRepository.CreateOrder(mappedOrder);
 
                 //check result
                 if (result)
                 {
-                    //set cart status to completed
-                    cart.Status = CartStatusEnum.Completed;
                     response.StatusCode = 201;
                     response.Message = "Order created successfully";
                     response.IsSuccess = true;
@@ -183,8 +160,6 @@ namespace KFS.src.Application.Service
                 }
                 else
                 {
-                    //set cart status to Deactive
-                    cart.Status = CartStatusEnum.Deactive;
                     response.StatusCode = 400;
                     response.Message = "Order creation failed";
                     response.IsSuccess = false;
@@ -193,7 +168,99 @@ namespace KFS.src.Application.Service
                         Data = data
                     };
                 }
-                var result1 = await _cartRepository.UpdateCart(cart);
+                return response;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+        public string GeneratePaymentUrl(Order order)
+        {
+            try
+            {
+                var httpContext = _httpContextAccessor.HttpContext;
+                if (httpContext == null)
+                {
+                    return "HttpContext is null";
+                }
+                return _vNPayService.CreatePaymentUrl(httpContext, new VNPayRequestModel
+                {
+                    Amount = (double)order.TotalPrice,
+                    CreateDate = DateTime.Now,
+                    Description = "Payment for order" + order.Id.ToString(),
+                    FullName = order.ContactName,
+                    OrderId = order.Id
+                });
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+        public async Task<ResponseDto> GetResponsePaymentUrl()
+        {
+            var response = new ResponseDto();
+            try
+            {
+                var httpContext = _httpContextAccessor.HttpContext;
+                if (httpContext == null)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "HttpContext is null";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                var collection = httpContext.Request.Query;
+                var vnPayResponseModel = _vNPayService.GetResponse(collection);
+                var payment = new Payment
+                {
+                    Id = Guid.NewGuid(),
+                    Amount = decimal.Parse(vnPayResponseModel.Amount),
+                    CreatedAt = DateTime.Now,
+                    Currency = "VND",
+                    OrderId = Guid.Parse(vnPayResponseModel.OrderId),
+                    PaymentMethod = PaymentMethodEnum.VNPAY,
+                    Status = PaymentStatusEnum.Completed,
+                    TransactionId = vnPayResponseModel.PaymentId,
+                    UserId = _orderRepository.GetOrderById(Guid.Parse(vnPayResponseModel.OrderId)).Result.UserId
+                };
+                var result = await _paymentRepository.CreatePayment(payment);
+                var carts = await _cartRepository.GetCartByUserId(payment.UserId);
+                var cart =  new Cart();
+                var order = await _orderRepository.GetOrderById(payment.OrderId);
+                if (result)
+                {
+                    foreach (var c in carts)
+                    {
+                        if(c.Status == CartStatusEnum.Active)
+                        {
+                            c.Status = CartStatusEnum.Completed;
+                            cart = c;
+                        }
+                    }
+                    order.Status = OrderStatusEnum.Completed;
+                    response.StatusCode = 200;
+                    response.Message = "Payment created successfully";
+                    response.IsSuccess = true;
+                }
+                else
+                {
+                    foreach (var c in carts)
+                    {
+                        if (cart.Status == CartStatusEnum.Active)
+                        {
+                            c.Status = CartStatusEnum.Deactive;
+                            cart = c;
+                        }
+                    }
+                    order.Status = OrderStatusEnum.Failed;
+                    response.StatusCode = 400;
+                    response.Message = "Payment creation failed";
+                    response.IsSuccess = false;
+                }
+                await _cartRepository.UpdateCart(cart);
+                await _orderRepository.UpdateOrder(order);
                 return response;
             }
             catch
