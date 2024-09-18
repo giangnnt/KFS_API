@@ -14,5 +14,8 @@ namespace KFS.src.Domain.IService
         Task<ResponseDto> CreateOrderFromCart(OrderCreateFromCart req);
         Task<ResponseDto> UpdateOrder(OrderUpdate req, Guid id);
         Task<ResponseDto> DeleteOrder(Guid id);
+        Task<ResponseDto> GetOrderByUserId(Guid userId);
+        Task<ResponseDto> AcceptOrder(Guid id);
+        Task<ResponseDto> GetResponsePaymentUrl();
     }
 }

@@ -4,9 +4,9 @@ namespace KFS.src.Application.Enum
     {
         Pending,
         Processing,
-        Shipped,
         Delivered,
         Completed,
         Cancelled,
+        Failed
     }
 }

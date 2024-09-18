@@ -51,7 +51,7 @@ namespace KFS.src.Infrastucture.Context
                     Id = Guid.Parse("2a9394e2-52b3-46d5-8a33-af4d6020e440"),
                     Name = "Product 1",
                     Description = "Description for Product 1",
-                    Price = 100,
+                    Price = 10000,
                     Inventory = 10,
                     CategoryId = Guid.Parse("5F18BF0C-7199-462C-B023-3CCF1FD9F806"),
                     Gender = GenderEnum.Male,
@@ -62,7 +62,7 @@ namespace KFS.src.Infrastucture.Context
                     Id = Guid.Parse("8657ed40-1b9d-44e2-800d-40bb1a20af98"),
                     Name = "Product 2",
                     Description = "Description for Product 2",
-                    Price = 200,
+                    Price = 20000,
                     Inventory = 10,
                     CategoryId = Guid.Parse("3D4FC185-049D-4A96-851B-1D320E7DBBA8"),
                     Gender = GenderEnum.Female,
@@ -73,7 +73,7 @@ namespace KFS.src.Infrastucture.Context
                     Id = Guid.Parse("f3b3b3b4-1b9d-44e2-800d-40bb1a20af98"),
                     Name = "Product 3",
                     Description = "Description for Product 3",
-                    Price = 300,
+                    Price = 30000,
                     Inventory = 10,
                     CategoryId = Guid.Parse("9A17DCF5-1426-45EE-A32E-C23EE5FE40D9"),
                     Gender = GenderEnum.Male,
@@ -173,11 +173,23 @@ namespace KFS.src.Infrastucture.Context
             //config order
             modelBuilder.Entity<Order>(entity =>
             {
-                entity.Property(entity => entity.Id).ValueGeneratedOnAdd();
                 entity.Property(entity => entity.Status)
                 .HasConversion(
                     v => v.ToString(),
                     v => v != null ? (OrderStatusEnum)Enum.Parse(typeof(OrderStatusEnum), v) : default);
+                
+                entity.Property(entity => entity.PaymentMethod)
+                .HasConversion(
+                    v => v.ToString(),
+                    v => v != null ? (PaymentMethodEnum)Enum.Parse(typeof(PaymentMethodEnum), v) : default);
+            });
+            //config payment
+            modelBuilder.Entity<Payment>(entity =>
+            {
+                entity.Property(entity => entity.Status)
+                .HasConversion(
+                    v => v.ToString(),
+                    v => v != null ? (PaymentStatusEnum)Enum.Parse(typeof(PaymentStatusEnum), v) : default);
                 
                 entity.Property(entity => entity.PaymentMethod)
                 .HasConversion(

@@ -73,7 +73,6 @@ namespace KFS.src.Infrastucture.Repository
             return await _context.Carts
             .Include(x => x.CartItems)
             .ThenInclude(x => x.Product)
-            .ThenInclude(x => x.Category.Id)
             .Where(x => x.UserId == userId)
             .ToListAsync();
         }

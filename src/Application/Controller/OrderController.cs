@@ -51,6 +51,7 @@ namespace KFS.src.Application.Controller
             {
                 var result = await _orderService.CreateOrderFromCart(req);
                 return Ok(result);
+
             }
             catch (Exception ex)
             {
@@ -76,6 +77,19 @@ namespace KFS.src.Application.Controller
             try
             {
                 var result = await _orderService.DeleteOrder(id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet("vnpayment-return")]
+        public async Task<IActionResult> PaymentReturn()
+        {
+            try
+            {
+                var result = await _orderService.GetResponsePaymentUrl();
                 return Ok(result);
             }
             catch (Exception ex)
