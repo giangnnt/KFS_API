@@ -203,6 +203,7 @@ namespace KFS.src.Application.Service
             var response = new ResponseDto();
             try
             {
+                //check http context 
                 var httpContext = _httpContextAccessor.HttpContext;
                 if (httpContext == null)
                 {
@@ -211,57 +212,73 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
                     return response;
                 }
+                //get query collection
                 var collection = httpContext.Request.Query;
+                //get response from vnpay
                 var vnPayResponseModel = _vNPayService.GetResponse(collection);
-                var payment = new Payment
+                //check response
+                if (vnPayResponseModel.Success == false || vnPayResponseModel.VnPayResponseCode != "00" || vnPayResponseModel.TransactionStatus != "00")
                 {
-                    Id = Guid.NewGuid(),
-                    Amount = decimal.Parse(vnPayResponseModel.Amount),
-                    CreatedAt = DateTime.Now,
-                    Currency = "VND",
-                    OrderId = Guid.Parse(vnPayResponseModel.OrderId),
-                    PaymentMethod = PaymentMethodEnum.VNPAY,
-                    Status = PaymentStatusEnum.Completed,
-                    TransactionId = vnPayResponseModel.PaymentId,
-                    UserId = _orderRepository.GetOrderById(Guid.Parse(vnPayResponseModel.OrderId)).Result.UserId
-                };
-                var result = await _paymentRepository.CreatePayment(payment);
-                var carts = await _cartRepository.GetCartByUserId(payment.UserId);
-                var cart =  new Cart();
-                var order = await _orderRepository.GetOrderById(payment.OrderId);
-                if (result)
-                {
-                    foreach (var c in carts)
-                    {
-                        if(c.Status == CartStatusEnum.Active)
-                        {
-                            c.Status = CartStatusEnum.Completed;
-                            cart = c;
-                        }
-                    }
-                    order.Status = OrderStatusEnum.Completed;
-                    response.StatusCode = 200;
-                    response.Message = "Payment created successfully";
-                    response.IsSuccess = true;
+                    response.StatusCode = 400;
+                    response.Message = "Payment failed" + vnPayResponseModel.VnPayResponseCode;
+                    response.IsSuccess = false;
+                    return response;
                 }
                 else
                 {
-                    foreach (var c in carts)
+                    //create payment
+                    var payment = new Payment
                     {
-                        if (cart.Status == CartStatusEnum.Active)
+                        Id = Guid.NewGuid(),
+                        Amount = decimal.Parse(vnPayResponseModel.Amount),
+                        CreatedAt = DateTime.Now,
+                        Currency = "VND",
+                        OrderId = Guid.Parse(vnPayResponseModel.OrderId),
+                        PaymentMethod = PaymentMethodEnum.VNPAY,
+                        Status = PaymentStatusEnum.Completed,
+                        TransactionId = vnPayResponseModel.PaymentId,
+                        UserId = _orderRepository.GetOrderById(Guid.Parse(vnPayResponseModel.OrderId)).Result.UserId
+                    };
+                    //get and update cart, order
+                    var carts = await _cartRepository.GetCartByUserId(payment.UserId);
+                    var cart = new Cart();
+                    var order = await _orderRepository.GetOrderById(payment.OrderId);
+                    //create payment
+                    var result = await _paymentRepository.CreatePayment(payment);
+                    if (result)
+                    {
+                        foreach (var c in carts)
                         {
-                            c.Status = CartStatusEnum.Deactive;
-                            cart = c;
+                            if (c.Status == CartStatusEnum.Active)
+                            {
+                                c.Status = CartStatusEnum.Completed;
+                                cart = c;
+                            }
                         }
+                        order.Status = OrderStatusEnum.Completed;
+                        response.StatusCode = 200;
+                        response.Message = "Payment created successfully";
+                        response.IsSuccess = true;
                     }
-                    order.Status = OrderStatusEnum.Failed;
-                    response.StatusCode = 400;
-                    response.Message = "Payment creation failed";
-                    response.IsSuccess = false;
+                    else
+                    {
+                        foreach (var c in carts)
+                        {
+                            if (cart.Status == CartStatusEnum.Active)
+                            {
+                                c.Status = CartStatusEnum.Deactive;
+                                cart = c;
+                            }
+                        }
+                        order.Status = OrderStatusEnum.Failed;
+                        response.StatusCode = 400;
+                        response.Message = "Payment creation failed";
+                        response.IsSuccess = false;
+                    }
+                    await _cartRepository.UpdateCart(cart);
+                    await _orderRepository.UpdateOrder(order);
+                    return response;
                 }
-                await _cartRepository.UpdateCart(cart);
-                await _orderRepository.UpdateOrder(order);
-                return response;
             }
             catch
             {
