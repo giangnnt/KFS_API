@@ -3,9 +3,29 @@ using KFS.src.Domain.IRepository;
 using KFS.src.Domain.IService;
 using KFS.src.Infrastucture.Context;
 using KFS.src.Infrastucture.Repository;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.EntityFrameworkCore;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins",
+      builder =>
+      {
+          builder.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+      });
+    options.AddDefaultPolicy(
+      builder =>
+      {
+          builder.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+      });
+});
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -30,16 +50,25 @@ builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
-
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<KFSContext>(options => options.UseSqlServer(connectionString).LogTo(Console.WriteLine, LogLevel.Information));
-
 // Create a logger
 var logger = LoggerFactory.Create(loggingBuilder => loggingBuilder.AddConsole()).CreateLogger<Program>();
 
-// Log the connection string
-logger.LogInformation("Connection String: {ConnectionString}", connectionString);
+var connectionString = builder.Configuration.GetConnectionString("DatabaseConnection");
+builder.Services.AddDbContext<KFSContext>(options => options.UseSqlServer(connectionString).LogTo(Console.WriteLine, LogLevel.Information));
+
+Console.WriteLine($"Redis connection string: {builder.Configuration.GetConnectionString("RedisConnection")}");
+builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("RedisConnection")));
+
+// Log configuration sources and values
+logger.LogInformation("Logging configuration sources and values:");
+var configurationRoot = (IConfigurationRoot)builder.Configuration;
+foreach (var provider in configurationRoot.Providers)
+{
+    if (provider.TryGet("ConnectionStrings:DatabaseConnection", out var value))
+    {
+        logger.LogInformation("Provider: {Provider}, ConnectionStrings:DatabaseConnection: {Value}", provider, value);
+    }
+}
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -49,13 +78,14 @@ builder.Services.AddSwaggerGen(c =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
 
-app.UseHttpsRedirection();
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+    //c.RoutePrefix = "swagger"; // Đặt Swagger UI ở root nếu muốn
+});
+//app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
