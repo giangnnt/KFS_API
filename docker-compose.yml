@@ -1,0 +1,46 @@
+services:
+  webapp:
+    image: giangnnt260703/kfs_api:v1.5
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT="Production"
+      - ConnectionStrings__DatabaseConnection=Server=sqlserver,1433;Database=KFS;User Id=sa;Password=giangpro123@;MultipleActiveResultSets=true;TrustServerCertificate=true;
+      - ConnectionStrings__RedisConnection=cache:6379,password=123456,abortConnect=false
+    restart: on-failure
+    depends_on:
+      - sqlserver
+      - cache
+    networks:
+      - webnet
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    ports:
+      - "1433:1433"
+    environment:
+      SA_PASSWORD: "giangpro123@"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Evaluation"
+    volumes:
+      - sql_data:/var/opt/mssql
+    restart: on-failure
+    networks:
+      - webnet
+
+  cache:
+    image: redis
+    environment:
+      - REDIS_PASSWORD=giangpro123@
+    ports:
+      - 6379:6379
+    restart: always
+    networks:
+      - webnet
+
+networks:
+  webnet:
+    driver: bridge
+
+volumes:
+  sql_data:
