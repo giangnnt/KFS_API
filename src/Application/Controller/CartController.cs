@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using KFS.src.Application.Constant;
 using KFS.src.Application.Dto.CartDtos;
+using KFS.src.Application.Middleware;
 using KFS.src.Domain.IService;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,6 +20,8 @@ namespace KFS.src.Application.Controller
         {
             _cartService = cartService;
         }
+
+        [Protected]
         [HttpGet("all")]
         public async Task<IActionResult> GetCarts()
         {
@@ -44,6 +48,8 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
+
+        [Protected]
         [HttpPost("create")]
         public async Task<IActionResult> CreateCart(CartCreate req)
         {
@@ -57,6 +63,8 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
+
+        [Protected]
         [HttpPut("update/{id}")]
         public async Task<IActionResult> UpdateCart(CartUpdate req, Guid id)
         {
@@ -70,6 +78,8 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
+
+        [Protected]
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteCart(Guid id)
         {
@@ -83,6 +93,8 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
+
+        [Protected]
         [HttpPost("add-product")]
         public async Task<IActionResult> AddProductToCart(CartAddRemoveDto req)
         {
@@ -96,6 +108,8 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
+
+        [Protected]
         [HttpPost("remove-product")]
         public async Task<IActionResult> RemoveProductFromCart(CartAddRemoveDto req)
         {

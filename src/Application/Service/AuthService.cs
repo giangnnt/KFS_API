@@ -110,7 +110,7 @@ namespace KFS.src.Application.Service
             try
             {
                 // Check if user exists
-                var user = _userRepository.GetUserByEmail(registerDto.Email);
+                var user = await _userRepository.GetUserByEmail(registerDto.Email);
                 if (user != null)
                 {
                     response.StatusCode = 400;

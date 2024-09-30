@@ -18,7 +18,7 @@ namespace KFS.src.Application.Middleware
     {
         private readonly string[] _permission;
 
-        public PermissionAttribute(string[] permission)
+        public PermissionAttribute(params string[] permission)
         {
             _permission = permission;
         }

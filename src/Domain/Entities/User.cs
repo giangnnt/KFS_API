@@ -14,7 +14,7 @@ namespace KFS.src.Domain.Entities
         public int RoleId { get; set; }
         public string? Avatar { get; set; }
         public string Phone { get; set; } = null!;
-        public string Address { get; set; } = null!;
+        public string? Address { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public Role Role { get; set; } = null!;

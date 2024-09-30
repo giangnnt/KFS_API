@@ -25,10 +25,10 @@ namespace KFS.src.Infrastucture.Repository
             return result > 0;
         }
 
-        public async Task<User> GetUserByEmail(string email)
+        public async Task<User?> GetUserByEmail(string email)
         {
             return await _context.Users.Where(x => x.Email == email)
-            .FirstOrDefaultAsync() ?? throw new Exception("User not found");
+            .FirstOrDefaultAsync();
         }
 
         public async Task<User> GetUserById(Guid id)
