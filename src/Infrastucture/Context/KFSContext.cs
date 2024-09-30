@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using KFS.src.Application.Constant;
 using KFS.src.Application.Enum;
 using KFS.src.Domain.Entities;
+using KFS.src.Infrastucture.Repository;
 using Microsoft.EntityFrameworkCore;
 
 namespace KFS.src.Infrastucture.Context
@@ -27,6 +28,8 @@ namespace KFS.src.Infrastucture.Context
         public DbSet<User> Users { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Payment> Payments { get; set; }
+        public DbSet<Role> Roles { get; set; }
+        public DbSet<Permission> Permissions { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -108,6 +111,33 @@ namespace KFS.src.Infrastucture.Context
                     Name = RoleConst.GUEST
                 }
             );
+            modelBuilder.Entity<Permission>()
+            .HasData(
+                new Permission { Slug = PermissionSlug.MANAGE_USER, Name = "Manage User" },
+                new Permission { Slug = PermissionSlug.MANAGE_OWN_USER, Name = "Manage Own User" },
+                new Permission { Slug = PermissionSlug.MANAGE_PERMISSION, Name = "Manage Permission" },
+                new Permission { Slug = PermissionSlug.MANAGE_ROLE, Name = "Manage Role" },
+                new Permission { Slug = PermissionSlug.MANAGE_PRODUCT, Name = "Manage Product" },
+                new Permission { Slug = PermissionSlug.MANAGE_ORDER, Name = "Manage Order" },
+                new Permission { Slug = PermissionSlug.MANAGE_CATEGORY, Name = "Manage Category" },
+                new Permission { Slug = PermissionSlug.MANAGE_FEEDBACK, Name = "Manage Feedback" },
+                new Permission { Slug = PermissionSlug.MANAGE_OWN_FEEDBACK, Name = "Manage Own Feedback" }
+            );
+            modelBuilder.Entity<Role>()
+            .HasMany(r => r.Permissions)
+            .WithMany(p => p.Roles)
+            .UsingEntity(j => j
+                .HasData(
+                new { RolesRoleId = RoleConst.ADMIN_ID, PermissionsSlug = PermissionSlug.MANAGE_USER },
+                new { RolesRoleId = RoleConst.ADMIN_ID, PermissionsSlug = PermissionSlug.MANAGE_OWN_USER },
+                new { RolesRoleId = RoleConst.ADMIN_ID, PermissionsSlug = PermissionSlug.MANAGE_PERMISSION },
+                new { RolesRoleId = RoleConst.ADMIN_ID, PermissionsSlug = PermissionSlug.MANAGE_ROLE },
+                new { RolesRoleId = RoleConst.ADMIN_ID, PermissionsSlug = PermissionSlug.MANAGE_PRODUCT },
+                new { RolesRoleId = RoleConst.ADMIN_ID, PermissionsSlug = PermissionSlug.MANAGE_ORDER },
+                new { RolesRoleId = RoleConst.ADMIN_ID, PermissionsSlug = PermissionSlug.MANAGE_CATEGORY },
+                new { RolesRoleId = RoleConst.ADMIN_ID, PermissionsSlug = PermissionSlug.MANAGE_FEEDBACK },
+                new { RolesRoleId = RoleConst.ADMIN_ID, PermissionsSlug = PermissionSlug.MANAGE_OWN_FEEDBACK })
+            );
             //seed user
             modelBuilder.Entity<User>().HasData(
                 new User
@@ -177,7 +207,7 @@ namespace KFS.src.Infrastucture.Context
                 .HasConversion(
                     v => v.ToString(),
                     v => v != null ? (OrderStatusEnum)Enum.Parse(typeof(OrderStatusEnum), v) : default);
-                
+
                 entity.Property(entity => entity.PaymentMethod)
                 .HasConversion(
                     v => v.ToString(),
@@ -190,7 +220,7 @@ namespace KFS.src.Infrastucture.Context
                 .HasConversion(
                     v => v.ToString(),
                     v => v != null ? (PaymentStatusEnum)Enum.Parse(typeof(PaymentStatusEnum), v) : default);
-                
+
                 entity.Property(entity => entity.PaymentMethod)
                 .HasConversion(
                     v => v.ToString(),

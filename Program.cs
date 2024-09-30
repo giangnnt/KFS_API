@@ -1,6 +1,7 @@
 using KFS.src.Application.Service;
 using KFS.src.Domain.IRepository;
 using KFS.src.Domain.IService;
+using KFS.src.Infrastucture.Cache;
 using KFS.src.Infrastucture.Context;
 using KFS.src.Infrastucture.Repository;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -39,11 +40,13 @@ builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+builder.Services.AddScoped<IRoleBaseRepository, RoleBaseRepository>();
 // Add Service 
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddSingleton<IVNPayService, VNPayService>();
+builder.Services.AddScoped<ICacheService, CacheService>();
 
 // Add Mapper
 builder.Services.AddAutoMapper(typeof(Program));
