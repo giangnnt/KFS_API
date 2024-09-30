@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KFS.Migrations
 {
     [DbContext(typeof(KFSContext))]
-    [Migration("20240925072608_01")]
+    [Migration("20240930014007_01")]
     partial class _01
     {
         /// <inheritdoc />
@@ -64,7 +64,7 @@ namespace KFS.Migrations
                         new
                         {
                             Id = new Guid("37ab9331-f39a-4072-80ad-4adc3684fcec"),
-                            CreatedAt = new DateTime(2024, 9, 25, 14, 26, 8, 624, DateTimeKind.Local).AddTicks(8945),
+                            CreatedAt = new DateTime(2024, 9, 30, 8, 40, 7, 491, DateTimeKind.Local).AddTicks(808),
                             Currency = "VND",
                             Status = "Active",
                             TotalItem = 0,
@@ -75,7 +75,7 @@ namespace KFS.Migrations
                         new
                         {
                             Id = new Guid("da17c01a-de60-4b46-810e-f824a1936e14"),
-                            CreatedAt = new DateTime(2024, 9, 25, 14, 26, 8, 624, DateTimeKind.Local).AddTicks(8952),
+                            CreatedAt = new DateTime(2024, 9, 30, 8, 40, 7, 491, DateTimeKind.Local).AddTicks(827),
                             Currency = "VND",
                             Status = "Completed",
                             TotalItem = 0,
@@ -297,7 +297,54 @@ namespace KFS.Migrations
 
                     b.HasKey("Slug");
 
-                    b.ToTable("Permission");
+                    b.ToTable("Permissions");
+
+                    b.HasData(
+                        new
+                        {
+                            Slug = "USER.ALL",
+                            Name = "Manage User"
+                        },
+                        new
+                        {
+                            Slug = "USER.OWN",
+                            Name = "Manage Own User"
+                        },
+                        new
+                        {
+                            Slug = "PERMISSION.ALL",
+                            Name = "Manage Permission"
+                        },
+                        new
+                        {
+                            Slug = "ROLE.ALL",
+                            Name = "Manage Role"
+                        },
+                        new
+                        {
+                            Slug = "PRODUCT.ALL",
+                            Name = "Manage Product"
+                        },
+                        new
+                        {
+                            Slug = "MANAGE_ORDER.ALL",
+                            Name = "Manage Order"
+                        },
+                        new
+                        {
+                            Slug = "MANAGE_CATEGORY.ALL",
+                            Name = "Manage Category"
+                        },
+                        new
+                        {
+                            Slug = "FEEDBACK.ALL",
+                            Name = "Manage Feedback"
+                        },
+                        new
+                        {
+                            Slug = "FEEDBACK.OWN",
+                            Name = "Manage Own Feedback"
+                        });
                 });
 
             modelBuilder.Entity("KFS.src.Domain.Entities.Product", b =>
@@ -363,7 +410,7 @@ namespace KFS.Migrations
                         {
                             Id = new Guid("2a9394e2-52b3-46d5-8a33-af4d6020e440"),
                             CategoryId = new Guid("5f18bf0c-7199-462c-b023-3ccf1fd9f806"),
-                            CreatedAt = new DateTime(2024, 9, 25, 14, 26, 8, 513, DateTimeKind.Local).AddTicks(8474),
+                            CreatedAt = new DateTime(2024, 9, 30, 8, 40, 7, 212, DateTimeKind.Local).AddTicks(3833),
                             Description = "Description for Product 1",
                             Gender = "Male",
                             Inventory = 10,
@@ -375,7 +422,7 @@ namespace KFS.Migrations
                         {
                             Id = new Guid("8657ed40-1b9d-44e2-800d-40bb1a20af98"),
                             CategoryId = new Guid("3d4fc185-049d-4a96-851b-1d320e7dbba8"),
-                            CreatedAt = new DateTime(2024, 9, 25, 14, 26, 8, 513, DateTimeKind.Local).AddTicks(8490),
+                            CreatedAt = new DateTime(2024, 9, 30, 8, 40, 7, 212, DateTimeKind.Local).AddTicks(3849),
                             Description = "Description for Product 2",
                             Gender = "Female",
                             Inventory = 10,
@@ -387,7 +434,7 @@ namespace KFS.Migrations
                         {
                             Id = new Guid("f3b3b3b4-1b9d-44e2-800d-40bb1a20af98"),
                             CategoryId = new Guid("9a17dcf5-1426-45ee-a32e-c23ee5fe40d9"),
-                            CreatedAt = new DateTime(2024, 9, 25, 14, 26, 8, 513, DateTimeKind.Local).AddTicks(8493),
+                            CreatedAt = new DateTime(2024, 9, 30, 8, 40, 7, 212, DateTimeKind.Local).AddTicks(3853),
                             Description = "Description for Product 3",
                             Gender = "Male",
                             Inventory = 10,
@@ -414,7 +461,7 @@ namespace KFS.Migrations
 
                     b.HasKey("RoleId");
 
-                    b.ToTable("Role");
+                    b.ToTable("Roles");
 
                     b.HasData(
                         new
@@ -493,10 +540,10 @@ namespace KFS.Migrations
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000001"),
                             Address = "HCM",
-                            CreatedAt = new DateTime(2024, 9, 25, 14, 26, 8, 624, DateTimeKind.Local).AddTicks(7465),
+                            CreatedAt = new DateTime(2024, 9, 30, 8, 40, 7, 490, DateTimeKind.Local).AddTicks(8792),
                             Email = "giangnnt260703@gmail.com",
                             FullName = "Truong Giang",
-                            Password = "$2a$11$MMwYSkletrfudjDRuGQ4AuBZhEKj3exgk0L59QIgDKvN3gR.oIMw6",
+                            Password = "$2a$11$LGTNIPT8LHO48pAh4U5D4uJnad0P7d793Gf1WzBT/4uUIPfF3X77e",
                             Phone = "0123456789",
                             RoleId = 1,
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -516,6 +563,53 @@ namespace KFS.Migrations
                     b.HasIndex("RolesRoleId");
 
                     b.ToTable("PermissionRole");
+
+                    b.HasData(
+                        new
+                        {
+                            PermissionsSlug = "USER.ALL",
+                            RolesRoleId = 1
+                        },
+                        new
+                        {
+                            PermissionsSlug = "USER.OWN",
+                            RolesRoleId = 1
+                        },
+                        new
+                        {
+                            PermissionsSlug = "PERMISSION.ALL",
+                            RolesRoleId = 1
+                        },
+                        new
+                        {
+                            PermissionsSlug = "ROLE.ALL",
+                            RolesRoleId = 1
+                        },
+                        new
+                        {
+                            PermissionsSlug = "PRODUCT.ALL",
+                            RolesRoleId = 1
+                        },
+                        new
+                        {
+                            PermissionsSlug = "MANAGE_ORDER.ALL",
+                            RolesRoleId = 1
+                        },
+                        new
+                        {
+                            PermissionsSlug = "MANAGE_CATEGORY.ALL",
+                            RolesRoleId = 1
+                        },
+                        new
+                        {
+                            PermissionsSlug = "FEEDBACK.ALL",
+                            RolesRoleId = 1
+                        },
+                        new
+                        {
+                            PermissionsSlug = "FEEDBACK.OWN",
+                            RolesRoleId = 1
+                        });
                 });
 
             modelBuilder.Entity("KFS.src.Domain.Entities.Cart", b =>
