@@ -1,3 +1,5 @@
+using KFS.src.Application.Core.Crypto;
+using KFS.src.Application.Core.Jwt;
 using KFS.src.Application.Service;
 using KFS.src.Domain.IRepository;
 using KFS.src.Domain.IService;
@@ -7,6 +9,7 @@ using KFS.src.Infrastucture.Repository;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -47,7 +50,9 @@ builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddSingleton<IVNPayService, VNPayService>();
 builder.Services.AddScoped<ICacheService, CacheService>();
-
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ICrypro, Crypto>();
+builder.Services.AddScoped<IJwtService, JwtService>();
 // Add Mapper
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddEndpointsApiExplorer();
@@ -76,6 +81,29 @@ foreach (var provider in configurationRoot.Providers)
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new() { Title = "KFS API", Version = "v1" });
+    // Add a bearer token to Swagger
+  c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+  {
+    Description = "JWT Authorization header using the Bearer scheme",
+    Type = SecuritySchemeType.Http,
+    Scheme = "bearer"
+  });
+
+  // Require the bearer token for all API operations
+  c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+      {
+          new OpenApiSecurityScheme
+          {
+              Reference = new OpenApiReference
+              {
+                  Type = ReferenceType.SecurityScheme,
+                  Id = "Bearer"
+              }
+          },
+          new string[] {}
+      }
+    });
 });
 
 var app = builder.Build();

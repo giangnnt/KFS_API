@@ -10,5 +10,6 @@ namespace KFS.src.Domain.IRepository
     {
         Task<User> GetUserById(Guid id);
         Task<User> GetUserByEmail(string email);
+        Task<bool> CreateUser(User user);
     }
 }
