@@ -221,10 +221,33 @@ namespace KFS.src.Application.Service
                 //check response
                 if (vnPayResponseModel.Success == false || vnPayResponseModel.VnPayResponseCode != "00" || vnPayResponseModel.TransactionStatus != "00")
                 {
-                    response.StatusCode = 400;
-                    response.Message = "Payment failed" + vnPayResponseModel.VnPayResponseCode;
-                    response.IsSuccess = false;
-                    return response;
+                    var payment = new Payment
+                    {
+                        Id = Guid.NewGuid(),
+                        Amount = decimal.Parse(vnPayResponseModel.Amount),
+                        CreatedAt = DateTime.Now,
+                        Currency = "VND",
+                        OrderId = Guid.Parse(vnPayResponseModel.OrderId),
+                        PaymentMethod = PaymentMethodEnum.VNPAY,
+                        Status = PaymentStatusEnum.Failed,
+                        TransactionId = vnPayResponseModel.PaymentId,
+                        UserId = _orderRepository.GetOrderById(Guid.Parse(vnPayResponseModel.OrderId)).Result.UserId
+                    };
+                    var result = await _paymentRepository.CreatePayment(payment);
+                    if (result)
+                    {
+                        response.StatusCode = 400;
+                        response.Message = "Payment created successfully" + vnPayResponseModel.VnPayResponseCode;
+                        response.IsSuccess = false;
+                        return response;
+                    }
+                    else
+                    {
+                        response.StatusCode = 400;
+                        response.Message = "Payment creation failed" + vnPayResponseModel.VnPayResponseCode;
+                        response.IsSuccess = false;
+                        return response;
+                    }
                 }
                 else
                 {
@@ -445,12 +468,17 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
                     return response;
                 }
+                // check order status
+                if (order.Status == OrderStatusEnum.Delivering || order.Status == OrderStatusEnum.Delivered || order.Status == OrderStatusEnum.Completed || order.Status == OrderStatusEnum.Canceled || order.Status == OrderStatusEnum.Failed)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Can not update order";
+                    response.IsSuccess = false;
+                    return response;
+                }
 
                 //map order update to order
                 var mappedOrder = _mapper.Map(req, order);
-
-                //calculate total price
-
 
                 //update order
                 var result = await _orderRepository.UpdateOrder(mappedOrder);
@@ -469,6 +497,49 @@ namespace KFS.src.Application.Service
                     response.Message = "Order update failed";
                     response.IsSuccess = false;
                     return response;
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public Task<ResponseDto> UpdateOrderStatus(OrderStatusEnum status, Guid id)
+        {
+            var response = new ResponseDto();
+            try
+            {
+                //get order
+                var order = _orderRepository.GetOrderById(id).Result;
+                if (order == null)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Order not found";
+                    response.IsSuccess = false;
+                    return Task.FromResult(response);
+                }
+
+                //set order status
+                order.Status = status;
+
+                //update order
+                var result = _orderRepository.UpdateOrder(order).Result;
+
+                //check result
+                if (result)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Order status updated successfully";
+                    response.IsSuccess = true;
+                    return Task.FromResult(response);
+                }
+                else
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Order status update failed";
+                    response.IsSuccess = false;
+                    return Task.FromResult(response);
                 }
             }
             catch

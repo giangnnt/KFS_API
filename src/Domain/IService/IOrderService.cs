@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using KFS.src.Application.Dto.OrderDtos;
 using KFS.src.Application.Dto.ResponseDtos;
+using KFS.src.Application.Enum;
 
 namespace KFS.src.Domain.IService
 {
@@ -13,6 +14,7 @@ namespace KFS.src.Domain.IService
         Task<ResponseDto> GetOrderById(Guid id);
         Task<ResponseDto> CreateOrderFromCart(OrderCreateFromCart req);
         Task<ResponseDto> UpdateOrder(OrderUpdate req, Guid id);
+        Task<ResponseDto> UpdateOrderStatus(OrderStatusEnum status, Guid id);
         Task<ResponseDto> DeleteOrder(Guid id);
         Task<ResponseDto> GetOrderByUserId(Guid userId);
         Task<ResponseDto> AcceptOrder(Guid id);
