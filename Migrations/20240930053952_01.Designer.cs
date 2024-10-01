@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KFS.Migrations
 {
     [DbContext(typeof(KFSContext))]
-    [Migration("20240930014007_01")]
+    [Migration("20240930053952_01")]
     partial class _01
     {
         /// <inheritdoc />
@@ -64,7 +64,7 @@ namespace KFS.Migrations
                         new
                         {
                             Id = new Guid("37ab9331-f39a-4072-80ad-4adc3684fcec"),
-                            CreatedAt = new DateTime(2024, 9, 30, 8, 40, 7, 491, DateTimeKind.Local).AddTicks(808),
+                            CreatedAt = new DateTime(2024, 9, 30, 12, 39, 52, 378, DateTimeKind.Local).AddTicks(1879),
                             Currency = "VND",
                             Status = "Active",
                             TotalItem = 0,
@@ -75,7 +75,7 @@ namespace KFS.Migrations
                         new
                         {
                             Id = new Guid("da17c01a-de60-4b46-810e-f824a1936e14"),
-                            CreatedAt = new DateTime(2024, 9, 30, 8, 40, 7, 491, DateTimeKind.Local).AddTicks(827),
+                            CreatedAt = new DateTime(2024, 9, 30, 12, 39, 52, 378, DateTimeKind.Local).AddTicks(1884),
                             Currency = "VND",
                             Status = "Completed",
                             TotalItem = 0,
@@ -410,7 +410,7 @@ namespace KFS.Migrations
                         {
                             Id = new Guid("2a9394e2-52b3-46d5-8a33-af4d6020e440"),
                             CategoryId = new Guid("5f18bf0c-7199-462c-b023-3ccf1fd9f806"),
-                            CreatedAt = new DateTime(2024, 9, 30, 8, 40, 7, 212, DateTimeKind.Local).AddTicks(3833),
+                            CreatedAt = new DateTime(2024, 9, 30, 12, 39, 52, 169, DateTimeKind.Local).AddTicks(1905),
                             Description = "Description for Product 1",
                             Gender = "Male",
                             Inventory = 10,
@@ -422,7 +422,7 @@ namespace KFS.Migrations
                         {
                             Id = new Guid("8657ed40-1b9d-44e2-800d-40bb1a20af98"),
                             CategoryId = new Guid("3d4fc185-049d-4a96-851b-1d320e7dbba8"),
-                            CreatedAt = new DateTime(2024, 9, 30, 8, 40, 7, 212, DateTimeKind.Local).AddTicks(3849),
+                            CreatedAt = new DateTime(2024, 9, 30, 12, 39, 52, 169, DateTimeKind.Local).AddTicks(1922),
                             Description = "Description for Product 2",
                             Gender = "Female",
                             Inventory = 10,
@@ -434,7 +434,7 @@ namespace KFS.Migrations
                         {
                             Id = new Guid("f3b3b3b4-1b9d-44e2-800d-40bb1a20af98"),
                             CategoryId = new Guid("9a17dcf5-1426-45ee-a32e-c23ee5fe40d9"),
-                            CreatedAt = new DateTime(2024, 9, 30, 8, 40, 7, 212, DateTimeKind.Local).AddTicks(3853),
+                            CreatedAt = new DateTime(2024, 9, 30, 12, 39, 52, 169, DateTimeKind.Local).AddTicks(1926),
                             Description = "Description for Product 3",
                             Gender = "Male",
                             Inventory = 10,
@@ -498,7 +498,6 @@ namespace KFS.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Address")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Avatar")
@@ -540,10 +539,10 @@ namespace KFS.Migrations
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000001"),
                             Address = "HCM",
-                            CreatedAt = new DateTime(2024, 9, 30, 8, 40, 7, 490, DateTimeKind.Local).AddTicks(8792),
+                            CreatedAt = new DateTime(2024, 9, 30, 12, 39, 52, 377, DateTimeKind.Local).AddTicks(9698),
                             Email = "giangnnt260703@gmail.com",
                             FullName = "Truong Giang",
-                            Password = "$2a$11$LGTNIPT8LHO48pAh4U5D4uJnad0P7d793Gf1WzBT/4uUIPfF3X77e",
+                            Password = "$2a$11$6U71Czkwb85ZEB/kn3A7DeFGyI.lD2BBFET5px1hPJUjPDQEHxoLu",
                             Phone = "0123456789",
                             RoleId = 1,
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)

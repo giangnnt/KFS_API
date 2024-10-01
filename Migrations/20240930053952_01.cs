@@ -120,7 +120,7 @@ namespace KFS.Migrations
                     RoleId = table.Column<int>(type: "int", nullable: false),
                     Avatar = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -330,23 +330,23 @@ namespace KFS.Migrations
                 columns: new[] { "Id", "Age", "CategoryId", "Color", "CreatedAt", "Description", "FeedingVolumn", "FilterRate", "Gender", "Inventory", "Length", "Name", "Origin", "Price", "Species", "UpdatedAt" },
                 values: new object[,]
                 {
-                    { new Guid("2a9394e2-52b3-46d5-8a33-af4d6020e440"), null, new Guid("5f18bf0c-7199-462c-b023-3ccf1fd9f806"), null, new DateTime(2024, 9, 30, 8, 40, 7, 212, DateTimeKind.Local).AddTicks(3833), "Description for Product 1", null, null, "Male", 10, null, "Product 1", null, 10000m, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { new Guid("8657ed40-1b9d-44e2-800d-40bb1a20af98"), null, new Guid("3d4fc185-049d-4a96-851b-1d320e7dbba8"), null, new DateTime(2024, 9, 30, 8, 40, 7, 212, DateTimeKind.Local).AddTicks(3849), "Description for Product 2", null, null, "Female", 10, null, "Product 2", null, 20000m, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { new Guid("f3b3b3b4-1b9d-44e2-800d-40bb1a20af98"), null, new Guid("9a17dcf5-1426-45ee-a32e-c23ee5fe40d9"), null, new DateTime(2024, 9, 30, 8, 40, 7, 212, DateTimeKind.Local).AddTicks(3853), "Description for Product 3", null, null, "Male", 10, null, "Product 3", null, 30000m, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { new Guid("2a9394e2-52b3-46d5-8a33-af4d6020e440"), null, new Guid("5f18bf0c-7199-462c-b023-3ccf1fd9f806"), null, new DateTime(2024, 9, 30, 12, 39, 52, 169, DateTimeKind.Local).AddTicks(1905), "Description for Product 1", null, null, "Male", 10, null, "Product 1", null, 10000m, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { new Guid("8657ed40-1b9d-44e2-800d-40bb1a20af98"), null, new Guid("3d4fc185-049d-4a96-851b-1d320e7dbba8"), null, new DateTime(2024, 9, 30, 12, 39, 52, 169, DateTimeKind.Local).AddTicks(1922), "Description for Product 2", null, null, "Female", 10, null, "Product 2", null, 20000m, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { new Guid("f3b3b3b4-1b9d-44e2-800d-40bb1a20af98"), null, new Guid("9a17dcf5-1426-45ee-a32e-c23ee5fe40d9"), null, new DateTime(2024, 9, 30, 12, 39, 52, 169, DateTimeKind.Local).AddTicks(1926), "Description for Product 3", null, null, "Male", 10, null, "Product 3", null, 30000m, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
                 });
 
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "Address", "Avatar", "CreatedAt", "Email", "FullName", "Password", "Phone", "RoleId", "UpdatedAt" },
-                values: new object[] { new Guid("00000000-0000-0000-0000-000000000001"), "HCM", null, new DateTime(2024, 9, 30, 8, 40, 7, 490, DateTimeKind.Local).AddTicks(8792), "giangnnt260703@gmail.com", "Truong Giang", "$2a$11$LGTNIPT8LHO48pAh4U5D4uJnad0P7d793Gf1WzBT/4uUIPfF3X77e", "0123456789", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
+                values: new object[] { new Guid("00000000-0000-0000-0000-000000000001"), "HCM", null, new DateTime(2024, 9, 30, 12, 39, 52, 377, DateTimeKind.Local).AddTicks(9698), "giangnnt260703@gmail.com", "Truong Giang", "$2a$11$6U71Czkwb85ZEB/kn3A7DeFGyI.lD2BBFET5px1hPJUjPDQEHxoLu", "0123456789", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
 
             migrationBuilder.InsertData(
                 table: "Carts",
                 columns: new[] { "Id", "CreatedAt", "Currency", "Status", "TotalItem", "TotalPrice", "UpdatedAt", "UserId" },
                 values: new object[,]
                 {
-                    { new Guid("37ab9331-f39a-4072-80ad-4adc3684fcec"), new DateTime(2024, 9, 30, 8, 40, 7, 491, DateTimeKind.Local).AddTicks(808), "VND", "Active", 0, 0m, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new Guid("00000000-0000-0000-0000-000000000001") },
-                    { new Guid("da17c01a-de60-4b46-810e-f824a1936e14"), new DateTime(2024, 9, 30, 8, 40, 7, 491, DateTimeKind.Local).AddTicks(827), "VND", "Completed", 0, 0m, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new Guid("00000000-0000-0000-0000-000000000001") }
+                    { new Guid("37ab9331-f39a-4072-80ad-4adc3684fcec"), new DateTime(2024, 9, 30, 12, 39, 52, 378, DateTimeKind.Local).AddTicks(1879), "VND", "Active", 0, 0m, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new Guid("00000000-0000-0000-0000-000000000001") },
+                    { new Guid("da17c01a-de60-4b46-810e-f824a1936e14"), new DateTime(2024, 9, 30, 12, 39, 52, 378, DateTimeKind.Local).AddTicks(1884), "VND", "Completed", 0, 0m, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new Guid("00000000-0000-0000-0000-000000000001") }
                 });
 
             migrationBuilder.CreateIndex(

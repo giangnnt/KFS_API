@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 namespace KFS.src.Application.Middleware
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
-    public class ProtectedAttribute : Attribute
+    public class ProtectedAttribute : Attribute, IAuthorizationFilter
     {
         private readonly IJwtService _jwtService;
 
@@ -43,23 +43,14 @@ namespace KFS.src.Application.Middleware
             {
                 var payload = _jwtService.ValidateToken(token);
                 context.HttpContext.Items["payload"] = payload;
-
-                // Nếu token hợp lệ, trả về thành công
-                context.Result = new JsonResult(new ResponseDto
-                {
-                    StatusCode = 200,
-                    Message = "Success",
-                    IsSuccess = true
-                });
-                return;
             }
-            catch
+            catch(Exception ex)
             {
                 // Token không hợp lệ
                 context.Result = new JsonResult(new ResponseDto
                 {
                     StatusCode = 401,
-                    Message = "Unauthorized",
+                    Message = ex.Message,
                     IsSuccess = false
                 });
                 return;

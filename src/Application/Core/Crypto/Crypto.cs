@@ -5,12 +5,12 @@ using System.Threading.Tasks;
 
 namespace KFS.src.Application.Core.Crypto
 {
-    public interface ICrrypro
+    public interface ICrypro
     {
         public string HashPassword(string password);
         public bool VerifyPassword(string password, string hash);
     }
-    public class Crypto : ICrrypro
+    public class Crypto : ICrypro
     {
         public string HashPassword(string password)
         {

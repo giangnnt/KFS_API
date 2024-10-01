@@ -17,11 +17,18 @@ namespace KFS.src.Infrastucture.Repository
             _context = context;
         }
 
-        public async Task<User> GetUserByEmail(string email)
+        public async Task<bool> CreateUser(User user)
+        {
+            user.CreatedAt = DateTime.Now;
+            _context.Users.Add(user);
+            var result = await _context.SaveChangesAsync();
+            return result > 0;
+        }
+
+        public async Task<User?> GetUserByEmail(string email)
         {
             return await _context.Users.Where(x => x.Email == email)
-            .Include(x => x.Password)
-            .FirstOrDefaultAsync() ?? throw new Exception("User not found");
+            .FirstOrDefaultAsync();
         }
 
         public async Task<User> GetUserById(Guid id)

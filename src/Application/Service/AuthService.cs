@@ -11,6 +11,7 @@ using KFS.src.Application.Core.Jwt;
 using KFS.src.Application.Dto.AuthDtos;
 using KFS.src.Application.Dto.ResponseDtos;
 using KFS.src.Application.Dto.Session;
+using KFS.src.Domain.Entities;
 using KFS.src.Domain.IRepository;
 using KFS.src.Domain.IService;
 using KFS.src.Infrastucture.Cache;
@@ -22,14 +23,14 @@ namespace KFS.src.Application.Service
     {
         private readonly IRoleBaseRepository _roleBaseRepository;
         private readonly IUserRepository _userRepository;
-        private readonly Crypto _crypto;
-        private readonly JwtService _jwtService;
+        private readonly ICrypro _crypto;
+        private readonly IJwtService _jwtService;
         private readonly ICacheService _cacheService;
-        public AuthService(IRoleBaseRepository roleBaseRepository, IUserRepository userRepository, Crypto crypto, JwtService jwtService, ICacheService cacheService)
+        public AuthService(IRoleBaseRepository roleBaseRepository, IUserRepository userRepository, ICrypro crypro, IJwtService jwtService, ICacheService cacheService)
         {
             _roleBaseRepository = roleBaseRepository;
             _userRepository = userRepository;
-            _crypto = crypto;
+            _crypto = crypro;
             _jwtService = jwtService;
             _cacheService = cacheService;
         }
@@ -54,55 +55,157 @@ namespace KFS.src.Application.Service
                     response.Message = "Invalid password";
                     response.IsSuccess = false;
                 }
-                Guid sessionId = Guid.NewGuid();
-                var accessToken = _jwtService.GenerateToken(user.Id, sessionId, user.RoleId, JwtConst.ACCESS_TOKEN_EXP);
-                var refreshToken = GenerateRefreshTk();
-
-                // create redis refresh token key
-                var redisRfTkKey = $"rfTk:{user.Id}:{refreshToken}";
-                await _cacheService.Set(redisRfTkKey, new RedisSession
+                else
                 {
-                    UserId = user.Id,
-                    SessionId = sessionId
-                }, TimeSpan.FromSeconds(JwtConst.REFRESH_TOKEN_EXP));
+                    Guid sessionId = Guid.NewGuid();
+                    var accessToken = _jwtService.GenerateToken(user.Id, sessionId, user.RoleId, JwtConst.ACCESS_TOKEN_EXP);
+                    var refreshToken = GenerateRefreshTk();
 
-                // create a session id key
-                var sessionKey = $"session:{user.Id}:{sessionId}";
-                await _cacheService.Set(sessionKey, new RedisSession
+                    // create redis refresh token key
+                    var redisRfTkKey = $"rfTk:{refreshToken}";
+                    await _cacheService.Set(redisRfTkKey, new RedisSession
+                    {
+                        UserId = user.Id,
+                        SessionId = sessionId
+                    }, TimeSpan.FromSeconds(JwtConst.REFRESH_TOKEN_EXP));
+
+                    // create a session id key
+                    var sessionKey = $"session:{user.Id}:{sessionId}";
+                    await _cacheService.Set(sessionKey, new RedisSession
+                    {
+                        UserId = user.Id,
+                        SessionId = sessionId,
+                        Refresh = refreshToken
+                    }, TimeSpan.FromSeconds(JwtConst.REFRESH_TOKEN_EXP));
+                    TokenResp tokenResp = new TokenResp
+                    {
+                        AccessToken = accessToken,
+                        RefreshToken = refreshToken,
+                        AccessTokenExp = DateTimeOffset.UtcNow.AddSeconds(JwtConst.ACCESS_TOKEN_EXP).ToUnixTimeSeconds(),
+                        RefreshTokenExp = DateTimeOffset.UtcNow.AddSeconds(JwtConst.REFRESH_TOKEN_EXP).ToUnixTimeSeconds()
+                    };
+                    response.StatusCode = 200;
+                    response.Message = "Login successful";
+                    response.Result = new ResultDto
+                    {
+                        Data = tokenResp
+                    };
+                }
+                return response;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public async Task<ResponseDto> RefreshToken(string token)
+        {
+            var response = new ResponseDto();
+            try
+            {
+                // check if token exists
+                var redisRfTkKey = $"rfTk:{token}";
+                var redisrfTk = await _cacheService.Get<RedisSession>(redisRfTkKey);
+                if (redisrfTk == null)
                 {
-                    UserId = user.Id,
-                    SessionId = sessionId,
-                    Refresh = refreshToken
-                }, TimeSpan.FromSeconds(JwtConst.REFRESH_TOKEN_EXP));
+                    response.StatusCode = 404;
+                    response.Message = "Token not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                var ssId = redisrfTk.SessionId;
+                var userId = redisrfTk.UserId;
+                var user = await _userRepository.GetUserById(redisrfTk.UserId);
+                if (user == null)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "User not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                var redisSessionKey = $"session:{userId}:{ssId}";
+                var redisSession = await _cacheService.Get<RedisSession>(redisSessionKey);
+                if (redisSession == null)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Session not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                if (redisSession.Refresh != token)
+                {
+                    response.StatusCode = 401;
+                    response.Message = "Invalid token";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                var newAccessToken = _jwtService.GenerateToken(user.Id, ssId, user.RoleId, JwtConst.ACCESS_TOKEN_EXP);
                 TokenResp tokenResp = new TokenResp
                 {
-                    AccessToken = accessToken,
-                    RefreshToken = refreshToken,
+                    AccessToken = newAccessToken,
+                    RefreshToken = token,
                     AccessTokenExp = DateTimeOffset.UtcNow.AddSeconds(JwtConst.ACCESS_TOKEN_EXP).ToUnixTimeSeconds(),
-                    RefreshTokenExp = DateTimeOffset.UtcNow.AddSeconds(JwtConst.REFRESH_TOKEN_EXP).ToUnixTimeSeconds()
+                    RefreshTokenExp = -1
                 };
                 response.StatusCode = 200;
-                response.Message = "Login successful";
+                response.Message = "Token refreshed";
                 response.Result = new ResultDto
                 {
                     Data = tokenResp
                 };
                 return response;
             }
-            catch 
+            catch
             {
                 throw;
             }
         }
 
-        public Task<ResponseDto> RefreshToken(string token)
+        public async Task<ResponseDto> Register(RegisterDto registerDto)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<ResponseDto> Register(RegisterDto registerDto)
-        {
-            throw new NotImplementedException();
+            var response = new ResponseDto();
+            try
+            {
+                // Check if user exists
+                var user = await _userRepository.GetUserByEmail(registerDto.Email);
+                if (user != null)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "User already exists";
+                    response.IsSuccess = false;
+                }
+                else
+                {
+                    var hashedPassword = _crypto.HashPassword(registerDto.Password);
+                    var newUser = new User
+                    {
+                        Email = registerDto.Email,
+                        Password = hashedPassword,
+                        FullName = registerDto.FullName,
+                        Phone = registerDto.PhoneNumber,
+                        RoleId = RoleConst.GetRoleId(RoleConst.CUSTOMER)
+                    };
+                    var result = await _userRepository.CreateUser(newUser);
+                    if (result)
+                    {
+                        response.StatusCode = 201;
+                        response.Message = "User created successfully";
+                        response.IsSuccess = true;
+                    }
+                    else
+                    {
+                        response.StatusCode = 500;
+                        response.Message = "Failed to create user";
+                        response.IsSuccess = false;
+                    }
+                }
+                return response;
+            }
+            catch
+            {
+                throw;
+            }
         }
         private static string GenerateRefreshTk()
         {
@@ -110,6 +213,62 @@ namespace KFS.src.Application.Service
             using var rng = RandomNumberGenerator.Create();
             rng.GetBytes(randomNumber);
             return Convert.ToBase64String(randomNumber);
+        }
+
+        public async Task<ResponseDto> Logout(string token)
+        {
+            var response = new ResponseDto();
+            try
+            {
+                var redisRfTkKey = $"rfTk:{token}";
+                var redisrfTk = await _cacheService.Get<RedisSession>(redisRfTkKey);
+                if (redisrfTk == null)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Token not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                var ssId = redisrfTk.SessionId;
+                var userId = redisrfTk.UserId;
+                var user = await _userRepository.GetUserById(redisrfTk.UserId);
+                if (user == null)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "User not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                var redisSessionKey = $"session:{userId}:{ssId}";
+                var redisSession = await _cacheService.Get<RedisSession>(redisSessionKey);
+                if (redisSession == null)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Session not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                if (redisSession.Refresh != token)
+                {
+                    response.StatusCode = 401;
+                    response.Message = "Invalid token";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                // remove refresh token and session
+                await _cacheService.Remove(redisRfTkKey);
+                await _cacheService.Remove(redisSessionKey);
+
+                response.StatusCode = 200;
+                response.Message = "Logout successful";
+                response.IsSuccess = true;
+                return response;
+                
+            }
+            catch
+            {
+                throw;
+            }
         }
     }
 }
