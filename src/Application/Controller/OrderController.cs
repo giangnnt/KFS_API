@@ -90,7 +90,6 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
-        [Protected]
         [HttpGet("vnpayment-return")]
         public async Task<IActionResult> PaymentReturn()
         {

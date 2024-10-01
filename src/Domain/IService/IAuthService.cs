@@ -12,5 +12,6 @@ namespace KFS.src.Domain.IService
         Task<ResponseDto> Login(LoginDto loginDto);
         Task<ResponseDto> Register(RegisterDto registerDto);
         Task<ResponseDto> RefreshToken(string token);
+        Task<ResponseDto> Logout(string token);
     }
 }

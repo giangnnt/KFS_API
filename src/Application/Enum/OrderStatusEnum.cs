@@ -6,7 +6,7 @@ namespace KFS.src.Application.Enum
         Processing,
         Delivered,
         Completed,
-        Cancelled,
+        Canceled,
         Failed
     }
 }

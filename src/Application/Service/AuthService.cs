@@ -62,7 +62,7 @@ namespace KFS.src.Application.Service
                     var refreshToken = GenerateRefreshTk();
 
                     // create redis refresh token key
-                    var redisRfTkKey = $"rfTk:{user.Id}:{refreshToken}";
+                    var redisRfTkKey = $"rfTk:{refreshToken}";
                     await _cacheService.Set(redisRfTkKey, new RedisSession
                     {
                         UserId = user.Id,
@@ -99,9 +99,67 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public Task<ResponseDto> RefreshToken(string token)
+        public async Task<ResponseDto> RefreshToken(string token)
         {
-            throw new NotImplementedException();
+            var response = new ResponseDto();
+            try
+            {
+                // check if token exists
+                var redisRfTkKey = $"rfTk:{token}";
+                var redisrfTk = await _cacheService.Get<RedisSession>(redisRfTkKey);
+                if (redisrfTk == null)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Token not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                var ssId = redisrfTk.SessionId;
+                var userId = redisrfTk.UserId;
+                var user = await _userRepository.GetUserById(redisrfTk.UserId);
+                if (user == null)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "User not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                var redisSessionKey = $"session:{userId}:{ssId}";
+                var redisSession = await _cacheService.Get<RedisSession>(redisSessionKey);
+                if (redisSession == null)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Session not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                if (redisSession.Refresh != token)
+                {
+                    response.StatusCode = 401;
+                    response.Message = "Invalid token";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                var newAccessToken = _jwtService.GenerateToken(user.Id, ssId, user.RoleId, JwtConst.ACCESS_TOKEN_EXP);
+                TokenResp tokenResp = new TokenResp
+                {
+                    AccessToken = newAccessToken,
+                    RefreshToken = token,
+                    AccessTokenExp = DateTimeOffset.UtcNow.AddSeconds(JwtConst.ACCESS_TOKEN_EXP).ToUnixTimeSeconds(),
+                    RefreshTokenExp = -1
+                };
+                response.StatusCode = 200;
+                response.Message = "Token refreshed";
+                response.Result = new ResultDto
+                {
+                    Data = tokenResp
+                };
+                return response;
+            }
+            catch
+            {
+                throw;
+            }
         }
 
         public async Task<ResponseDto> Register(RegisterDto registerDto)
@@ -155,6 +213,62 @@ namespace KFS.src.Application.Service
             using var rng = RandomNumberGenerator.Create();
             rng.GetBytes(randomNumber);
             return Convert.ToBase64String(randomNumber);
+        }
+
+        public async Task<ResponseDto> Logout(string token)
+        {
+            var response = new ResponseDto();
+            try
+            {
+                var redisRfTkKey = $"rfTk:{token}";
+                var redisrfTk = await _cacheService.Get<RedisSession>(redisRfTkKey);
+                if (redisrfTk == null)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Token not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                var ssId = redisrfTk.SessionId;
+                var userId = redisrfTk.UserId;
+                var user = await _userRepository.GetUserById(redisrfTk.UserId);
+                if (user == null)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "User not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                var redisSessionKey = $"session:{userId}:{ssId}";
+                var redisSession = await _cacheService.Get<RedisSession>(redisSessionKey);
+                if (redisSession == null)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Session not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                if (redisSession.Refresh != token)
+                {
+                    response.StatusCode = 401;
+                    response.Message = "Invalid token";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                // remove refresh token and session
+                await _cacheService.Remove(redisRfTkKey);
+                await _cacheService.Remove(redisSessionKey);
+
+                response.StatusCode = 200;
+                response.Message = "Logout successful";
+                response.IsSuccess = true;
+                return response;
+                
+            }
+            catch
+            {
+                throw;
+            }
         }
     }
 }
