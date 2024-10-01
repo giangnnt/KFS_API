@@ -22,10 +22,11 @@ namespace KFS.src.Application.Service
         private readonly ICartRepository _cartRepository;
         private readonly IVNPayService _vNPayService;
         private readonly IPaymentRepository _paymentRepository;
+        private readonly IProductRepository _productRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         private readonly IMapper _mapper;
-        public OrderService(IOrderRepository orderRepository, IMapper mapper, IUserRepository userRepository, ICartRepository cartRepository, IVNPayService vNPayService, IHttpContextAccessor httpContextAccessor, IPaymentRepository paymentRepository)
+        public OrderService(IOrderRepository orderRepository, IMapper mapper, IUserRepository userRepository, ICartRepository cartRepository, IVNPayService vNPayService, IHttpContextAccessor httpContextAccessor, IProductRepository productRepository, IPaymentRepository paymentRepository)
         {
             _orderRepository = orderRepository;
             _mapper = mapper;
@@ -34,6 +35,7 @@ namespace KFS.src.Application.Service
             _vNPayService = vNPayService;
             _httpContextAccessor = httpContextAccessor;
             _paymentRepository = paymentRepository;
+            _productRepository = productRepository;
         }
 
         public async Task<ResponseDto> AcceptOrder(Guid id)
@@ -254,6 +256,12 @@ namespace KFS.src.Application.Service
                                 c.Status = CartStatusEnum.Completed;
                                 cart = c;
                             }
+                        }
+                        foreach (var orderItem in order.OrderItems)
+                        {
+                            var product = await _productRepository.GetProductById(orderItem.ProductId);
+                            product.Inventory -= orderItem.Quantity;
+                            await _productRepository.UpdateProduct(product);
                         }
                         order.Status = OrderStatusEnum.Completed;
                         response.StatusCode = 200;
