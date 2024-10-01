@@ -47,6 +47,7 @@ namespace KFS.src.Application.Service
                     response.StatusCode = 404;
                     response.Message = "User not found";
                     response.IsSuccess = false;
+                    return response;
                 }
                 // Verify password
                 if (!_crypto.VerifyPassword(loginDto.Password, user!.Password))
@@ -54,43 +55,41 @@ namespace KFS.src.Application.Service
                     response.StatusCode = 401;
                     response.Message = "Invalid password";
                     response.IsSuccess = false;
+                    return response;
                 }
-                else
+                Guid sessionId = Guid.NewGuid();
+                var accessToken = _jwtService.GenerateToken(user.Id, sessionId, user.RoleId, JwtConst.ACCESS_TOKEN_EXP);
+                var refreshToken = GenerateRefreshTk();
+
+                // create redis refresh token key
+                var redisRfTkKey = $"rfTk:{refreshToken}";
+                await _cacheService.Set(redisRfTkKey, new RedisSession
                 {
-                    Guid sessionId = Guid.NewGuid();
-                    var accessToken = _jwtService.GenerateToken(user.Id, sessionId, user.RoleId, JwtConst.ACCESS_TOKEN_EXP);
-                    var refreshToken = GenerateRefreshTk();
+                    UserId = user.Id,
+                    SessionId = sessionId
+                }, TimeSpan.FromSeconds(JwtConst.REFRESH_TOKEN_EXP));
 
-                    // create redis refresh token key
-                    var redisRfTkKey = $"rfTk:{refreshToken}";
-                    await _cacheService.Set(redisRfTkKey, new RedisSession
-                    {
-                        UserId = user.Id,
-                        SessionId = sessionId
-                    }, TimeSpan.FromSeconds(JwtConst.REFRESH_TOKEN_EXP));
-
-                    // create a session id key
-                    var sessionKey = $"session:{user.Id}:{sessionId}";
-                    await _cacheService.Set(sessionKey, new RedisSession
-                    {
-                        UserId = user.Id,
-                        SessionId = sessionId,
-                        Refresh = refreshToken
-                    }, TimeSpan.FromSeconds(JwtConst.REFRESH_TOKEN_EXP));
-                    TokenResp tokenResp = new TokenResp
-                    {
-                        AccessToken = accessToken,
-                        RefreshToken = refreshToken,
-                        AccessTokenExp = DateTimeOffset.UtcNow.AddSeconds(JwtConst.ACCESS_TOKEN_EXP).ToUnixTimeSeconds(),
-                        RefreshTokenExp = DateTimeOffset.UtcNow.AddSeconds(JwtConst.REFRESH_TOKEN_EXP).ToUnixTimeSeconds()
-                    };
-                    response.StatusCode = 200;
-                    response.Message = "Login successful";
-                    response.Result = new ResultDto
-                    {
-                        Data = tokenResp
-                    };
-                }
+                // create a session id key
+                var sessionKey = $"session:{user.Id}:{sessionId}";
+                await _cacheService.Set(sessionKey, new RedisSession
+                {
+                    UserId = user.Id,
+                    SessionId = sessionId,
+                    Refresh = refreshToken
+                }, TimeSpan.FromSeconds(JwtConst.REFRESH_TOKEN_EXP));
+                TokenResp tokenResp = new TokenResp
+                {
+                    AccessToken = accessToken,
+                    RefreshToken = refreshToken,
+                    AccessTokenExp = DateTimeOffset.UtcNow.AddSeconds(JwtConst.ACCESS_TOKEN_EXP).ToUnixTimeSeconds(),
+                    RefreshTokenExp = DateTimeOffset.UtcNow.AddSeconds(JwtConst.REFRESH_TOKEN_EXP).ToUnixTimeSeconds()
+                };
+                response.StatusCode = 200;
+                response.Message = "Login successful";
+                response.Result = new ResultDto
+                {
+                    Data = tokenResp
+                };
                 return response;
             }
             catch
@@ -263,7 +262,7 @@ namespace KFS.src.Application.Service
                 response.Message = "Logout successful";
                 response.IsSuccess = true;
                 return response;
-                
+
             }
             catch
             {

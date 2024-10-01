@@ -10,7 +10,6 @@ namespace KFS.src.Application.Dto.CartDtos
 {
     public class CartCreate
     {
-        public Guid UserId { get; set; }
         public string Currency { get; set; } = "VND";
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public CartStatusEnum Status { get; set; }

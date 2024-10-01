@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using KFS.src.Application.Core.Jwt;
 using KFS.src.Application.Dto.CartDtos;
 using KFS.src.Application.Dto.ResponseDtos;
 using KFS.src.Application.Enum;
@@ -19,12 +20,14 @@ namespace KFS.src.Application.Service
         private readonly IProductRepository _productRepository;
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
-        public CartService(ICartRepository cartRepository, IProductRepository productRepository, IUserRepository userRepository, IMapper mapper)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public CartService(ICartRepository cartRepository, IProductRepository productRepository, IUserRepository userRepository, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             _cartRepository = cartRepository;
             _productRepository = productRepository;
             _userRepository = userRepository;
             _mapper = mapper;
+            _httpContextAccessor = httpContextAccessor;
         }
         public async Task<ResponseDto> AddProductToCart(CartAddRemoveDto req)
         {
@@ -103,10 +106,31 @@ namespace KFS.src.Application.Service
             var response = new ResponseDto();
             try
             {
+                var httpContext = _httpContextAccessor.HttpContext;
+                // check httpContext
+                if (httpContext == null)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Http context is required";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                // get payload
+                var payload = httpContext.Items["payload"] as Payload;
+                // check payload
+                if (payload == null)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Payload is required";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                // get userId
+                var userId = payload.UserId;
                 //map cart
                 var mappedCart = _mapper.Map<Cart>(req);
                 //check if user exist
-                var user = await _userRepository.GetUserById(req.UserId);
+                var user = await _userRepository.GetUserById(userId);
                 if (user == null)
                 {
                     response.StatusCode = 404;
@@ -120,15 +144,7 @@ namespace KFS.src.Application.Service
                 {
                     mappedCart.User = user;
                 }
-                var userCarts = await _cartRepository.GetCartByUserId(req.UserId);
-                //check if cart status is null
-                if (req.Status == 0)
-                {
-                    response.StatusCode = 400;
-                    response.Message = "Cart status is required";
-                    response.IsSuccess = false;
-                    return response;
-                }
+                var userCarts = await _cartRepository.GetCartByUserId(userId);
                 //check if user has an active cart
                 if (req.Status == CartStatusEnum.Active)
                 {

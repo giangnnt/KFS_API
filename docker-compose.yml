@@ -6,7 +6,8 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT="Production"
       - ConnectionStrings__DatabaseConnection=Server=sqlserver,1433;Database=KFS;User Id=sa;Password=giangpro123@;MultipleActiveResultSets=true;TrustServerCertificate=true;
-      - ConnectionStrings__RedisConnection=cache:6379,password=123456,abortConnect=false
+      - ConnectionStrings__RedisConnection=cache:6379,password=123456,abortConnect=false;
+      - JWT_SECRET=8a21f416ac3c7de71de084e5190bb322456f5739eff177aeb5be84af1a70bc59
     restart: on-failure
     depends_on:
       - sqlserver
