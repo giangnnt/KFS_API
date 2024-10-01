@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using KFS.src.Application.Enum;
 
 namespace KFS.src.Application.Dto.OrderDtos
 {
@@ -11,5 +12,6 @@ namespace KFS.src.Application.Dto.OrderDtos
         public string? ContactNumber { get; set; }
         public string? ContactName { get; set; }
         public string? Note { get; set; }
+        public OrderStatusEnum? Status { get; set; }
     }
 }

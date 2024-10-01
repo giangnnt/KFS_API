@@ -445,12 +445,17 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
                     return response;
                 }
+                // check order status
+                if (order.Status == OrderStatusEnum.Delivering || order.Status == OrderStatusEnum.Delivered || order.Status == OrderStatusEnum.Completed || order.Status == OrderStatusEnum.Canceled || order.Status == OrderStatusEnum.Failed)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Order is completed, canceled or failed";
+                    response.IsSuccess = false;
+                    return response;
+                }
 
                 //map order update to order
                 var mappedOrder = _mapper.Map(req, order);
-
-                //calculate total price
-
 
                 //update order
                 var result = await _orderRepository.UpdateOrder(mappedOrder);
@@ -469,6 +474,49 @@ namespace KFS.src.Application.Service
                     response.Message = "Order update failed";
                     response.IsSuccess = false;
                     return response;
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public Task<ResponseDto> UpdateOrderStatus(OrderStatusEnum status, Guid id)
+        {
+            var response = new ResponseDto();
+            try
+            {
+                //get order
+                var order = _orderRepository.GetOrderById(id).Result;
+                if (order == null)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Order not found";
+                    response.IsSuccess = false;
+                    return Task.FromResult(response);
+                }
+
+                //set order status
+                order.Status = status;
+
+                //update order
+                var result = _orderRepository.UpdateOrder(order).Result;
+
+                //check result
+                if (result)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Order status updated successfully";
+                    response.IsSuccess = true;
+                    return Task.FromResult(response);
+                }
+                else
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Order status update failed";
+                    response.IsSuccess = false;
+                    return Task.FromResult(response);
                 }
             }
             catch
