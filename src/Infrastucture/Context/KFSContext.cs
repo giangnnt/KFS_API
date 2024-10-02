@@ -30,6 +30,8 @@ namespace KFS.src.Infrastucture.Context
         public DbSet<Payment> Payments { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<Permission> Permissions { get; set; }
+        public DbSet<Consignment> Consignments { get; set; }
+        public DbSet<Shipment> Shipments { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
