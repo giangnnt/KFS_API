@@ -9,5 +9,9 @@ namespace KFS.src.Domain.IRepository
     public interface IPaymentRepository
     {
         Task<bool> CreatePayment(Payment payment);
+        Task<IEnumerable<Payment>> GetPayments();
+        Task<Payment> GetPaymentById(Guid id);
+        Task<bool> UpdatePayment(Payment payment);
+        Task<bool> DeletePayment(Guid id);
     }
 }

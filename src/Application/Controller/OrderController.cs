@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using KFS.src.Application.Constant;
 using KFS.src.Application.Dto.OrderDtos;
+using KFS.src.Application.Enum;
 using KFS.src.Application.Middleware;
 using KFS.src.Domain.IService;
 using Microsoft.AspNetCore.Mvc;
@@ -96,6 +97,48 @@ namespace KFS.src.Application.Controller
             try
             {
                 var result = await _orderService.GetResponsePaymentUrl();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [Protected]
+        [HttpPut("update-status/{id}")]
+        public async Task<IActionResult> UpdateOrderStatus(OrderUpdateStatus req)
+        {
+            try
+            {
+                var result = await _orderService.UpdateOrderStatus(req);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [Protected]
+        [HttpGet("user/{userId}")]
+        public async Task<IActionResult> GetOrderByUserId(Guid userId)
+        {
+            try
+            {
+                var result = await _orderService.GetOrderByUserId(userId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [Protected]
+        [HttpPut("accept/{id}")]
+        public async Task<IActionResult> AcceptOrder(Guid id)
+        {
+            try
+            {
+                var result = await _orderService.AcceptOrder(id);
                 return Ok(result);
             }
             catch (Exception ex)

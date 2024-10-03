@@ -14,10 +14,11 @@ namespace KFS.src.Domain.IService
         Task<ResponseDto> GetOrderById(Guid id);
         Task<ResponseDto> CreateOrderFromCart(OrderCreateFromCart req);
         Task<ResponseDto> UpdateOrder(OrderUpdate req, Guid id);
-        Task<ResponseDto> UpdateOrderStatus(OrderStatusEnum status, Guid id);
+        Task<ResponseDto> UpdateOrderStatus(OrderUpdateStatus req);
         Task<ResponseDto> DeleteOrder(Guid id);
         Task<ResponseDto> GetOrderByUserId(Guid userId);
         Task<ResponseDto> AcceptOrder(Guid id);
         Task<ResponseDto> GetResponsePaymentUrl();
+        //Task<ResponseDto> CancelOrder(Guid id);
     }
 }

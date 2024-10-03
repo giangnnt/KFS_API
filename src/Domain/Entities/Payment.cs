@@ -15,7 +15,7 @@ namespace KFS.src.Domain.Entities
         public decimal Amount { get; set; }
         public PaymentStatusEnum Status { get; set; }
         public string Currency { get; set; } = "VND";
-        public string TransactionId { get; set; } = null!;
+        public string? TransactionId { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public Order Order { get; set; } = null!;

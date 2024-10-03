@@ -12,6 +12,5 @@ namespace KFS.src.Application.Dto.OrderDtos
         public string? ContactNumber { get; set; }
         public string? ContactName { get; set; }
         public string? Note { get; set; }
-        public OrderStatusEnum? Status { get; set; }
     }
 }
