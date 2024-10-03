@@ -49,6 +49,24 @@ namespace KFS.src.Infrastucture.Context
                 entity.Property(entity => entity.Gender).HasConversion(v => v.ToString(), v => v != null ? (GenderEnum)Enum.Parse(typeof(GenderEnum), v) : default)
                 .HasColumnType("nvarchar(20)");
             });
+            //config payment
+            modelBuilder.Entity<Payment>(entity =>
+            {
+                entity.Property(entity => entity.Id).ValueGeneratedOnAdd();
+                entity.Property(entity => entity.Status).HasConversion(v => v.ToString(), v => v != null ? (PaymentStatusEnum)Enum.Parse(typeof(PaymentStatusEnum), v) : default)
+                .HasColumnType("nvarchar(20)");
+                entity.Property(entity => entity.PaymentMethod).HasConversion(v => v.ToString(), v => v != null ? (PaymentMethodEnum)Enum.Parse(typeof(PaymentMethodEnum), v) : default)
+                .HasColumnType("nvarchar(20)");
+            });
+            //config shipment
+            modelBuilder.Entity<Shipment>(entity =>
+            {
+                entity.HasOne(entity => entity.Order)
+                .WithOne(entity => entity.Shipment);
+                entity.Property(entity => entity.Id).ValueGeneratedOnAdd();
+                entity.Property(entity => entity.Status).HasConversion(v => v.ToString(), v => v != null ? (ShipmentStatusEnum)Enum.Parse(typeof(ShipmentStatusEnum), v) : default)
+                .HasColumnType("nvarchar(20)");
+            });
             //seed product
             modelBuilder.Entity<Product>().HasData(
                 new Product
@@ -205,6 +223,8 @@ namespace KFS.src.Infrastucture.Context
             //config order
             modelBuilder.Entity<Order>(entity =>
             {
+                entity.HasOne(entity => entity.Payment)
+                .WithOne(entity => entity.Order);
                 entity.Property(entity => entity.Status)
                 .HasConversion(
                     v => v.ToString(),

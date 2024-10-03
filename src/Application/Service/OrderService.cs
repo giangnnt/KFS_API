@@ -505,13 +505,13 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public Task<ResponseDto> UpdateOrderStatus(OrderStatusEnum status, Guid id)
+        public Task<ResponseDto> UpdateOrderStatus(OrderUpdateStatus req)
         {
             var response = new ResponseDto();
             try
             {
                 //get order
-                var order = _orderRepository.GetOrderById(id).Result;
+                var order = _orderRepository.GetOrderById(req.Id).Result;
                 if (order == null)
                 {
                     response.StatusCode = 404;
@@ -521,7 +521,7 @@ namespace KFS.src.Application.Service
                 }
 
                 //set order status
-                order.Status = status;
+                order.Status = req.Status;
 
                 //update order
                 var result = _orderRepository.UpdateOrder(order).Result;

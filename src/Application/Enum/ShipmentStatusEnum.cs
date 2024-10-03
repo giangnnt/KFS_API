@@ -4,5 +4,7 @@ namespace KFS.src.Application.Enum
     {
         Delivering,
         Delivered,
+        Completed,
+        Cancelled
     }
 }

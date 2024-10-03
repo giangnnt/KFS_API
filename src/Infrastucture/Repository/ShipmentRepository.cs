@@ -19,7 +19,7 @@ namespace KFS.src.Infrastucture.Repository
         public async Task<bool> CreateShipment(Shipment shipment)
         {
             _context.Shipments.Add(shipment);
-            var result = await _context.SaveChangesAsync();
+            int result = await _context.SaveChangesAsync();
             return result > 0;
         }
 
@@ -32,7 +32,7 @@ namespace KFS.src.Infrastucture.Repository
             return result > 0;
         }
 
-        public async Task<Shipment> GetShipment(Guid id)
+        public async Task<Shipment> GetShipmentById(Guid id)
         {
             return await _context.Shipments
             .Include(x => x.Order)
