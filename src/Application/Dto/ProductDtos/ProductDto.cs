@@ -26,6 +26,7 @@ namespace KFS.src.Application.Dto.ProductDtos
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public GenderEnum Gender { get; set; }
         public int Inventory { get; set; }
+        public bool IsForSell { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public CategotyDto Category { get; set; } = null!;

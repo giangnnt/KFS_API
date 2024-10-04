@@ -89,5 +89,19 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }   
+        [Protected]
+        [HttpPut("update-is-for-sell/{id}")]
+        public async Task<IActionResult> UpdateIsForSell(bool isForSell, Guid id)
+        {
+            try
+            {
+                var result = await _productService.UpdateIsForSell(isForSell, id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

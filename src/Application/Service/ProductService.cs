@@ -159,6 +159,46 @@ namespace KFS.src.Application.Service
             }
         }
 
+        public async Task<ResponseDto> UpdateIsForSell(bool isForSell, Guid id)
+        {
+            var response = new ResponseDto();
+            try
+            {
+                //get product by id
+                var product = await _productRepository.GetProductById(id);
+                if (product != null)
+                {
+                    product.IsForSell = isForSell;
+                    var result = _productRepository.UpdateProduct(product);
+                    if (result.Result)
+                    {
+                        response.StatusCode = 200;
+                        response.Message = "Product updated successfully";
+                        response.IsSuccess = true;
+                        return response;
+                    }
+                    else
+                    {
+                        response.StatusCode = 400;
+                        response.Message = "Product update failed";
+                        response.IsSuccess = false;
+                        return response;
+                    }
+                }
+                else
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Product not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
         public async Task<ResponseDto> UpdateProduct(ProductUpdate req, Guid id)
         {
             var response = new ResponseDto();

@@ -225,6 +225,8 @@ namespace KFS.src.Infrastucture.Context
             {
                 entity.HasOne(entity => entity.Payment)
                 .WithOne(entity => entity.Order);
+                entity.HasOne(entity => entity.Shipment)
+                .WithOne(entity => entity.Order);
                 entity.Property(entity => entity.Status)
                 .HasConversion(
                     v => v.ToString(),
@@ -247,6 +249,22 @@ namespace KFS.src.Infrastucture.Context
                 .HasConversion(
                     v => v.ToString(),
                     v => v != null ? (PaymentMethodEnum)Enum.Parse(typeof(PaymentMethodEnum), v) : default);
+            });
+            //config consignment
+            modelBuilder.Entity<Consignment>(entity =>
+            {
+                entity.Property(entity => entity.Id).ValueGeneratedOnAdd();
+                entity.Property(entity => entity.Method)
+                .HasConversion(
+                    v => v.ToString(),
+                    v => v != null ? (ConsignmentMethodEnum)Enum.Parse(typeof(ConsignmentMethodEnum), v) : default)
+                .HasColumnType("nvarchar(20)");
+
+                entity.Property(entity => entity.Status)
+                .HasConversion(
+                    v => v.ToString(),
+                    v => v != null ? (ConsignmentStatusEnum)Enum.Parse(typeof(ConsignmentStatusEnum), v) : default)
+                .HasColumnType("nvarchar(20)");
             });
         }
     }

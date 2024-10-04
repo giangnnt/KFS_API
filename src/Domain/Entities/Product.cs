@@ -24,9 +24,11 @@ namespace KFS.src.Domain.Entities
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public Guid CategoryId { get; set; }
+        public Guid? ConsignmentId { get; set; }
+        public bool IsForSell { get; set; } = false;
         public Category Category { get; set; } = null!;
+        public Consignment? Consignment { get; set; }
         public List<CartItem> CartItems { get; set; } = new List<CartItem>();
         public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
-        public Consignment? Consignment { get; set; }
     }
 }
