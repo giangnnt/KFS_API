@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using KFS.src.Application.Core.Jwt;
 using KFS.src.Application.Dto.ConsignmentDtos;
 using KFS.src.Application.Dto.ResponseDtos;
 using KFS.src.Application.Enum;
@@ -29,9 +30,73 @@ namespace KFS.src.Application.Service
             _orderItemRepository = orderItemRepository;
             _mapper = mapper;
         }
-        public Task<ResponseDto> CreateConsignment(ConsignmentCreate req)
+        public async Task<ResponseDto> CreateConsignment(ConsignmentCreate req)
         {
-            throw new NotImplementedException();
+            var response = new ResponseDto();
+            var httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext == null)
+            {
+                response.StatusCode = 400;
+                response.Message = "Unauthorized";
+                response.IsSuccess = false;
+                return response;
+            }
+            var payload = httpContext.Items["payload"] as Payload;
+            if (payload == null)
+            {
+                response.StatusCode = 400;
+                response.Message = "Unauthorized";
+                response.IsSuccess = false;
+                return response;
+            }
+            try
+            {
+                var consignment = new Consignment
+                {
+                    UserId = payload.UserId,
+                    Method = ConsignmentMethodEnum.Offline,
+                    CommissionPercentage = req.CommissionPercentage,
+                    DealingAmount = req.DealingAmount,
+                    Status = ConsignmentStatusEnum.Pending,
+                    IsForSell = req.IsForSell,
+                    Product = new Product
+                    {
+                        IsForSell = false,
+                        Name = req.Name,
+                        Description = req.Description,
+                        Price = req.DealingAmount,
+                        Origin = req.Origin,
+                        CategoryId = req.CategoryId,
+                        Age = req.Age,
+                        Length = req.Length,
+                        Species = req.Species,
+                        Color = req.Color,
+                        FeedingVolumn = req.FeedingVolumn,
+                        FilterRate = req.FilterRate,
+                        Inventory = req.Quantity,
+                        CreatedAt = DateTime.Now,
+                    }
+                };
+                var result = await _consignmentRepository.CreateConsignment(consignment);
+                if (result)
+                {
+                    response.StatusCode = 201;
+                    response.Message = "Consignment created successfully";
+                    response.IsSuccess = true;
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Failed to create consignment";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch
+            {
+                throw;
+            }
         }
 
         public async Task<ResponseDto> CreateConsignmentOnline(ConsignmentCreateByOrderItem req)
@@ -152,8 +217,13 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
                     return response;
                 }
+                // update consignment status
                 consignment.Status = isApproved ? ConsignmentStatusEnum.Approved : ConsignmentStatusEnum.Rejected;
-                consignment.Product.IsForSell = isApproved;
+                // update product status
+                if (consignment.IsForSell)
+                {
+                    consignment.Product.IsForSell = isApproved;
+                }
                 var result = await _consignmentRepository.UpdateConsignment(consignment);
                 if (result)
                 {
