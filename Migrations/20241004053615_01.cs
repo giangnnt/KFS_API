@@ -54,38 +54,6 @@ namespace KFS.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Products",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Origin = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Age = table.Column<int>(type: "int", nullable: true),
-                    Length = table.Column<float>(type: "real", nullable: true),
-                    Species = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Color = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FeedingVolumn = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FilterRate = table.Column<float>(type: "real", nullable: true),
-                    Gender = table.Column<string>(type: "nvarchar(20)", nullable: true),
-                    Inventory = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Products", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Products_Categories_CategoryId",
-                        column: x => x.CategoryId,
-                        principalTable: "Categories",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "PermissionRole",
                 columns: table => new
                 {
@@ -165,24 +133,17 @@ namespace KFS.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
-                    Method = table.Column<int>(type: "int", nullable: false),
+                    Method = table.Column<string>(type: "nvarchar(20)", nullable: false),
                     CommissionPercentage = table.Column<int>(type: "int", nullable: false),
                     DealingAmount = table.Column<int>(type: "int", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(20)", nullable: false),
+                    IsForSell = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Consignments", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Consignments_Products_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "Products",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Consignments_Users_UserId",
                         column: x => x.UserId,
@@ -224,57 +185,42 @@ namespace KFS.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CartItems",
+                name: "Products",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CartId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Origin = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Age = table.Column<int>(type: "int", nullable: true),
+                    Length = table.Column<float>(type: "real", nullable: true),
+                    Species = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Color = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FeedingVolumn = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FilterRate = table.Column<float>(type: "real", nullable: true),
+                    Gender = table.Column<string>(type: "nvarchar(20)", nullable: true),
+                    Inventory = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ConsignmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsForSell = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CartItems", x => x.Id);
+                    table.PrimaryKey("PK_Products", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CartItems_Carts_CartId",
-                        column: x => x.CartId,
-                        principalTable: "Carts",
+                        name: "FK_Products_Categories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Categories",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_CartItems_Products_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "Products",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "OrderItems",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_OrderItems", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_OrderItems_Orders_OrderId",
-                        column: x => x.OrderId,
-                        principalTable: "Orders",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_OrderItems_Products_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "Products",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        name: "FK_Products_Consignments_ConsignmentId",
+                        column: x => x.ConsignmentId,
+                        principalTable: "Consignments",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -318,6 +264,61 @@ namespace KFS.Migrations
                         name: "FK_Shipments_Orders_OrderId",
                         column: x => x.OrderId,
                         principalTable: "Orders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CartItems",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CartId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CartItems", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CartItems_Carts_CartId",
+                        column: x => x.CartId,
+                        principalTable: "Carts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CartItems_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OrderItems",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    IsConsignment = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderItems", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OrderItems_Orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Orders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_OrderItems_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -378,26 +379,26 @@ namespace KFS.Migrations
 
             migrationBuilder.InsertData(
                 table: "Products",
-                columns: new[] { "Id", "Age", "CategoryId", "Color", "CreatedAt", "Description", "FeedingVolumn", "FilterRate", "Gender", "Inventory", "Length", "Name", "Origin", "Price", "Species", "UpdatedAt" },
+                columns: new[] { "Id", "Age", "CategoryId", "Color", "ConsignmentId", "CreatedAt", "Description", "FeedingVolumn", "FilterRate", "Gender", "Inventory", "IsForSell", "Length", "Name", "Origin", "Price", "Species", "UpdatedAt" },
                 values: new object[,]
                 {
-                    { new Guid("2a9394e2-52b3-46d5-8a33-af4d6020e440"), null, new Guid("5f18bf0c-7199-462c-b023-3ccf1fd9f806"), null, new DateTime(2024, 10, 3, 10, 0, 25, 933, DateTimeKind.Local).AddTicks(5985), "Description for Product 1", null, null, "Male", 10, null, "Product 1", null, 10000m, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { new Guid("8657ed40-1b9d-44e2-800d-40bb1a20af98"), null, new Guid("3d4fc185-049d-4a96-851b-1d320e7dbba8"), null, new DateTime(2024, 10, 3, 10, 0, 25, 933, DateTimeKind.Local).AddTicks(6002), "Description for Product 2", null, null, "Female", 10, null, "Product 2", null, 20000m, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { new Guid("f3b3b3b4-1b9d-44e2-800d-40bb1a20af98"), null, new Guid("9a17dcf5-1426-45ee-a32e-c23ee5fe40d9"), null, new DateTime(2024, 10, 3, 10, 0, 25, 933, DateTimeKind.Local).AddTicks(6005), "Description for Product 3", null, null, "Male", 10, null, "Product 3", null, 30000m, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { new Guid("2a9394e2-52b3-46d5-8a33-af4d6020e440"), null, new Guid("5f18bf0c-7199-462c-b023-3ccf1fd9f806"), null, null, new DateTime(2024, 10, 4, 12, 36, 15, 243, DateTimeKind.Local).AddTicks(8233), "Description for Product 1", null, null, "Male", 10, false, null, "Product 1", null, 10000m, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { new Guid("8657ed40-1b9d-44e2-800d-40bb1a20af98"), null, new Guid("3d4fc185-049d-4a96-851b-1d320e7dbba8"), null, null, new DateTime(2024, 10, 4, 12, 36, 15, 243, DateTimeKind.Local).AddTicks(8247), "Description for Product 2", null, null, "Female", 10, false, null, "Product 2", null, 20000m, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { new Guid("f3b3b3b4-1b9d-44e2-800d-40bb1a20af98"), null, new Guid("9a17dcf5-1426-45ee-a32e-c23ee5fe40d9"), null, null, new DateTime(2024, 10, 4, 12, 36, 15, 243, DateTimeKind.Local).AddTicks(8250), "Description for Product 3", null, null, "Male", 10, false, null, "Product 3", null, 30000m, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
                 });
 
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "Address", "Avatar", "CreatedAt", "Email", "FullName", "Password", "Phone", "RoleId", "UpdatedAt" },
-                values: new object[] { new Guid("00000000-0000-0000-0000-000000000001"), "HCM", null, new DateTime(2024, 10, 3, 10, 0, 26, 50, DateTimeKind.Local).AddTicks(9328), "giangnnt260703@gmail.com", "Truong Giang", "$2a$11$toPZMM8nKD0ItXV6/eVPVOhVRoFeDeKglwhyyL1rBItfm2sM.VHh6", "0123456789", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
+                values: new object[] { new Guid("00000000-0000-0000-0000-000000000001"), "HCM", null, new DateTime(2024, 10, 4, 12, 36, 15, 366, DateTimeKind.Local).AddTicks(9646), "giangnnt260703@gmail.com", "Truong Giang", "$2a$11$9MmsOqwM6D09BxOV3IBJGuyLsTEYKbXdzs04TmRHg.XHpX2qHtXP.", "0123456789", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
 
             migrationBuilder.InsertData(
                 table: "Carts",
                 columns: new[] { "Id", "CreatedAt", "Currency", "Status", "TotalItem", "TotalPrice", "UpdatedAt", "UserId" },
                 values: new object[,]
                 {
-                    { new Guid("37ab9331-f39a-4072-80ad-4adc3684fcec"), new DateTime(2024, 10, 3, 10, 0, 26, 51, DateTimeKind.Local).AddTicks(1648), "VND", "Active", 0, 0m, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new Guid("00000000-0000-0000-0000-000000000001") },
-                    { new Guid("da17c01a-de60-4b46-810e-f824a1936e14"), new DateTime(2024, 10, 3, 10, 0, 26, 51, DateTimeKind.Local).AddTicks(1654), "VND", "Completed", 0, 0m, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new Guid("00000000-0000-0000-0000-000000000001") }
+                    { new Guid("37ab9331-f39a-4072-80ad-4adc3684fcec"), new DateTime(2024, 10, 4, 12, 36, 15, 367, DateTimeKind.Local).AddTicks(2200), "VND", "Active", 0, 0m, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new Guid("00000000-0000-0000-0000-000000000001") },
+                    { new Guid("da17c01a-de60-4b46-810e-f824a1936e14"), new DateTime(2024, 10, 4, 12, 36, 15, 367, DateTimeKind.Local).AddTicks(2206), "VND", "Completed", 0, 0m, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new Guid("00000000-0000-0000-0000-000000000001") }
                 });
 
             migrationBuilder.CreateIndex(
@@ -414,12 +415,6 @@ namespace KFS.Migrations
                 name: "IX_Carts_UserId",
                 table: "Carts",
                 column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Consignments_ProductId",
-                table: "Consignments",
-                column: "ProductId",
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Consignments_UserId",
@@ -458,6 +453,13 @@ namespace KFS.Migrations
                 column: "CategoryId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Products_ConsignmentId",
+                table: "Products",
+                column: "ConsignmentId",
+                unique: true,
+                filter: "[ConsignmentId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Shipments_OrderId",
                 table: "Shipments",
                 column: "OrderId",
@@ -474,9 +476,6 @@ namespace KFS.Migrations
         {
             migrationBuilder.DropTable(
                 name: "CartItems");
-
-            migrationBuilder.DropTable(
-                name: "Consignments");
 
             migrationBuilder.DropTable(
                 name: "OrderItems");
@@ -504,6 +503,9 @@ namespace KFS.Migrations
 
             migrationBuilder.DropTable(
                 name: "Categories");
+
+            migrationBuilder.DropTable(
+                name: "Consignments");
 
             migrationBuilder.DropTable(
                 name: "Users");

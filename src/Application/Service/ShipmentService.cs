@@ -17,13 +17,11 @@ namespace KFS.src.Application.Service
     {
         private readonly IShipmentRepository _shipmentRepository;
         private readonly IOrderRepository _orderRepository;
-        private readonly KFSContext _context;
         private readonly IMapper _mapper;
-        public ShipmentService(IShipmentRepository shipmentRepository, IOrderRepository orderRepository, KFSContext context, IMapper mapper)
+        public ShipmentService(IShipmentRepository shipmentRepository, IOrderRepository orderRepository, IMapper mapper)
         {
             _orderRepository = orderRepository;
             _shipmentRepository = shipmentRepository;
-            _context = context;
             _mapper = mapper;
         }
 
@@ -33,27 +31,39 @@ namespace KFS.src.Application.Service
             try
             {
                 var shipment = await _shipmentRepository.GetShipmentById(id);
+                var order = await _orderRepository.GetOrderById(shipment.OrderId);
                 if (shipment == null)
                 {
                     response.Message = "Shipment not found";
                     response.IsSuccess = false;
                     return response;
                 }
-                shipment.Status = ShipmentStatusEnum.Delivered;
-                var result = _shipmentRepository.UpdateShipment(shipment).Result;
+                // Check order payment method
+                if (order.PaymentMethod == PaymentMethodEnum.VNPAY)
+                {
+                    order.Status = OrderStatusEnum.Completed;
+                    shipment.Status = ShipmentStatusEnum.Completed;
+                }
+                else
+                {
+                    order.Status = OrderStatusEnum.Delivered;
+                    shipment.Status = ShipmentStatusEnum.Delivered;
+                }
+                var result = await _shipmentRepository.UpdateShipment(shipment);
                 if (result)
                 {
-                    var order = await _orderRepository.GetOrderById(shipment.OrderId);
-                    order.Status = OrderStatusEnum.Delivered;
                     await _orderRepository.UpdateOrder(order);
                     response.Message = "Shipment Delivered successfully";
                     response.IsSuccess = true;
                     return response;
                 }
-                response.Message = "Shipment Delivered failed";
-                response.IsSuccess = false;
-                return response;
-            }
+                else
+                {
+                    response.Message = "Shipment Delivered failed";
+                    response.IsSuccess = false;
+                    return response;
+                }
+        }
             catch
             {
                 throw;
@@ -66,20 +76,34 @@ namespace KFS.src.Application.Service
             try
             {
                 var order = await _orderRepository.GetOrderById(orderId);
-                var orderState = _context.Entry(order).State;
-                Console.WriteLine($"Order State: {orderState}");
                 if (order == null)
                 {
                     response.Message = "Order not found";
                     response.IsSuccess = false;
                     return response;
                 }
-                if (order.Status != OrderStatusEnum.Processing)
+                // Check order payment method
+                if (order.PaymentMethod == PaymentMethodEnum.VNPAY)
                 {
-                    response.Message = "Order is not confirmed yet";
-                    response.IsSuccess = false;
-                    return response;
+                    if (order.Status != OrderStatusEnum.Paid)
+                    {
+                        response.Message = "Order is not paid";
+                        response.IsSuccess = false;
+                        return response;
+                    }
                 }
+                if (order.PaymentMethod == PaymentMethodEnum.COD)
+                {
+                    if (order.Status != OrderStatusEnum.Processing)
+                    {
+                        response.Message = "Order is not processing";
+                        response.IsSuccess = false;
+                        return response;
+                    }
+                }
+                order.Status = OrderStatusEnum.Delivering;
+                await _orderRepository.UpdateOrder(order);
+
                 var shipment = new Shipment
                 {
                     OrderId = orderId,
@@ -89,8 +113,6 @@ namespace KFS.src.Application.Service
                 var result = await _shipmentRepository.CreateShipment(shipment);
                 if (result)
                 {
-                    order.Status = OrderStatusEnum.Delivering;
-                    await _orderRepository.UpdateOrder(order);
                     response.Message = "Shipment created successfully";
                     response.IsSuccess = true;
                     return response;
@@ -98,6 +120,7 @@ namespace KFS.src.Application.Service
                 response.Message = "Shipment creation failed";
                 response.IsSuccess = false;
                 return response;
+
             }
             catch
             {

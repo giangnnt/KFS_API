@@ -36,6 +36,14 @@ namespace KFS.src.Application.Service
             {
                 var cart = await _cartRepository.GetCartById(req.CartId);
                 var product = await _productRepository.GetProductById(req.ProductId);
+                //check if product is for sell
+                if (product.IsForSell == false)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Product is not for sell";
+                    response.IsSuccess = false;
+                    return response;
+                }
 
                 //check if any cart item exists
                 var cartItem = cart.CartItems.FirstOrDefault(x => x.ProductId == req.ProductId);

@@ -14,6 +14,7 @@ namespace KFS.src.Application.Dto.OrderItemDtos
         public Guid ProductId { get; set; }
         public int Quantity { get; set; }
         public decimal Price { get; set; }
+        public bool IsConsignment { get; set; }
     }
     public class OrderItemProfile : Profile
     {

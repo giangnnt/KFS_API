@@ -112,7 +112,7 @@ namespace KFS.src.Application.Service
                 {
                     order.Shipment.Status = ShipmentStatusEnum.Completed;
                 }
-                await _shipmentRepository.UpdateShipment(order.Shipment);
+                await _shipmentRepository.UpdateShipment(order.Shipment!);
                 await _cartRepository.UpdateCart(cart);
                 await _orderRepository.UpdateOrder(order);
                 return response;

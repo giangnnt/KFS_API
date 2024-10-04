@@ -27,7 +27,6 @@ namespace KFS.src.Domain.Entities
         public User User { get; set; } = null!;
         public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
         public Payment? Payment { get; set; }
-        public Shipment? Shipment { get; set; }
-
+        public Shipment Shipment { get; set; } = null!;
     }
 }

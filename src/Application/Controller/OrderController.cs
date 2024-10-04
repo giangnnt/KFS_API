@@ -132,19 +132,5 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
-        [Protected]
-        [HttpPut("accept/{id}")]
-        public async Task<IActionResult> AcceptOrder(Guid id)
-        {
-            try
-            {
-                var result = await _orderService.AcceptOrder(id);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
     }
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using KFS.src.Application.Dto.OrderItemDtos;
 using KFS.src.Application.Dto.PaymentDtos;
+using KFS.src.Application.Dto.ShipmentDtos;
 using KFS.src.Application.Enum;
 using KFS.src.Domain.Entities;
 
@@ -33,6 +34,7 @@ namespace KFS.src.Application.Dto.OrderDtos
         public DateTime UpdatedAt { get; set; }
         public List<OrderItemDto> OrderItems { get; set; } = new List<OrderItemDto>();
         public PaymentDto? Payment { get; set; }
+        public ShipmentDto? Shipment { get; set; }
     }
     public class OrderProfile : Profile
     {
@@ -40,6 +42,8 @@ namespace KFS.src.Application.Dto.OrderDtos
         {
             CreateMap<Order, OrderDto>()
             .ForMember(dest => dest.OrderItems, opt => opt.MapFrom(src => src.OrderItems))
+            .ForMember(dest => dest.Payment, opt => opt.MapFrom(src => src.Payment))
+            .ForMember(dest => dest.Shipment, opt => opt.MapFrom(src => src.Shipment))
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<OrderCreateFromCart, Order>()
             .ForMember(dest => dest.Id, opt => opt.Ignore())

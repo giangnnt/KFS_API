@@ -38,58 +38,6 @@ namespace KFS.src.Application.Service
             _productRepository = productRepository;
         }
 
-        public async Task<ResponseDto> AcceptOrder(Guid id)
-        {
-            var response = new ResponseDto();
-            try
-            {
-                //get order
-                var order = await _orderRepository.GetOrderById(id);
-                if (order == null)
-                {
-                    response.StatusCode = 404;
-                    response.Message = "Order not found";
-                    response.IsSuccess = false;
-                    return response;
-                }
-
-                //check order status
-                if (order.Status != OrderStatusEnum.Pending)
-                {
-                    response.StatusCode = 400;
-                    response.Message = "Order is not pending";
-                    response.IsSuccess = false;
-                    return response;
-                }
-
-                //set order status to accepted
-                order.Status = OrderStatusEnum.Processing;
-
-                //update order
-                var result = await _orderRepository.UpdateOrder(order);
-
-                //check result
-                if (result)
-                {
-                    response.StatusCode = 200;
-                    response.Message = "Order accepted successfully";
-                    response.IsSuccess = true;
-                    return response;
-                }
-                else
-                {
-                    response.StatusCode = 400;
-                    response.Message = "Order acceptance failed";
-                    response.IsSuccess = false;
-                    return response;
-                }
-            }
-            catch
-            {
-                throw;
-            }
-        }
-
         public async Task<ResponseDto> CreateOrderFromCart(OrderCreateFromCart req)
         {
             var response = new ResponseDto();
@@ -129,7 +77,7 @@ namespace KFS.src.Application.Service
                 mappedOrder.TotalPrice = cart.TotalPrice + mappedOrder.ShippingFee - ((decimal)req.Discount / 100 * cart.TotalPrice);
 
                 //set order status
-                mappedOrder.Status = OrderStatusEnum.Pending;
+                mappedOrder.Status = OrderStatusEnum.Processing;
 
                 //set id order 
                 mappedOrder.Id = Guid.NewGuid();
@@ -286,7 +234,7 @@ namespace KFS.src.Application.Service
                             product.Inventory -= orderItem.Quantity;
                             await _productRepository.UpdateProduct(product);
                         }
-                        order.Status = OrderStatusEnum.Completed;
+                        order.Status = OrderStatusEnum.Paid;
                         response.StatusCode = 200;
                         response.Message = "Payment created successfully";
                         response.IsSuccess = true;
