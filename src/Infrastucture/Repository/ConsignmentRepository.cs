@@ -35,12 +35,19 @@ namespace KFS.src.Infrastucture.Repository
 
         public async Task<Consignment> GetConsignmentById(Guid id)
         {
-            return await _context.Consignments.FindAsync(id) ?? throw new Exception("Consignment not found");
+            return await _context.Consignments
+            .Include(x => x.Product)
+            .ThenInclude(x => x.Category)
+            .FirstOrDefaultAsync(x => x.Id == id) ?? throw new Exception("Consignment not found");
         }
+
 
         public async Task<IEnumerable<Consignment>> GetConsignments()
         {
-            return await _context.Consignments.ToListAsync();
+            return await _context.Consignments
+            .Include(x => x.Product)
+            .ThenInclude(x => x.Category)
+            .ToListAsync();
         }
 
         public async Task<bool> UpdateConsignment(Consignment consignment)

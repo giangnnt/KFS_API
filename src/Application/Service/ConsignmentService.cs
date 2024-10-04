@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using KFS.src.Application.Dto.ConsignmentDtos;
 using KFS.src.Application.Dto.ResponseDtos;
 using KFS.src.Application.Enum;
@@ -18,13 +19,15 @@ namespace KFS.src.Application.Service
         private readonly IConsignmentRepository _consignmentRepository;
         private readonly IProductRepository _productRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public ConsignmentService(IOrderRepository orderRepository, IConsignmentRepository consignmentRepository, IProductRepository productRepository, IHttpContextAccessor httpContextAccessor, IOrderItemRepository orderItemRepository)
+        private readonly IMapper _mapper;
+        public ConsignmentService(IOrderRepository orderRepository, IConsignmentRepository consignmentRepository, IProductRepository productRepository, IHttpContextAccessor httpContextAccessor, IOrderItemRepository orderItemRepository, IMapper mapper)
         {
             _consignmentRepository = consignmentRepository;
             _orderRepository = orderRepository;
             _httpContextAccessor = httpContextAccessor;
             _productRepository = productRepository;
             _orderItemRepository = orderItemRepository;
+            _mapper = mapper;
         }
         public Task<ResponseDto> CreateConsignment(ConsignmentCreate req)
         {
@@ -80,7 +83,7 @@ namespace KFS.src.Application.Service
                     Status = ConsignmentStatusEnum.Pending,
                     IsForSell = req.IsForSell,
                     Product = new Product
-                    {   
+                    {
                         IsForSell = false,
                         Name = product.Name,
                         Description = product.Description,
@@ -129,9 +132,48 @@ namespace KFS.src.Application.Service
             throw new NotImplementedException();
         }
 
-        public Task<ResponseDto> EvaluateConsignment(bool isApproved)
+        public async Task<ResponseDto> EvaluateConsignment(bool isApproved, Guid id)
         {
-            throw new NotImplementedException();
+            var response = new ResponseDto();
+            try
+            {
+                var consignment = await _consignmentRepository.GetConsignmentById(id);
+                if (consignment == null)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Consignment not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                if (consignment.Status != ConsignmentStatusEnum.Pending)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Consignment is not pending";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                consignment.Status = isApproved ? ConsignmentStatusEnum.Approved : ConsignmentStatusEnum.Rejected;
+                consignment.Product.IsForSell = isApproved;
+                var result = await _consignmentRepository.UpdateConsignment(consignment);
+                if (result)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Consignment evaluated successfully";
+                    response.IsSuccess = true;
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Failed to evaluate consignment";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch
+            {
+                throw;
+            }
         }
 
         public Task<ResponseDto> GetConsignmentById(Guid id)
@@ -139,9 +181,36 @@ namespace KFS.src.Application.Service
             throw new NotImplementedException();
         }
 
-        public Task<ResponseDto> GetConsignments()
+        public async Task<ResponseDto> GetConsignments()
         {
-            throw new NotImplementedException();
+            var response = new ResponseDto();
+            try
+            {
+                var consignments = await _consignmentRepository.GetConsignments();
+                var mappedConsignment = _mapper.Map<List<ConsignmentDto>>(consignments);
+                if (consignments != null && consignments.Count() > 0)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Consignments found";
+                    response.IsSuccess = true;
+                    response.Result = new ResultDto
+                    {
+                        Data = mappedConsignment
+                    };
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 404;
+                    response.Message = "No consignment found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch
+            {
+                throw;
+            }
         }
 
         public Task<ResponseDto> UpdateConsignment(Guid id)

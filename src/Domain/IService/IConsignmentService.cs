@@ -15,6 +15,6 @@ namespace KFS.src.Domain.IService
         Task<ResponseDto> DeleteConsignment(Guid id);
         Task<ResponseDto> GetConsignments();
         Task<ResponseDto> GetConsignmentById(Guid id);
-        Task<ResponseDto> EvaluateConsignment(bool isApproved);
+        Task<ResponseDto> EvaluateConsignment(bool isApproved, Guid id);
     }
 }
