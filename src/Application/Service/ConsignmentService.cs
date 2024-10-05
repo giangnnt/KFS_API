@@ -51,6 +51,12 @@ namespace KFS.src.Application.Service
             }
             try
             {
+                // set to 0 if not for sell
+                if (req.IsForSell != true)
+                {
+                    req.CommissionPercentage = 0;
+                    req.DealingAmount = 0;
+                }
                 var consignment = new Consignment
                 {
                     UserId = payload.UserId,
@@ -138,6 +144,12 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
                     return response;
                 }
+                // set to 0 if not for sell
+                if (req.IsForSell != true)
+                {
+                    req.CommissionPercentage = 0;
+                    req.DealingAmount = 0;
+                }
                 // create consignment
                 var consignment = new Consignment
                 {
@@ -192,9 +204,39 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public Task<ResponseDto> DeleteConsignment(Guid id)
+        public async Task<ResponseDto> DeleteConsignment(Guid id)
         {
-            throw new NotImplementedException();
+            var response = new ResponseDto();
+            try
+            {
+                var consignment = await _consignmentRepository.GetConsignmentById(id);
+                if (consignment == null)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Consignment not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                var result = await _consignmentRepository.DeleteConsignment(consignment);
+                if (result)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Consignment deleted successfully";
+                    response.IsSuccess = true;
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Failed to delete consignment";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch
+            {
+                throw;
+            }
         }
 
         public async Task<ResponseDto> EvaluateConsignment(bool isApproved, Guid id)
@@ -246,9 +288,36 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public Task<ResponseDto> GetConsignmentById(Guid id)
+        public async Task<ResponseDto> GetConsignmentById(Guid id)
         {
-            throw new NotImplementedException();
+            var response = new ResponseDto();
+            try
+            {
+                var consignment = await _consignmentRepository.GetConsignmentById(id);
+                var mappedConsignment = _mapper.Map<ConsignmentDto>(consignment);
+                if (mappedConsignment != null)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Consignment found";
+                    response.IsSuccess = true;
+                    response.Result = new ResultDto
+                    {
+                        Data = mappedConsignment
+                    };
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Consignment not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch
+            {
+                throw;
+            }
         }
 
         public async Task<ResponseDto> GetConsignments()

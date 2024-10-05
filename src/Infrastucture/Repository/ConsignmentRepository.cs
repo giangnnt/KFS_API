@@ -24,10 +24,8 @@ namespace KFS.src.Infrastucture.Repository
             return result > 0;
         }
 
-        public async Task<bool> DeleteConsignment(Guid id)
+        public async Task<bool> DeleteConsignment(Consignment consignment)
         {
-            var consignment = await _context.Consignments.FindAsync(id);
-            if (consignment == null) throw new Exception("Consignment not found");
             _context.Consignments.Remove(consignment);
             var result = await _context.SaveChangesAsync();
             return result > 0;
