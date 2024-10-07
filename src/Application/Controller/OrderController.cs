@@ -13,7 +13,7 @@ namespace KFS.src.Application.Controller
 {
     [Produces("application/json")]
     [ApiController]
-    [Route("api/orders")]
+    [Route("api/order")]
     public class OrderController : ControllerBase
     {
         private readonly IOrderService _orderService;

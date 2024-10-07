@@ -12,7 +12,7 @@ namespace KFS.src.Application.Controller
 {
     [Produces("application/json")]
     [ApiController]
-    [Route("api/carts")]
+    [Route("api/cart")]
     public class CartController : ControllerBase
     {
         private readonly ICartService _cartService;

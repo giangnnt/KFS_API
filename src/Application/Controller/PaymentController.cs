@@ -10,7 +10,7 @@ namespace KFS.src.Application.Controller
 {
     [Produces("application/json")]
     [ApiController]
-    [Route("api/payments")]
+    [Route("api/payment")]
     public class PaymentController : ControllerBase
     {
         private readonly IPaymentService _paymentService;
