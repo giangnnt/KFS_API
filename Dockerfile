@@ -6,8 +6,6 @@ RUN dotnet restore
 
 COPY . ./
 COPY appsettings.Production.json /app/appsettings.Production.json
-# COPY server.crt /etc/ssl/certs/server.crt
-# COPY server.key /etc/ssl/private/server.key
 
 RUN dotnet publish -c Release -o out
 

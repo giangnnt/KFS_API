@@ -40,6 +40,24 @@ namespace KFS.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Promotions",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PromotionCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DiscountPercentage = table.Column<int>(type: "int", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Promotions", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Roles",
                 columns: table => new
                 {
@@ -51,6 +69,30 @@ namespace KFS.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Roles", x => x.RoleId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CategoryPromotion",
+                columns: table => new
+                {
+                    CategoriesId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PromotionsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CategoryPromotion", x => new { x.CategoriesId, x.PromotionsId });
+                    table.ForeignKey(
+                        name: "FK_CategoryPromotion_Categories_CategoriesId",
+                        column: x => x.CategoriesId,
+                        principalTable: "Categories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CategoryPromotion_Promotions_PromotionsId",
+                        column: x => x.PromotionsId,
+                        principalTable: "Promotions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -134,8 +176,8 @@ namespace KFS.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Method = table.Column<string>(type: "nvarchar(20)", nullable: false),
-                    CommissionPercentage = table.Column<int>(type: "int", nullable: false),
-                    DealingAmount = table.Column<int>(type: "int", nullable: false),
+                    CommissionPercentage = table.Column<int>(type: "int", nullable: true),
+                    DealingAmount = table.Column<int>(type: "int", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(20)", nullable: false),
                     IsForSell = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -269,6 +311,28 @@ namespace KFS.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Batches",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Batches", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Batches_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CartItems",
                 columns: table => new
                 {
@@ -319,6 +383,54 @@ namespace KFS.Migrations
                         name: "FK_OrderItems_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProductPromotion",
+                columns: table => new
+                {
+                    ProductsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PromotionsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductPromotion", x => new { x.ProductsId, x.PromotionsId });
+                    table.ForeignKey(
+                        name: "FK_ProductPromotion_Products_ProductsId",
+                        column: x => x.ProductsId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ProductPromotion_Promotions_PromotionsId",
+                        column: x => x.PromotionsId,
+                        principalTable: "Promotions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BatchPromotion",
+                columns: table => new
+                {
+                    BatchesId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PromotionsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BatchPromotion", x => new { x.BatchesId, x.PromotionsId });
+                    table.ForeignKey(
+                        name: "FK_BatchPromotion_Batches_BatchesId",
+                        column: x => x.BatchesId,
+                        principalTable: "Batches",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_BatchPromotion_Promotions_PromotionsId",
+                        column: x => x.PromotionsId,
+                        principalTable: "Promotions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -382,24 +494,34 @@ namespace KFS.Migrations
                 columns: new[] { "Id", "Age", "CategoryId", "Color", "ConsignmentId", "CreatedAt", "Description", "FeedingVolumn", "FilterRate", "Gender", "Inventory", "IsForSell", "Length", "Name", "Origin", "Price", "Species", "UpdatedAt" },
                 values: new object[,]
                 {
-                    { new Guid("2a9394e2-52b3-46d5-8a33-af4d6020e440"), null, new Guid("5f18bf0c-7199-462c-b023-3ccf1fd9f806"), null, null, new DateTime(2024, 10, 4, 12, 36, 15, 243, DateTimeKind.Local).AddTicks(8233), "Description for Product 1", null, null, "Male", 10, false, null, "Product 1", null, 10000m, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { new Guid("8657ed40-1b9d-44e2-800d-40bb1a20af98"), null, new Guid("3d4fc185-049d-4a96-851b-1d320e7dbba8"), null, null, new DateTime(2024, 10, 4, 12, 36, 15, 243, DateTimeKind.Local).AddTicks(8247), "Description for Product 2", null, null, "Female", 10, false, null, "Product 2", null, 20000m, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { new Guid("f3b3b3b4-1b9d-44e2-800d-40bb1a20af98"), null, new Guid("9a17dcf5-1426-45ee-a32e-c23ee5fe40d9"), null, null, new DateTime(2024, 10, 4, 12, 36, 15, 243, DateTimeKind.Local).AddTicks(8250), "Description for Product 3", null, null, "Male", 10, false, null, "Product 3", null, 30000m, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { new Guid("2a9394e2-52b3-46d5-8a33-af4d6020e440"), null, new Guid("5f18bf0c-7199-462c-b023-3ccf1fd9f806"), null, null, new DateTime(2024, 10, 7, 8, 23, 18, 863, DateTimeKind.Local).AddTicks(5345), "Description for Product 1", null, null, "Male", 10, false, null, "Product 1", null, 10000m, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { new Guid("8657ed40-1b9d-44e2-800d-40bb1a20af98"), null, new Guid("3d4fc185-049d-4a96-851b-1d320e7dbba8"), null, null, new DateTime(2024, 10, 7, 8, 23, 18, 863, DateTimeKind.Local).AddTicks(5363), "Description for Product 2", null, null, "Female", 10, false, null, "Product 2", null, 20000m, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { new Guid("f3b3b3b4-1b9d-44e2-800d-40bb1a20af98"), null, new Guid("9a17dcf5-1426-45ee-a32e-c23ee5fe40d9"), null, null, new DateTime(2024, 10, 7, 8, 23, 18, 863, DateTimeKind.Local).AddTicks(5367), "Description for Product 3", null, null, "Male", 10, false, null, "Product 3", null, 30000m, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
                 });
 
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "Address", "Avatar", "CreatedAt", "Email", "FullName", "Password", "Phone", "RoleId", "UpdatedAt" },
-                values: new object[] { new Guid("00000000-0000-0000-0000-000000000001"), "HCM", null, new DateTime(2024, 10, 4, 12, 36, 15, 366, DateTimeKind.Local).AddTicks(9646), "giangnnt260703@gmail.com", "Truong Giang", "$2a$11$9MmsOqwM6D09BxOV3IBJGuyLsTEYKbXdzs04TmRHg.XHpX2qHtXP.", "0123456789", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
+                values: new object[] { new Guid("00000000-0000-0000-0000-000000000001"), "HCM", null, new DateTime(2024, 10, 7, 8, 23, 19, 106, DateTimeKind.Local).AddTicks(9246), "giangnnt260703@gmail.com", "Truong Giang", "$2a$11$yK5QNDwfd4RXQwzDnGpFRuExVNz/ubJjz0sCUNq/V9z7h.F9.NAFi", "0123456789", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
 
             migrationBuilder.InsertData(
                 table: "Carts",
                 columns: new[] { "Id", "CreatedAt", "Currency", "Status", "TotalItem", "TotalPrice", "UpdatedAt", "UserId" },
                 values: new object[,]
                 {
-                    { new Guid("37ab9331-f39a-4072-80ad-4adc3684fcec"), new DateTime(2024, 10, 4, 12, 36, 15, 367, DateTimeKind.Local).AddTicks(2200), "VND", "Active", 0, 0m, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new Guid("00000000-0000-0000-0000-000000000001") },
-                    { new Guid("da17c01a-de60-4b46-810e-f824a1936e14"), new DateTime(2024, 10, 4, 12, 36, 15, 367, DateTimeKind.Local).AddTicks(2206), "VND", "Completed", 0, 0m, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new Guid("00000000-0000-0000-0000-000000000001") }
+                    { new Guid("37ab9331-f39a-4072-80ad-4adc3684fcec"), new DateTime(2024, 10, 7, 8, 23, 19, 107, DateTimeKind.Local).AddTicks(706), "VND", "Active", 0, 0m, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new Guid("00000000-0000-0000-0000-000000000001") },
+                    { new Guid("da17c01a-de60-4b46-810e-f824a1936e14"), new DateTime(2024, 10, 7, 8, 23, 19, 107, DateTimeKind.Local).AddTicks(712), "VND", "Completed", 0, 0m, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new Guid("00000000-0000-0000-0000-000000000001") }
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Batches_ProductId",
+                table: "Batches",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BatchPromotion_PromotionsId",
+                table: "BatchPromotion",
+                column: "PromotionsId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CartItems_CartId",
@@ -415,6 +537,11 @@ namespace KFS.Migrations
                 name: "IX_Carts_UserId",
                 table: "Carts",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CategoryPromotion_PromotionsId",
+                table: "CategoryPromotion",
+                column: "PromotionsId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Consignments_UserId",
@@ -448,6 +575,11 @@ namespace KFS.Migrations
                 column: "RolesRoleId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ProductPromotion_PromotionsId",
+                table: "ProductPromotion",
+                column: "PromotionsId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Products_CategoryId",
                 table: "Products",
                 column: "CategoryId");
@@ -475,7 +607,13 @@ namespace KFS.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "BatchPromotion");
+
+            migrationBuilder.DropTable(
                 name: "CartItems");
+
+            migrationBuilder.DropTable(
+                name: "CategoryPromotion");
 
             migrationBuilder.DropTable(
                 name: "OrderItems");
@@ -487,19 +625,28 @@ namespace KFS.Migrations
                 name: "PermissionRole");
 
             migrationBuilder.DropTable(
+                name: "ProductPromotion");
+
+            migrationBuilder.DropTable(
                 name: "Shipments");
+
+            migrationBuilder.DropTable(
+                name: "Batches");
 
             migrationBuilder.DropTable(
                 name: "Carts");
 
             migrationBuilder.DropTable(
-                name: "Products");
-
-            migrationBuilder.DropTable(
                 name: "Permissions");
 
             migrationBuilder.DropTable(
+                name: "Promotions");
+
+            migrationBuilder.DropTable(
                 name: "Orders");
+
+            migrationBuilder.DropTable(
+                name: "Products");
 
             migrationBuilder.DropTable(
                 name: "Categories");

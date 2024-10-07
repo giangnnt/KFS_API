@@ -24,9 +24,8 @@ namespace KFS.src.Infrastucture.Repository
             return result > 0;
         }
 
-        public async Task<bool> DeletePayment(Guid id)
+        public async Task<bool> DeletePayment(Payment payment)
         {
-            var payment = await _context.Payments.FindAsync(id) ?? throw new Exception("Payment not found");
             _context.Payments.Remove(payment);
             var result = await _context.SaveChangesAsync();
             return result > 0;

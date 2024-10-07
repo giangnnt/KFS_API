@@ -30,5 +30,7 @@ namespace KFS.src.Domain.Entities
         public Consignment? Consignment { get; set; }
         public List<CartItem> CartItems { get; set; } = new List<CartItem>();
         public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+        public List<Batch> Batches { get; set; } = new List<Batch>();
+        public List<Promotion> Promotions { get; set; } = new List<Promotion>();
     }
 }

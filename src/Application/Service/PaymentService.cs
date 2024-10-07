@@ -50,7 +50,7 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
                     return response;
                 }
-                if(order.PaymentMethod != PaymentMethodEnum.COD)
+                if (order.PaymentMethod != PaymentMethodEnum.COD)
                 {
                     response.StatusCode = 400;
                     response.Message = "Payment method is not Cash On Delivery";
@@ -108,7 +108,7 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
 
                 }
-                if(order.Shipment != null)
+                if (order.Shipment != null)
                 {
                     order.Shipment.Status = ShipmentStatusEnum.Completed;
                 }
@@ -123,9 +123,39 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public Task<ResponseDto> DeletePayment(Guid id)
+        public async Task<ResponseDto> DeletePayment(Guid id)
         {
-            throw new NotImplementedException();
+            var response = new ResponseDto();
+            try
+            {
+                var payment = await _paymentRepository.GetPaymentById(id);
+                if (payment == null)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Payment not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                var result = await _paymentRepository.DeletePayment(payment);
+                if (result)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Payment deleted successfully";
+                    response.IsSuccess = true;
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Payment deletion failed";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch
+            {
+                throw;
+            }
         }
 
         public Task<ResponseDto> GetPaymentById(Guid id)

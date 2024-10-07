@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KFS.Migrations
 {
     [DbContext(typeof(KFSContext))]
-    [Migration("20241004053615_01")]
+    [Migration("20241007012319_01")]
     partial class _01
     {
         /// <inheritdoc />
@@ -24,6 +24,65 @@ namespace KFS.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("BatchPromotion", b =>
+                {
+                    b.Property<Guid>("BatchesId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PromotionsId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("BatchesId", "PromotionsId");
+
+                    b.HasIndex("PromotionsId");
+
+                    b.ToTable("BatchPromotion");
+                });
+
+            modelBuilder.Entity("CategoryPromotion", b =>
+                {
+                    b.Property<Guid>("CategoriesId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PromotionsId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("CategoriesId", "PromotionsId");
+
+                    b.HasIndex("PromotionsId");
+
+                    b.ToTable("CategoryPromotion");
+                });
+
+            modelBuilder.Entity("KFS.src.Domain.Entities.Batch", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("Batches");
+                });
 
             modelBuilder.Entity("KFS.src.Domain.Entities.Cart", b =>
                 {
@@ -64,7 +123,7 @@ namespace KFS.Migrations
                         new
                         {
                             Id = new Guid("37ab9331-f39a-4072-80ad-4adc3684fcec"),
-                            CreatedAt = new DateTime(2024, 10, 4, 12, 36, 15, 367, DateTimeKind.Local).AddTicks(2200),
+                            CreatedAt = new DateTime(2024, 10, 7, 8, 23, 19, 107, DateTimeKind.Local).AddTicks(706),
                             Currency = "VND",
                             Status = "Active",
                             TotalItem = 0,
@@ -75,7 +134,7 @@ namespace KFS.Migrations
                         new
                         {
                             Id = new Guid("da17c01a-de60-4b46-810e-f824a1936e14"),
-                            CreatedAt = new DateTime(2024, 10, 4, 12, 36, 15, 367, DateTimeKind.Local).AddTicks(2206),
+                            CreatedAt = new DateTime(2024, 10, 7, 8, 23, 19, 107, DateTimeKind.Local).AddTicks(712),
                             Currency = "VND",
                             Status = "Completed",
                             TotalItem = 0,
@@ -153,13 +212,13 @@ namespace KFS.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("CommissionPercentage")
+                    b.Property<int?>("CommissionPercentage")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("DealingAmount")
+                    b.Property<int?>("DealingAmount")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsForSell")
@@ -461,7 +520,7 @@ namespace KFS.Migrations
                         {
                             Id = new Guid("2a9394e2-52b3-46d5-8a33-af4d6020e440"),
                             CategoryId = new Guid("5f18bf0c-7199-462c-b023-3ccf1fd9f806"),
-                            CreatedAt = new DateTime(2024, 10, 4, 12, 36, 15, 243, DateTimeKind.Local).AddTicks(8233),
+                            CreatedAt = new DateTime(2024, 10, 7, 8, 23, 18, 863, DateTimeKind.Local).AddTicks(5345),
                             Description = "Description for Product 1",
                             Gender = "Male",
                             Inventory = 10,
@@ -474,7 +533,7 @@ namespace KFS.Migrations
                         {
                             Id = new Guid("8657ed40-1b9d-44e2-800d-40bb1a20af98"),
                             CategoryId = new Guid("3d4fc185-049d-4a96-851b-1d320e7dbba8"),
-                            CreatedAt = new DateTime(2024, 10, 4, 12, 36, 15, 243, DateTimeKind.Local).AddTicks(8247),
+                            CreatedAt = new DateTime(2024, 10, 7, 8, 23, 18, 863, DateTimeKind.Local).AddTicks(5363),
                             Description = "Description for Product 2",
                             Gender = "Female",
                             Inventory = 10,
@@ -487,7 +546,7 @@ namespace KFS.Migrations
                         {
                             Id = new Guid("f3b3b3b4-1b9d-44e2-800d-40bb1a20af98"),
                             CategoryId = new Guid("9a17dcf5-1426-45ee-a32e-c23ee5fe40d9"),
-                            CreatedAt = new DateTime(2024, 10, 4, 12, 36, 15, 243, DateTimeKind.Local).AddTicks(8250),
+                            CreatedAt = new DateTime(2024, 10, 7, 8, 23, 18, 863, DateTimeKind.Local).AddTicks(5367),
                             Description = "Description for Product 3",
                             Gender = "Male",
                             Inventory = 10,
@@ -496,6 +555,39 @@ namespace KFS.Migrations
                             Price = 30000m,
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
+                });
+
+            modelBuilder.Entity("KFS.src.Domain.Entities.Promotion", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DiscountPercentage")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PromotionCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Promotions");
                 });
 
             modelBuilder.Entity("KFS.src.Domain.Entities.Role", b =>
@@ -614,10 +706,10 @@ namespace KFS.Migrations
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000001"),
                             Address = "HCM",
-                            CreatedAt = new DateTime(2024, 10, 4, 12, 36, 15, 366, DateTimeKind.Local).AddTicks(9646),
+                            CreatedAt = new DateTime(2024, 10, 7, 8, 23, 19, 106, DateTimeKind.Local).AddTicks(9246),
                             Email = "giangnnt260703@gmail.com",
                             FullName = "Truong Giang",
-                            Password = "$2a$11$9MmsOqwM6D09BxOV3IBJGuyLsTEYKbXdzs04TmRHg.XHpX2qHtXP.",
+                            Password = "$2a$11$yK5QNDwfd4RXQwzDnGpFRuExVNz/ubJjz0sCUNq/V9z7h.F9.NAFi",
                             Phone = "0123456789",
                             RoleId = 1,
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -684,6 +776,62 @@ namespace KFS.Migrations
                             PermissionsSlug = "FEEDBACK.OWN",
                             RolesRoleId = 1
                         });
+                });
+
+            modelBuilder.Entity("ProductPromotion", b =>
+                {
+                    b.Property<Guid>("ProductsId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PromotionsId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ProductsId", "PromotionsId");
+
+                    b.HasIndex("PromotionsId");
+
+                    b.ToTable("ProductPromotion");
+                });
+
+            modelBuilder.Entity("BatchPromotion", b =>
+                {
+                    b.HasOne("KFS.src.Domain.Entities.Batch", null)
+                        .WithMany()
+                        .HasForeignKey("BatchesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("KFS.src.Domain.Entities.Promotion", null)
+                        .WithMany()
+                        .HasForeignKey("PromotionsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("CategoryPromotion", b =>
+                {
+                    b.HasOne("KFS.src.Domain.Entities.Category", null)
+                        .WithMany()
+                        .HasForeignKey("CategoriesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("KFS.src.Domain.Entities.Promotion", null)
+                        .WithMany()
+                        .HasForeignKey("PromotionsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("KFS.src.Domain.Entities.Batch", b =>
+                {
+                    b.HasOne("KFS.src.Domain.Entities.Product", "Product")
+                        .WithMany("Batches")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("KFS.src.Domain.Entities.Cart", b =>
@@ -822,6 +970,21 @@ namespace KFS.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("ProductPromotion", b =>
+                {
+                    b.HasOne("KFS.src.Domain.Entities.Product", null)
+                        .WithMany()
+                        .HasForeignKey("ProductsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("KFS.src.Domain.Entities.Promotion", null)
+                        .WithMany()
+                        .HasForeignKey("PromotionsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("KFS.src.Domain.Entities.Cart", b =>
                 {
                     b.Navigation("CartItems");
@@ -850,6 +1013,8 @@ namespace KFS.Migrations
 
             modelBuilder.Entity("KFS.src.Domain.Entities.Product", b =>
                 {
+                    b.Navigation("Batches");
+
                     b.Navigation("CartItems");
 
                     b.Navigation("OrderItems");

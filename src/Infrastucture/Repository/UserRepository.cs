@@ -31,7 +31,7 @@ namespace KFS.src.Infrastucture.Repository
             .FirstOrDefaultAsync();
         }
 
-        public async Task<User> GetUserById(Guid id)
+        public async Task<User?> GetUserById(Guid id)
         {
             return await _context.Users.FindAsync(id) ?? throw new Exception("User not found");
         }
