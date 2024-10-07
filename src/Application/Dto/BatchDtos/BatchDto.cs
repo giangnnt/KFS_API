@@ -22,6 +22,10 @@ namespace KFS.src.Application.Dto.BatchDtos
         {
             CreateMap<Batch, BatchDto>()
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<BatchUpdate, Batch>()
+            .ForMember(dest => dest.Product, opt => opt.Ignore())
+            .ForMember(dest => dest.Promotions, opt => opt.Ignore())
+            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
         }
     }
 }
