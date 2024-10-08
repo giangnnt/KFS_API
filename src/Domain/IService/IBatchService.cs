@@ -11,7 +11,7 @@ namespace KFS.src.Domain.IService
     {
         public Task<ResponseDto> GetBatches();
         public Task<ResponseDto> GetBatchById(Guid id);
-        public Task<ResponseDto> CreateBatch(BatchCreate batch, Guid productId);
+        public Task<ResponseDto> CreateBatchFromProduct(BatchCreate batch, Guid productId);
         public Task<ResponseDto> UpdateBatch(BatchUpdate batch, Guid id);
         public Task<ResponseDto> DeleteBatch(Guid id);
         

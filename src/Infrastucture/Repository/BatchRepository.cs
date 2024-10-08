@@ -16,9 +16,9 @@ namespace KFS.src.Infrastucture.Repository
         {
             _context = context;
         }
-        public async Task<bool> CreateBatch(List<Batch> batches)
+        public async Task<bool> CreateBatch(Batch batch)
         {
-            _context.Batches.AddRange(batches);
+            _context.Batches.Add(batch);
             var result = await _context.SaveChangesAsync();
             return result > 0;
         }

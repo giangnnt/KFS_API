@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using KFS.src.Application.Dto.BatchDtos;
 using KFS.src.Application.Dto.ResponseDtos;
+using KFS.src.Application.Enum;
 using KFS.src.Domain.Entities;
 using KFS.src.Domain.IRepository;
 using KFS.src.Domain.IService;
@@ -22,7 +23,7 @@ namespace KFS.src.Application.Service
             _mapper = mapper;
             _productRepository = productRepository;
         }
-        public async Task<ResponseDto> CreateBatch(BatchCreate batch, Guid productId)
+        public async Task<ResponseDto> CreateBatchFromProduct(BatchCreate batch, Guid productId)
         {
             var response = new ResponseDto();
             try
@@ -42,38 +43,29 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
                     return response;
                 }
-                if (batch.NumberOfBatchs == 0)
+                if (batch.Inventory == 0)
                 {
                     response.StatusCode = 400;
                     response.Message = "Batch numbers is required";
                     response.IsSuccess = false;
                     return response;
                 }
-                if (batch.NumberOfBatchs * batch.Quantity > product.Inventory)
+                if (batch.Inventory * batch.Quantity > product.Inventory)
                 {
                     response.StatusCode = 400;
                     response.Message = "Batch quantity is greater than product quantity";
                     response.IsSuccess = false;
                     return response;
                 }
-                var listOfBatches = new List<Batch>();
-                for (int i = 0; i < batch.NumberOfBatchs; i++)
-                {
-                    listOfBatches.Add(new Batch
-                    {
-                        Name = batch.Name,
-                        Description = batch.Description,
-                        Price = batch.Price,
-                        Quantity = batch.Quantity,
-                        ProductId = productId
-                    });
-                }
+                var mappedBatch = _mapper.Map<Batch>(batch);
+                mappedBatch.ProductId = productId;
+                mappedBatch.Status = ProductStatusEnum.Deactive;
 
-                var result = await _batchRepository.CreateBatch(listOfBatches);
+                var result = await _batchRepository.CreateBatch(mappedBatch);
                 if (result)
                 {
                     // update product inventory
-                    product.Inventory -= batch.NumberOfBatchs * batch.Quantity;
+                    product.Inventory -= batch.Inventory * batch.Quantity;
                     await _productRepository.UpdateProduct(product);
 
                     response.StatusCode = 201;

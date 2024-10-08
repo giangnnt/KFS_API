@@ -80,10 +80,12 @@ namespace KFS.src.Infrastucture.Repository
         public async Task<IEnumerable<Cart>> GetCarts()
         {
             return await _context.Carts
-            .Include(x => x.CartItems)
-            .ThenInclude(ci => ci.Product)
-            .ThenInclude(p => p.Category)
-            .ToListAsync();
+                .Include(c => c.CartItems)
+                .ThenInclude(ci => ci.Product)
+                .ThenInclude(p => p.Category)
+                .Include(c => c.CartItems)
+                .ThenInclude(ci => ci.Batch)
+                .ToListAsync();
         }
 
         public async Task<bool> UpdateCart(Cart cart)

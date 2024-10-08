@@ -53,7 +53,7 @@ namespace KFS.src.Application.Controller
         {
             try
             {
-                var result = await _batchService.CreateBatch(req, productId);
+                var result = await _batchService.CreateBatchFromProduct(req, productId);
                 return Ok(result);
             }
             catch (Exception ex)
