@@ -12,12 +12,5 @@ namespace KFS.src.Application.Dto.CategoryDtos
         public string Name { get; set; } = null!;
         public string? Description { get; set; }
     }
-    public class CategoryProfile : Profile
-    {
-        public CategoryProfile()
-        {
-            CreateMap<Domain.Entities.Category, CategotyDto>()
-            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
-        }
-    }
+   
 }

@@ -21,11 +21,7 @@ namespace KFS.src.Infrastucture.Repository
             return await _context.Categories.ToListAsync();
         }
 
-        public async Task<Category> GetCategoryById(Guid id)
-        {
-            return await _context.Categories.FirstOrDefaultAsync(x => x.Id == id) ?? throw new Exception("Category not found");
-        }
-
+       
         public async Task<bool> CreateCategory(Category category)
         {
             _context.Categories.Add(category);
@@ -47,6 +43,16 @@ namespace KFS.src.Infrastucture.Repository
             _context.Categories.Remove(category);
             int result = await _context.SaveChangesAsync();
             return result > 0;
+        }
+
+        public async Task<Category> GetCategoryByName(string name)
+        {
+            return await _context.Categories.FirstOrDefaultAsync(x => x.Name == name) ?? throw new Exception("Category not found");
+        }
+
+        public async Task<Category> GetCategoryById(Guid id)
+        {
+            return await _context.Categories.FirstOrDefaultAsync(x => x.Id == id) ?? throw new Exception("Category not found");
         }
     }
 }

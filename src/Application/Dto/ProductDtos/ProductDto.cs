@@ -26,7 +26,7 @@ namespace KFS.src.Application.Dto.ProductDtos
         public int Inventory { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-        public CategotyDto Category { get; set; } = null!;
+        public categorydtov2 Category { get; set; } = null!;
     }
     public class ProductProfile : Profile
     {
