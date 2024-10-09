@@ -20,15 +20,101 @@ namespace KFS.src.Application.Service
         private readonly IProductRepository _productRepository;
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
+        private readonly ICartItemRepository _cartItemRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public CartService(ICartRepository cartRepository, IProductRepository productRepository, IUserRepository userRepository, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+        private readonly IBatchRepository _batchRepository;
+        public CartService(ICartRepository cartRepository, IProductRepository productRepository, IUserRepository userRepository, IMapper mapper, IHttpContextAccessor httpContextAccessor, IBatchRepository batchRepository, ICartItemRepository cartItemRepository)
         {
             _cartRepository = cartRepository;
             _productRepository = productRepository;
             _userRepository = userRepository;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
+            _batchRepository = batchRepository;
+            _cartItemRepository = cartItemRepository;
         }
+
+        public async Task<ResponseDto> AddBatchToCart(BatchAddRemoveDto req)
+        {
+            var response = new ResponseDto();
+            try
+            {
+                var cart = await _cartRepository.GetCartById(req.CartId);
+                var batch = await _batchRepository.GetBatchById(req.BatchId);
+                var product = await _productRepository.GetProductById(batch.ProductId);
+                //check if batch is for sell
+                if (batch.IsForSell == false)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Batch is not for sell";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                //check if any cart item exists
+                var cartItem = cart.CartItems.FirstOrDefault(x => x.ProductId == batch.ProductId);
+                if (cartItem == null)
+                {
+                    //check inventory
+                    if (batch.Quantity < req.Quantity)
+                    {
+                        response.StatusCode = 400;
+                        response.Message = "Batch quantity is not enough";
+                        response.IsSuccess = false;
+                        return response;
+                    }
+                    //create new cart item
+                    cartItem = new CartItem
+                    {
+                        CartId = req.CartId,
+                        ProductId = batch.ProductId,
+                        Quantity = req.Quantity,
+                        Price = batch.Price * req.Quantity,
+                        IsBatch = true,
+                        Product = product
+                    };
+                    cart.CartItems.Add(cartItem);
+                }
+                else
+                {
+                    //check inventory
+                    if (batch.Quantity < cartItem.Quantity + req.Quantity)
+                    {
+                        response.StatusCode = 400;
+                        response.Message = "Batch quantity is not enough";
+                        response.IsSuccess = false;
+                        return response;
+                    }
+                    //update cart item
+                    cartItem.Quantity += req.Quantity;
+                    cartItem.Price = batch.Price * cartItem.Quantity;
+                }
+                // update cart
+                cart.TotalItem += req.Quantity;
+                cart.TotalPrice += batch.Price * req.Quantity;
+                var result = await _cartRepository.AddRemoveCartItem(cart);
+                //check result
+                if (result)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Batch added to cart successfully";
+                    response.IsSuccess = true;
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Batch addition to cart failed";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
         public async Task<ResponseDto> AddProductToCart(CartAddRemoveDto req)
         {
             var response = new ResponseDto();
@@ -282,6 +368,66 @@ namespace KFS.src.Application.Service
             }
         }
 
+        public async Task<ResponseDto> RemoveBatchFromCart(BatchAddRemoveDto req)
+        {
+            var response = new ResponseDto();
+            try
+            {
+                var cart = await _cartRepository.GetCartById(req.CartId);
+                var batch = await _batchRepository.GetBatchById(req.BatchId);
+                //check if any cart item exists
+                var cartItem = cart.CartItems.FirstOrDefault(x => x.ProductId == batch.ProductId);
+                if (cartItem == null)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Batch not found in cart";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                //check if req quantity is equal to cart item quantity
+                if (req.Quantity == cartItem.Quantity)
+                {
+                    //remove cart item
+                    cart.CartItems.Remove(cartItem);
+                }
+                //check if quantity is greater than cart item quantity
+                if (req.Quantity > cartItem.Quantity)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Quantity is greater than cart item quantity";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                //update cart item
+                cartItem.Quantity -= req.Quantity;
+                cartItem.Price = batch.Price * cartItem.Quantity;
+                await _cartItemRepository.UpdateCartItem(cartItem);
+                //update cart
+                cart.TotalItem -= req.Quantity;
+                cart.TotalPrice -= batch.Price * req.Quantity;
+                var result = await _cartRepository.UpdateCart(cart);
+                //check result
+                if (result)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Batch removed from cart successfully";
+                    response.IsSuccess = true;
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Batch removal from cart failed";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
         public async Task<ResponseDto> RemoveProductFromCart(CartAddRemoveDto req)
         {
             var response = new ResponseDto();
@@ -316,6 +462,7 @@ namespace KFS.src.Application.Service
                 //update cart item
                 cartItem.Quantity -= req.Quantity;
                 cartItem.Price = product.Price * cartItem.Quantity;
+                await _cartItemRepository.UpdateCartItem(cartItem);
                 //update cart
                 cart.TotalItem -= req.Quantity;
                 cart.TotalPrice -= product.Price * req.Quantity;

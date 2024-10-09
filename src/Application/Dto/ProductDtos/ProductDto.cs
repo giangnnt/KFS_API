@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using AutoMapper;
+using KFS.src.Application.Dto.BatchDtos;
 using KFS.src.Application.Dto.CategoryDtos;
 using KFS.src.Application.Enum;
 using KFS.src.Domain.Entities;
@@ -30,6 +31,7 @@ namespace KFS.src.Application.Dto.ProductDtos
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public CategotyDto Category { get; set; } = null!;
+        public List<BatchDto>? Batches { get; set; }
     }
     public class ProductProfile : Profile
     {

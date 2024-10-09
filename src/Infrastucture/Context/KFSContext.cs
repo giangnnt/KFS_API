@@ -50,6 +50,9 @@ namespace KFS.src.Infrastucture.Context
                 entity.Property(entity => entity.Id).ValueGeneratedOnAdd();
                 entity.Property(entity => entity.Gender).HasConversion(v => v.ToString(), v => v != null ? (GenderEnum)Enum.Parse(typeof(GenderEnum), v) : default)
                 .HasColumnType("nvarchar(20)");
+                entity.HasMany(p => p.Batches)
+                .WithOne(b => b.Product)
+                .OnDelete(DeleteBehavior.Restrict);
             });
             //config payment
             modelBuilder.Entity<Payment>(entity =>
@@ -195,6 +198,16 @@ namespace KFS.src.Infrastucture.Context
                 .HasColumnType("nvarchar(20)");
 
             });
+            //config cart
+            modelBuilder.Entity<Cart>(entity =>
+            {
+                entity.Property(entity => entity.Status)
+                .HasConversion(
+                    v => v.ToString(),
+                    v => v != null ? (CartStatusEnum)Enum.Parse(typeof(CartStatusEnum), v) : default)
+                .HasColumnType("nvarchar(20)");
+            });
+
             //seed cart
             modelBuilder.Entity<Cart>().HasData(
                 new Cart
@@ -238,19 +251,25 @@ namespace KFS.src.Infrastucture.Context
                 .HasConversion(
                     v => v.ToString(),
                     v => v != null ? (PaymentMethodEnum)Enum.Parse(typeof(PaymentMethodEnum), v) : default);
-            });
-            //config payment
-            modelBuilder.Entity<Payment>(entity =>
-            {
-                entity.Property(entity => entity.Status)
-                .HasConversion(
-                    v => v.ToString(),
-                    v => v != null ? (PaymentStatusEnum)Enum.Parse(typeof(PaymentStatusEnum), v) : default);
+                entity.HasOne(o => o.User)
+                .WithMany(u => u.Orders)
+                .HasForeignKey(o => o.UserId)
+                .OnDelete(DeleteBehavior.Cascade); // Potential cascade path
 
-                entity.Property(entity => entity.PaymentMethod)
-                .HasConversion(
-                    v => v.ToString(),
-                    v => v != null ? (PaymentMethodEnum)Enum.Parse(typeof(PaymentMethodEnum), v) : default);
+            entity.HasMany(o => o.OrderItems)
+                .WithOne(oi => oi.Order)
+                .HasForeignKey(oi => oi.OrderId)
+                .OnDelete(DeleteBehavior.Cascade); // Potential cascade path
+
+            entity.HasOne(o => o.Payment)
+                .WithOne(p => p.Order)
+                .HasForeignKey<Payment>(p => p.OrderId)
+                .OnDelete(DeleteBehavior.Restrict); // Potential cascade path
+
+            entity.HasOne(o => o.Shipment)
+                .WithOne(s => s.Order)
+                .HasForeignKey<Shipment>(s => s.OrderId)
+                .OnDelete(DeleteBehavior.Cascade); // Potential cascade path
             });
             //config consignment
             modelBuilder.Entity<Consignment>(entity =>
