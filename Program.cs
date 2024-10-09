@@ -1,4 +1,4 @@
-using KFS.src.Application.Core.Crypto;
+﻿using KFS.src.Application.Core.Crypto;
 using KFS.src.Application.Core.Jwt;
 using KFS.src.Application.Service;
 using KFS.src.Domain.IRepository;
@@ -38,37 +38,6 @@ builder.Services.AddHttpContextAccessor();
 // Add Repository
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-// Add Service 
-builder.Services.AddScoped<IProductService, ProductService>();
-=======
-builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
-builder.Services.AddScoped<ICartRepository, CartRepository>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
-builder.Services.AddScoped<IRoleBaseRepository, RoleBaseRepository>();
-builder.Services.AddScoped<IShipmentRepository, ShipmentRepository>();
-builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
-builder.Services.AddScoped<IConsignmentRepository, ConsignmentRepository>();
-builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>();
-builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-    // Add Service 
-builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
-builder.Services.AddScoped<ICartRepository, CartRepository>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
-builder.Services.AddScoped<IRoleBaseRepository, RoleBaseRepository>();
-builder.Services.AddScoped<IShipmentRepository, ShipmentRepository>();
-builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
-builder.Services.AddScoped<IConsignmentRepository, ConsignmentRepository>();
-builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>();
-// Add Service 
-builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<ICategoryService,categoryservice>();
-=======
 builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
 builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -81,9 +50,9 @@ builder.Services.AddScoped<IConsignmentRepository, ConsignmentRepository>();
 builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>();
 builder.Services.AddScoped<IBatchRepository, BatchRpository>();
 builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
+builder.Services.AddScoped<ICategoryRepository,CategoryRepository>();
 // Add Service 
 builder.Services.AddScoped<IProductService, ProductService>();
->>>>>>> 112a6ff895d7e0c320d4412edd79a55449d01881
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddSingleton<IVNPayService, VNPayService>();
@@ -94,11 +63,8 @@ builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IShipmentService, ShipmentService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IConsignmentService, ConsignmentService>();
-<<<<<<< HEAD
->>>>>>> Stashed changes
-=======
 builder.Services.AddScoped<IPromotionService, PromotionService>();
->>>>>>> 112a6ff895d7e0c320d4412edd79a55449d01881
+builder.Services.AddScoped<ICategoryService,categoryservice>();
 // Add Mapper
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddEndpointsApiExplorer();

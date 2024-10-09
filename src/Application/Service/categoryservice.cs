@@ -6,7 +6,9 @@ using KFS.src.Domain.Entities;
 using KFS.src.Domain.IRepository;
 using KFS.src.Domain.IService;
 using KFS.src.Infrastucture.Repository;
+using Microsoft.AspNetCore.Authentication.OAuth.Claims;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace KFS.src.Application.Service
 {
@@ -91,35 +93,58 @@ namespace KFS.src.Application.Service
 
         public async Task<ResponseDto> GetAllCategories()
         {
-            var response = new ResponseDto();
-            try
-            {
-                var result = await _categoryRepository.GetCategories();
-                var mappedcategory = _mapper.Map<List<Category>>(result);
-                if (result != null && result.Count() > 0)
+            
+                var response = new ResponseDto();
+                try
                 {
-                    response.StatusCode = 200;
-                    response.Message = "Category found";
-                    response.IsSuccess = true;
-                    response.Result = new ResultDto
+                    var result = await _categoryRepository.GetCategories();
+                    var mappedCategories = _mapper.Map<List<CategoryDto>>(result);
+
+                    if (mappedCategories != null && mappedCategories.Any())
                     {
-                        Data = mappedcategory
-                    };
-                    return response;
+                        // Group products by category
+                        var categoriesWithProducts = mappedCategories.Select(category => new
+                        {
+                            CategoryId = category.Id,
+                            CategoryName = category.Name,
+                            CategoryDescription = category.Description,
+                            Products = category.Products.Select(product => new
+                            {
+                                ProductId = product.Id,
+                                ProductName = product.Name,
+                                ProductDescription = product.Description,
+                                Price = product.Price,
+                                // Add other product properties as needed
+                            }).ToList()
+                        }).ToList();
+
+                        response.StatusCode = 200;
+                        response.Message = "Categories with products found";
+                        response.IsSuccess = true;
+                        response.Result = new ResultDto
+                        {
+                            Data = categoriesWithProducts,
+                        };
+
+                        return response;
+                    }
+                    else
+                    {
+                        response.StatusCode = 404;
+                        response.Message = "Categories not found";
+                        response.IsSuccess = false;
+                        return response;
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    response.StatusCode = 404;
-                    response.Message = "Products not found";
+                    response.StatusCode = 500;
+                    response.Message = "An error occurred while fetching categories";
                     response.IsSuccess = false;
-                    return response;
+                return response;
                 }
             }
-            catch
-            {
-                throw;
-            }
-        }
+        
         [HttpGet ("id")]
         public async Task<ResponseDto> GetCategoryById(Guid id)
         {
@@ -127,30 +152,50 @@ namespace KFS.src.Application.Service
             try
             {
                 var result = await _categoryRepository.GetCategoryById(id);
-                var mappedProduct = _mapper.Map<Category>(result);
+
                 if (result != null)
                 {
+                    var mappedCategory = _mapper.Map<CategoryDto>(result);
+
+                    var categoryWithProducts = new
+                    {
+                        CategoryId = mappedCategory.Id,
+                        CategoryName = mappedCategory.Name,
+                        CategoryDescription = mappedCategory.Description,
+                        Products = mappedCategory.Products.Select(product => new
+                        {
+                            ProductId = product.Id,
+                            ProductName = product.Name,
+                            ProductDescription = product.Description,
+                            Price = product.Price,
+                            // Add other product properties as needed
+                        }).ToList()
+                    };
+
                     response.StatusCode = 200;
                     response.Message = "Category found";
                     response.IsSuccess = true;
                     response.Result = new ResultDto
                     {
-                        Data = mappedProduct
+                        Data = categoryWithProducts
                     };
-                    return response;
                 }
                 else
                 {
                     response.StatusCode = 404;
                     response.Message = "Category not found";
                     response.IsSuccess = false;
-                    return response;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = "An error occurred while fetching the category";
+                response.IsSuccess = false;
+               
             }
+
+            return response;
         }
 
         public async Task<ResponseDto> GetCategoryByName(string name)
@@ -159,30 +204,50 @@ namespace KFS.src.Application.Service
             try
             {
                 var result = await _categoryRepository.GetCategoryByName(name);
-                var mappedProduct = _mapper.Map<Category>(result);
+
                 if (result != null)
                 {
+                    var mappedCategory = _mapper.Map<CategoryDto>(result);
+
+                    var categoryWithProducts = new
+                    {
+                        CategoryId = mappedCategory.Id,
+                        CategoryName = mappedCategory.Name,
+                        CategoryDescription = mappedCategory.Description,
+                        Products = mappedCategory.Products.Select(product => new
+                        {
+                            ProductId = product.Id,
+                            ProductName = product.Name,
+                            ProductDescription = product.Description,
+                            Price = product.Price,
+                            // Add other product properties as needed
+                        }).ToList()
+                    };
+
                     response.StatusCode = 200;
                     response.Message = "Category found";
                     response.IsSuccess = true;
                     response.Result = new ResultDto
                     {
-                        Data = mappedProduct
+                        Data = categoryWithProducts
                     };
-                    return response;
                 }
                 else
                 {
                     response.StatusCode = 404;
                     response.Message = "Category not found";
                     response.IsSuccess = false;
-                    return response;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = "An error occurred while fetching the category";
+                response.IsSuccess = false;
+
             }
+
+            return response;
         }
 
        

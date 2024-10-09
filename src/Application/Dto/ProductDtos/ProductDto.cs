@@ -29,7 +29,7 @@ namespace KFS.src.Application.Dto.ProductDtos
         public bool IsForSell { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-        public categorydtov2 Category { get; set; } = null!;
+        public CategotyDto Category { get; set; } = null!;
     }
     public class ProductProfile : Profile
     {
