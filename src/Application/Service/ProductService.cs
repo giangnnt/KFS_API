@@ -28,6 +28,9 @@ namespace KFS.src.Application.Service
             var response = new ResponseDto();
             try
             {
+                //map product
+                var mappedProduct = _mapper.Map<Product>(req);
+                //check if category id is empty
                 if (req.CategoryId == Guid.Empty)
                 {
                     response.StatusCode = 400;
@@ -35,9 +38,13 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
                     return response;
                 }
+                //get category by id
                 var Category = await _categoryRepository.GetCategoryById(req.CategoryId);
-                var mappedProduct = _mapper.Map<Product>(req);
-                mappedProduct.Category = Category;
+                //map category
+                if (Category != null)
+                {
+                    mappedProduct.Category = Category;
+                }
                 var result = await _productRepository.CreateProduct(mappedProduct);
                 if (result)
                 {
@@ -132,7 +139,7 @@ namespace KFS.src.Application.Service
             {
                 var result = await _productRepository.GetProducts();
                 var mappedProduct = _mapper.Map<List<ProductDto>>(result);
-                if (result != null)
+                if (result != null && result.Count() > 0)
                 {
                     response.StatusCode = 200;
                     response.Message = "Products found";
@@ -147,6 +154,46 @@ namespace KFS.src.Application.Service
                 {
                     response.StatusCode = 404;
                     response.Message = "Products not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public async Task<ResponseDto> UpdateIsForSell(bool isForSell, Guid id)
+        {
+            var response = new ResponseDto();
+            try
+            {
+                //get product by id
+                var product = await _productRepository.GetProductById(id);
+                if (product != null)
+                {
+                    product.IsForSell = isForSell;
+                    var result = _productRepository.UpdateProduct(product);
+                    if (result.Result)
+                    {
+                        response.StatusCode = 200;
+                        response.Message = "Product updated successfully";
+                        response.IsSuccess = true;
+                        return response;
+                    }
+                    else
+                    {
+                        response.StatusCode = 400;
+                        response.Message = "Product update failed";
+                        response.IsSuccess = false;
+                        return response;
+                    }
+                }
+                else
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Product not found";
                     response.IsSuccess = false;
                     return response;
                 }

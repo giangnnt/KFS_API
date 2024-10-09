@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using AutoMapper;
 using KFS.src.Application.Dto.CategoryDtos;
@@ -22,8 +23,10 @@ namespace KFS.src.Application.Dto.ProductDtos
         public string? Color { get; set; }
         public string? FeedingVolumn { get; set; }
         public float? FilterRate { get; set; }
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public GenderEnum Gender { get; set; }
         public int Inventory { get; set; }
+        public bool IsForSell { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public categorydtov2 Category { get; set; } = null!;

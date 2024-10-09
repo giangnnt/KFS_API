@@ -15,5 +15,6 @@ namespace KFS.src.Domain.IService
         public Task<ResponseDto> CreateProduct(ProductCreate req);
         public Task<ResponseDto> UpdateProduct(ProductUpdate req, Guid id);
         public Task<ResponseDto> DeleteProduct(Guid id);
+        public Task<ResponseDto> UpdateIsForSell(bool isForSell, Guid id);
     }
 }
