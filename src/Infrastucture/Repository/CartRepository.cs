@@ -84,7 +84,8 @@ namespace KFS.src.Infrastucture.Repository
                 .ThenInclude(ci => ci.Product)
                 .ThenInclude(p => p.Category)
                 .Include(c => c.CartItems)
-                .ThenInclude(ci => ci.Batch)
+                .ThenInclude(ci => ci.Product)
+                .ThenInclude(p => p.Batches)
                 .ToListAsync();
         }
 

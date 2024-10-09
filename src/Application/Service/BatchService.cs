@@ -23,6 +23,43 @@ namespace KFS.src.Application.Service
             _mapper = mapper;
             _productRepository = productRepository;
         }
+
+        public async Task<ResponseDto> BatchIsForSell(bool isForSell, Guid id)
+        {
+            var response = new ResponseDto();
+            try
+            {
+                var batch = await _batchRepository.GetBatchById(id);
+                if (batch == null)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Batch not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                batch.IsForSell = isForSell;
+                var result = await _batchRepository.UpdateBatch(batch);
+                if (result)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Batch updated successfully";
+                    response.IsSuccess = true;
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Batch update failed";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
         public async Task<ResponseDto> CreateBatchFromProduct(BatchCreate batch, Guid productId)
         {
             var response = new ResponseDto();
@@ -46,7 +83,7 @@ namespace KFS.src.Application.Service
                 if (batch.Inventory == 0)
                 {
                     response.StatusCode = 400;
-                    response.Message = "Batch numbers is required";
+                    response.Message = "Batch inventory is required";
                     response.IsSuccess = false;
                     return response;
                 }
@@ -60,6 +97,7 @@ namespace KFS.src.Application.Service
                 var mappedBatch = _mapper.Map<Batch>(batch);
                 mappedBatch.ProductId = productId;
                 mappedBatch.Status = ProductStatusEnum.Deactive;
+                mappedBatch.IsForSell = false;
 
                 var result = await _batchRepository.CreateBatch(mappedBatch);
                 if (result)

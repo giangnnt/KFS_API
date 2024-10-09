@@ -10,12 +10,10 @@ namespace KFS.src.Domain.Entities
         public Guid Id { get; set; }
         public Guid OrderId { get; set; }
         public Guid ProductId { get; set; }
-        public Guid BatchId { get; set; }
         public int Quantity { get; set; }
         public decimal Price { get; set; }
         public bool IsConsignment { get; set; } = false;
         public Order Order { get; set; } = null!;
         public Product Product { get; set; } = null!;
-        public Batch? Batch { get; set; }
     }
 }
