@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
-
+//test
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
 {
