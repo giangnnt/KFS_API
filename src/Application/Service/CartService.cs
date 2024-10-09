@@ -20,9 +20,10 @@ namespace KFS.src.Application.Service
         private readonly IProductRepository _productRepository;
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
+        private readonly ICartItemRepository _cartItemRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IBatchRepository _batchRepository;
-        public CartService(ICartRepository cartRepository, IProductRepository productRepository, IUserRepository userRepository, IMapper mapper, IHttpContextAccessor httpContextAccessor, IBatchRepository batchRepository)
+        public CartService(ICartRepository cartRepository, IProductRepository productRepository, IUserRepository userRepository, IMapper mapper, IHttpContextAccessor httpContextAccessor, IBatchRepository batchRepository, ICartItemRepository cartItemRepository)
         {
             _cartRepository = cartRepository;
             _productRepository = productRepository;
@@ -30,6 +31,7 @@ namespace KFS.src.Application.Service
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
             _batchRepository = batchRepository;
+            _cartItemRepository = cartItemRepository;
         }
 
         public async Task<ResponseDto> AddBatchToCart(BatchAddRemoveDto req)
@@ -399,6 +401,7 @@ namespace KFS.src.Application.Service
                 //update cart item
                 cartItem.Quantity -= req.Quantity;
                 cartItem.Price = batch.Price * cartItem.Quantity;
+                await _cartItemRepository.UpdateCartItem(cartItem);
                 //update cart
                 cart.TotalItem -= req.Quantity;
                 cart.TotalPrice -= batch.Price * req.Quantity;
@@ -459,6 +462,7 @@ namespace KFS.src.Application.Service
                 //update cart item
                 cartItem.Quantity -= req.Quantity;
                 cartItem.Price = product.Price * cartItem.Quantity;
+                await _cartItemRepository.UpdateCartItem(cartItem);
                 //update cart
                 cart.TotalItem -= req.Quantity;
                 cart.TotalPrice -= product.Price * req.Quantity;
