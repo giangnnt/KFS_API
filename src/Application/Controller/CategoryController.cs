@@ -38,7 +38,7 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
-        [HttpGet("name")]
+        [HttpGet("Name")]
         public async Task<IActionResult> GetCategoryByName(string name)
         {
             try
@@ -52,7 +52,7 @@ namespace KFS.src.Application.Controller
             }
         }
         
-        [HttpPost("create")]
+        [HttpPost]
         public async Task<IActionResult> CreateCategory([FromBody] categorydtov2 req)
         {
             try
@@ -65,7 +65,7 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
-        [HttpGet("Id")]
+        [HttpGet("id")]
         public async Task<IActionResult> GetCategoryById(Guid id)
         {
             try
@@ -78,8 +78,8 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteById([FromRoute] Guid id)
+        [HttpDelete("id")]
+        public async Task<IActionResult> DeleteById( Guid id)
         {
             try
             {
@@ -91,8 +91,8 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPut ("{id}")]
-        public async Task<IActionResult> UpdateProduct([FromRoute] Guid id,[FromBody] categoryv3 req)
+        [HttpPut ("id")]
+        public async Task<IActionResult> UpdateProduct(Guid id,[FromBody] categoryv3 req)
         {
             try
             {
@@ -104,7 +104,32 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
-
+        [HttpGet("CateID/products")]
+        public async Task<IActionResult> GetProductByCateID(Guid id)
+        {
+            try
+            {
+                var result = await _categoryService.GetProductByCateId(id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpDelete("ProductID")]
+        public async Task<IActionResult> DeleteByProductid(Guid id)
+        {
+            try
+            {
+                var result = await _categoryService.DeleteProductByProId(id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
     }
 }
