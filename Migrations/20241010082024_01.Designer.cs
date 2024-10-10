@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KFS.Migrations
 {
     [DbContext(typeof(KFSContext))]
-    [Migration("20241009132154_01")]
+    [Migration("20241010082024_01")]
     partial class _01
     {
         /// <inheritdoc />
@@ -132,7 +132,7 @@ namespace KFS.Migrations
                         new
                         {
                             Id = new Guid("37ab9331-f39a-4072-80ad-4adc3684fcec"),
-                            CreatedAt = new DateTime(2024, 10, 9, 20, 21, 53, 633, DateTimeKind.Local).AddTicks(6615),
+                            CreatedAt = new DateTime(2024, 10, 10, 15, 20, 24, 214, DateTimeKind.Local).AddTicks(3050),
                             Currency = "VND",
                             Status = "Active",
                             TotalItem = 0,
@@ -143,7 +143,7 @@ namespace KFS.Migrations
                         new
                         {
                             Id = new Guid("da17c01a-de60-4b46-810e-f824a1936e14"),
-                            CreatedAt = new DateTime(2024, 10, 9, 20, 21, 53, 633, DateTimeKind.Local).AddTicks(6641),
+                            CreatedAt = new DateTime(2024, 10, 10, 15, 20, 24, 214, DateTimeKind.Local).AddTicks(3056),
                             Currency = "VND",
                             Status = "Completed",
                             TotalItem = 0,
@@ -535,7 +535,7 @@ namespace KFS.Migrations
                         {
                             Id = new Guid("2a9394e2-52b3-46d5-8a33-af4d6020e440"),
                             CategoryId = new Guid("5f18bf0c-7199-462c-b023-3ccf1fd9f806"),
-                            CreatedAt = new DateTime(2024, 10, 9, 20, 21, 53, 361, DateTimeKind.Local).AddTicks(628),
+                            CreatedAt = new DateTime(2024, 10, 10, 15, 20, 24, 93, DateTimeKind.Local).AddTicks(6700),
                             Description = "Description for Product 1",
                             Gender = "Male",
                             Inventory = 10,
@@ -548,7 +548,7 @@ namespace KFS.Migrations
                         {
                             Id = new Guid("8657ed40-1b9d-44e2-800d-40bb1a20af98"),
                             CategoryId = new Guid("3d4fc185-049d-4a96-851b-1d320e7dbba8"),
-                            CreatedAt = new DateTime(2024, 10, 9, 20, 21, 53, 361, DateTimeKind.Local).AddTicks(644),
+                            CreatedAt = new DateTime(2024, 10, 10, 15, 20, 24, 93, DateTimeKind.Local).AddTicks(6728),
                             Description = "Description for Product 2",
                             Gender = "Female",
                             Inventory = 10,
@@ -561,7 +561,7 @@ namespace KFS.Migrations
                         {
                             Id = new Guid("f3b3b3b4-1b9d-44e2-800d-40bb1a20af98"),
                             CategoryId = new Guid("9a17dcf5-1426-45ee-a32e-c23ee5fe40d9"),
-                            CreatedAt = new DateTime(2024, 10, 9, 20, 21, 53, 361, DateTimeKind.Local).AddTicks(647),
+                            CreatedAt = new DateTime(2024, 10, 10, 15, 20, 24, 93, DateTimeKind.Local).AddTicks(6731),
                             Description = "Description for Product 3",
                             Gender = "Male",
                             Inventory = 10,
@@ -721,10 +721,10 @@ namespace KFS.Migrations
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000001"),
                             Address = "HCM",
-                            CreatedAt = new DateTime(2024, 10, 9, 20, 21, 53, 633, DateTimeKind.Local).AddTicks(3341),
+                            CreatedAt = new DateTime(2024, 10, 10, 15, 20, 24, 214, DateTimeKind.Local).AddTicks(340),
                             Email = "giangnnt260703@gmail.com",
                             FullName = "Truong Giang",
-                            Password = "$2a$11$.GGMZvtQVQIi4dkaigv4j.PBapoyqqioqgZCGRbaRiwHEFajqKSAG",
+                            Password = "$2a$11$b6xeLb0tNThbCyvOzWYzHOu8tdyIJVUI3lIkS5MZLR/PvVIhTM57m",
                             Phone = "0123456789",
                             RoleId = 1,
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)

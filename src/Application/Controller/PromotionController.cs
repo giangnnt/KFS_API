@@ -145,5 +145,19 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
+        [Protected]
+        [HttpPut("expire/{promotionId}")]
+        public async Task<IActionResult> ExpirePromotion(Guid promotionId)
+        {
+            try
+            {
+                var result = await _promotionService.PromotionExpire(promotionId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

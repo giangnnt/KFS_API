@@ -19,12 +19,16 @@ namespace KFS.src.Infrastucture.Repository
         {
             return await _context.Products
             .Include(x => x.Category)
+            .Include(x=>x.Promotions)
+            .Include(x=>x.Batches)
             .ToListAsync();
         }
         public async Task<Domain.Entities.Product> GetProductById(Guid id)
         {
             return await _context.Products
             .Include(x => x.Category)
+            .Include(x=>x.Promotions)
+            .Include(x=>x.Batches)
             .FirstOrDefaultAsync(x => x.Id == id) ?? throw new Exception("Product not found");
         }
         public async Task<bool> CreateProduct(Domain.Entities.Product product)

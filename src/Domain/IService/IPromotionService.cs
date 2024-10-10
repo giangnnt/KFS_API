@@ -20,6 +20,6 @@ namespace KFS.src.Domain.IService
         public Task<ResponseDto> UpdateProductToPromotion(Guid promotionId, List<Guid> productId);
         public Task<ResponseDto> UpdateBatchToPromotion(Guid promotionId, List<Guid> batchId);
         public Task<ResponseDto> UpdateCategoryToPromotion(Guid promotionId, List<Guid> categoryId);
-
+        public Task<ResponseDto> PromotionExpire(Guid promotionId);
     }
 }
