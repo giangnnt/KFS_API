@@ -155,7 +155,7 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public async Task<ResponseDto> ListBatchToPromotion(Guid promotionId, List<Guid> batchId)
+        public async Task<ResponseDto> UpdateBatchToPromotion(Guid promotionId, List<Guid> batchId)
         {
             var response = new ResponseDto();
             try
@@ -197,7 +197,7 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public async Task<ResponseDto> ListCategoryToPromotion(Guid promotionId, List<Guid> categoryId)
+        public async Task<ResponseDto> UpdateCategoryToPromotion(Guid promotionId, List<Guid> categoryId)
         {
             var response = new ResponseDto();
             try
@@ -239,7 +239,7 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public async Task<ResponseDto> ListProductToPromotion(Guid promotionId, List<Guid> productId)
+        public async Task<ResponseDto> UpdateProductToPromotion(Guid promotionId, List<Guid> productId)
         {
             var response = new ResponseDto();
             try

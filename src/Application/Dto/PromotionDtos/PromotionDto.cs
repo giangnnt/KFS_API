@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using KFS.src.Application.Dto.BatchDtos;
 using KFS.src.Application.Dto.CategoryDtos;
 using KFS.src.Application.Dto.ProductDtos;
 using KFS.src.Domain.Entities;
@@ -20,7 +21,7 @@ namespace KFS.src.Application.Dto.PromotionDtos
         public DateTime EndDate { get; set; }
         public bool IsActive { get; set; }
         public List<ProductDto> Products { get; set; } = new();
-        public List<Batch> Batches { get; set; } = new();
+        public List<BatchDto> Batches { get; set; } = new();
         public List<CategotyDto> Categories { get; set; } = new();
     }
     public class PromotionProfile : Profile
