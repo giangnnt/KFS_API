@@ -64,11 +64,8 @@ builder.Services.AddScoped<IShipmentService, ShipmentService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IConsignmentService, ConsignmentService>();
 builder.Services.AddScoped<IPromotionService, PromotionService>();
-<<<<<<< HEAD
 builder.Services.AddScoped<ICategoryService,categoryservice>();
-=======
 builder.Services.AddScoped<IBatchService, BatchService>();
->>>>>>> 1bfd8a306b90c390423541cdf28fdc0a9226fa30
 // Add Mapper
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddEndpointsApiExplorer();
