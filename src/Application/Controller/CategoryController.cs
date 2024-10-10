@@ -1,7 +1,7 @@
 ﻿using KFS.src.Application.Dto.CategoryDtos;
 using KFS.src.Application.Dto.ProductDtos;
 using KFS.src.Application.Dto.ResponseDtos;
-
+using KFS.src.Application.Middleware;
 using KFS.src.Application.Service;
 using KFS.src.Domain.Entities;
 using KFS.src.Domain.IService;
@@ -51,7 +51,7 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
-        
+        [Protected]
         [HttpPost("create")]
         public async Task<IActionResult> CreateCategory([FromBody] categorydtov2 req)
         {
@@ -78,6 +78,7 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
+        [Protected]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteById([FromRoute] Guid id)
         {
@@ -91,6 +92,7 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
+        [Protected]
         [HttpPut ("{id}")]
         public async Task<IActionResult> UpdateProduct([FromRoute] Guid id,[FromBody] categoryv3 req)
         {
