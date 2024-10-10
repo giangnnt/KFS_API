@@ -48,12 +48,12 @@ namespace KFS.src.Infrastucture.Repository
 
         public async Task<Category> GetCategoryByName(string name)
         {
-            return await _context.Categories.Include(x => x.Products).FirstOrDefaultAsync(x => x.Name == name) ?? throw new Exception("Category not found");
+            return await _context.Categories.Include(x => x.Products).ThenInclude(x=>x.Consignment).FirstOrDefaultAsync(x => x.Name == name) ?? throw new Exception("Category not found");
         }
 
         public async Task<Category> GetCategoryById(Guid id)
         {
-            return await _context.Categories.Include(x => x.Products).ThenInclude(p => p.Consignment).FirstOrDefaultAsync(x => x.Id == id) ?? throw new Exception("Category not found");
+            return await _context.Categories.Include(x => x.Products).ThenInclude(x => x.Consignment).FirstOrDefaultAsync(x => x.Id == id) ?? throw new Exception("Category not found");
         }
         
     }
