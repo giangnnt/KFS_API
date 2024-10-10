@@ -123,5 +123,33 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
+        [Protected]
+        [HttpPost("add-batch")]
+        public async Task<IActionResult> AddBatchToCart(BatchAddRemoveDto req)
+        {
+            try
+            {
+                var result = await _cartService.AddBatchToCart(req);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [Protected]
+        [HttpPost("remove-batch")]
+        public async Task<IActionResult> RemoveBatchFromCart(BatchAddRemoveDto req)
+        {
+            try
+            {
+                var result = await _cartService.RemoveBatchFromCart(req);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

@@ -18,5 +18,7 @@ namespace KFS.src.Domain.IService
         Task<ResponseDto> DeleteCart(Guid id);
         Task<ResponseDto> AddProductToCart(CartAddRemoveDto req);
         Task<ResponseDto> RemoveProductFromCart(CartAddRemoveDto req);
+        Task<ResponseDto> AddBatchToCart(BatchAddRemoveDto req);
+        Task<ResponseDto> RemoveBatchFromCart(BatchAddRemoveDto req);
     }
 }

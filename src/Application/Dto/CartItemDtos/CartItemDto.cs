@@ -15,6 +15,7 @@ namespace KFS.src.Application.Dto.CartItemDtos
         public Guid ProductId { get; set; }
         public int Quantity { get; set; }
         public decimal Price { get; set; }
+        public bool IsBatch { get; set; }
         public ProductDto Product { get; set; } = null!;
     }
     public class CartItemProfile : Profile
