@@ -104,7 +104,32 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
-
+        [HttpGet("CateID/products")]
+        public async Task<IActionResult> GetProductByCateID(Guid id)
+        {
+            try
+            {
+                var result = await _categoryService.GetProductByCateId(id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpDelete("ProductID")]
+        public async Task<IActionResult> DeleteByProductid(Guid id)
+        {
+            try
+            {
+                var result = await _categoryService.DeleteProductByProId(id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
     }
 }
