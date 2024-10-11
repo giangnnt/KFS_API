@@ -16,11 +16,13 @@ namespace KFS.src.Application.Service
         private readonly IProductRepository _productRepository;
         private readonly ICategoryRepository _categoryRepository;
         private readonly IMapper _mapper;
-        public ProductService(IProductRepository productRepository, ICategoryRepository categoryRepository, IMapper mapper)
+        private readonly IBatchRepository _batchRepository;
+        public ProductService(IProductRepository productRepository, ICategoryRepository categoryRepository, IMapper mapper, IBatchRepository batchRepository)
         {
             _productRepository = productRepository;
             _categoryRepository = categoryRepository;
             _mapper = mapper;
+            _batchRepository = batchRepository;
         }
 
         public async Task<ResponseDto> CreateProduct(ProductCreate req)
@@ -174,6 +176,10 @@ namespace KFS.src.Application.Service
                 if (product != null)
                 {
                     product.IsForSell = isForSell;
+                    foreach (var batch in product.Batches)
+                    {
+                        batch.IsForSell = isForSell;
+                    }
                     var result = _productRepository.UpdateProduct(product);
                     if (result.Result)
                     {

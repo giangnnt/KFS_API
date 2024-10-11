@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Hangfire;
 using KFS.src.Application.Dto.PromotionDtos;
 using KFS.src.Application.Dto.ResponseDtos;
 using KFS.src.Domain.Entities;
@@ -18,14 +19,17 @@ namespace KFS.src.Application.Service
         private readonly IBatchRepository _batchRepository;
         private readonly ICategoryRepository _categoryRepository;
         private readonly IMapper _mapper;
-        public PromotionService(IPromotionRepository promotionRepository, IMapper mapper, IProductRepository productRepository, IBatchRepository batchRepository, ICategoryRepository categoryRepository)
+        private readonly IBackgroundJobClient _backgroundJobClient;
+        public PromotionService(IPromotionRepository promotionRepository, IMapper mapper, IProductRepository productRepository, IBatchRepository batchRepository, ICategoryRepository categoryRepository, IBackgroundJobClient backgroundJobClient)
         {
             _promotionRepository = promotionRepository;
             _mapper = mapper;
             _productRepository = productRepository;
             _batchRepository = batchRepository;
             _categoryRepository = categoryRepository;
+            _backgroundJobClient = backgroundJobClient;
         }
+
         public async Task<ResponseDto> CreatePromotion(PromotionCreate promotion)
         {
             var response = new ResponseDto();
@@ -37,6 +41,8 @@ namespace KFS.src.Application.Service
                 var result = await _promotionRepository.CreatePromotion(mappedPromotion);
                 if (result)
                 {
+                    _backgroundJobClient.Schedule(() => JobStartPromotion(mappedPromotion.Id), mappedPromotion.StartDate);
+                    _backgroundJobClient.Schedule(() => JobExpirePromotion(mappedPromotion.Id), mappedPromotion.EndDate);
                     response.StatusCode = 200;
                     response.Message = "Promotion created successfully";
                     response.IsSuccess = true;
@@ -155,7 +161,7 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public async Task<ResponseDto> ListBatchToPromotion(Guid promotionId, List<Guid> batchId)
+        public async Task<ResponseDto> UpdateBatchToPromotion(Guid promotionId, List<Guid> batchId)
         {
             var response = new ResponseDto();
             try
@@ -197,7 +203,7 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public async Task<ResponseDto> ListCategoryToPromotion(Guid promotionId, List<Guid> categoryId)
+        public async Task<ResponseDto> UpdateCategoryToPromotion(Guid promotionId, List<Guid> categoryId)
         {
             var response = new ResponseDto();
             try
@@ -239,7 +245,7 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public async Task<ResponseDto> ListProductToPromotion(Guid promotionId, List<Guid> productId)
+        public async Task<ResponseDto> UpdateProductToPromotion(Guid promotionId, List<Guid> productId)
         {
             var response = new ResponseDto();
             try
@@ -281,35 +287,60 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public async Task<ResponseDto> SetPromotionIsActive(Guid id, bool state)
+        public async Task<ResponseDto> StartPromotion(Guid id)
         {
             var response = new ResponseDto();
             try
             {
                 var promotion = await _promotionRepository.GetPromotionById(id);
-                if (promotion != null)
-                {
-                    promotion.IsActive = state;
-                    var result = await _promotionRepository.UpdatePromotion(promotion);
-                    if (result)
-                    {
-                        response.StatusCode = 200;
-                        response.Message = "Promotion state updated successfully";
-                        response.IsSuccess = true;
-                        return response;
-                    }
-                    else
-                    {
-                        response.StatusCode = 400;
-                        response.Message = "Promotion state update failed";
-                        response.IsSuccess = false;
-                        return response;
-                    }
-                }
-                else
+                if (promotion == null)
                 {
                     response.StatusCode = 404;
                     response.Message = "Promotion not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                // set new price for products and batches
+                foreach (var product in promotion.Products)
+                {
+                    product.Price = product.Price - (product.Price * promotion.DiscountPercentage / 100);
+                }
+                foreach (var batch in promotion.Batches)
+                {
+                    batch.Price = batch.Price - (batch.Price * promotion.DiscountPercentage / 100);
+                }
+                // set new price for products and batches in category except the one already in promotion
+                var productInCategory = promotion.Categories.SelectMany(x => x.Products).ToList();
+                var batchInCategory = productInCategory.SelectMany(x => x.Batches).ToList();
+                foreach (var product in productInCategory)
+                {
+                    if (!promotion.Products.Contains(product))
+                    {
+                        product.Price = product.Price - (product.Price * promotion.DiscountPercentage / 100);
+                    }
+                }
+                foreach (var batch in batchInCategory)
+                {
+                    if (!promotion.Batches.Contains(batch))
+                    {
+                        batch.Price = batch.Price - (batch.Price * promotion.DiscountPercentage / 100);
+                    }
+                }
+                // set promotion state
+                promotion.IsActive = true;
+                // update promotion
+                var result = await _promotionRepository.UpdatePromotion(promotion);
+                if (result)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Promotion state updated successfully";
+                    response.IsSuccess = true;
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Promotion state update failed";
                     response.IsSuccess = false;
                     return response;
                 }
@@ -346,6 +377,185 @@ namespace KFS.src.Application.Service
                 {
                     response.StatusCode = 400;
                     response.Message = "Promotion update failed";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public async Task JobExpirePromotion(Guid promotionId)
+        {
+            var response = new ResponseDto();
+            try
+            {
+                var promotion = await _promotionRepository.GetPromotionById(promotionId);
+                if (promotion == null)
+                {
+                    Console.WriteLine("Promotion not found");
+                    return;
+                }
+                // set new price for products and batches
+                foreach (var product in promotion.Products)
+                {
+                    product.Price = product.Price * 100 / (100 - promotion.DiscountPercentage);
+                }
+                foreach (var batch in promotion.Batches)
+                {
+                    batch.Price = batch.Price * 100 / (100 - promotion.DiscountPercentage);
+                }
+                // set new price for products and batches in category except the one already in promotion
+                var productInCategory = promotion.Categories.SelectMany(x => x.Products).ToList();
+                var batchInCategory = productInCategory.SelectMany(x => x.Batches).ToList();
+                foreach (var product in productInCategory)
+                {
+                    if (!promotion.Products.Contains(product))
+                    {
+                        product.Price = product.Price * 100 / (100 - promotion.DiscountPercentage);
+                    }
+                }
+                foreach (var batch in batchInCategory)
+                {
+                    if (!promotion.Batches.Contains(batch))
+                    {
+                        batch.Price = batch.Price * 100 / (100 - promotion.DiscountPercentage);
+                    }
+                }
+                // set promotion state
+                promotion.IsActive = false;
+                // update promotion
+                var result = await _promotionRepository.UpdatePromotion(promotion);
+                if (result)
+                {
+                    Console.WriteLine("Promotion expired successfully");
+                    return;
+                }
+                else
+                {
+                    Console.WriteLine("Promotion expiration failed");
+                    return;
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+        public async Task JobStartPromotion(Guid promotionId)
+        {
+            var response = new ResponseDto();
+            try
+            {
+                var promotion = await _promotionRepository.GetPromotionById(promotionId);
+                if (promotion == null)
+                {
+                    Console.WriteLine("Promotion not found");
+                    return;
+                }
+                // set new price for products and batches
+                foreach (var product in promotion.Products)
+                {
+                    product.Price = product.Price - (product.Price * promotion.DiscountPercentage / 100);
+                }
+                foreach (var batch in promotion.Batches)
+                {
+                    batch.Price = batch.Price - (batch.Price * promotion.DiscountPercentage / 100);
+                }
+                // set new price for products and batches in category except the one already in promotion
+                var productInCategory = promotion.Categories.SelectMany(x => x.Products).ToList();
+                var batchInCategory = productInCategory.SelectMany(x => x.Batches).ToList();
+                foreach (var product in productInCategory)
+                {
+                    if (!promotion.Products.Contains(product))
+                    {
+                        product.Price = product.Price - (product.Price * promotion.DiscountPercentage / 100);
+                    }
+                }
+                foreach (var batch in batchInCategory)
+                {
+                    if (!promotion.Batches.Contains(batch))
+                    {
+                        batch.Price = batch.Price - (batch.Price * promotion.DiscountPercentage / 100);
+                    }
+                }
+                // set promotion state
+                promotion.IsActive = true;
+                // update promotion
+                var result = await _promotionRepository.UpdatePromotion(promotion);
+                if (result)
+                {
+                    Console.WriteLine("Promotion started successfully");
+                    return;
+                }
+                else
+                {
+                    Console.WriteLine("Promotion start failed");
+                    return;
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public async Task<ResponseDto> EndPromotion(Guid promotionId)
+        {
+            var response = new ResponseDto();
+            try
+            {
+                var promotion = await _promotionRepository.GetPromotionById(promotionId);
+                if (promotion == null)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Promotion not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                // set new price for products and batches
+                foreach (var product in promotion.Products)
+                {
+                    product.Price = product.Price * 100 / (100 - promotion.DiscountPercentage);
+                }
+                foreach (var batch in promotion.Batches)
+                {
+                    batch.Price = batch.Price * 100 / (100 - promotion.DiscountPercentage);
+                }
+                // set new price for products and batches in category except the one already in promotion
+                var productInCategory = promotion.Categories.SelectMany(x => x.Products).ToList();
+                var batchInCategory = productInCategory.SelectMany(x => x.Batches).ToList();
+                foreach (var product in productInCategory)
+                {
+                    if (!promotion.Products.Contains(product))
+                    {
+                        product.Price = product.Price * 100 / (100 - promotion.DiscountPercentage);
+                    }
+                }
+                foreach (var batch in batchInCategory)
+                {
+                    if (!promotion.Batches.Contains(batch))
+                    {
+                        batch.Price = batch.Price * 100 / (100 - promotion.DiscountPercentage);
+                    }
+                }
+                // set promotion state
+                promotion.IsActive = false;
+                // update promotion
+                var result = await _promotionRepository.UpdatePromotion(promotion);
+                if (result)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Promotion ended successfully";
+                    response.IsSuccess = true;
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Promotion end failed";
                     response.IsSuccess = false;
                     return response;
                 }

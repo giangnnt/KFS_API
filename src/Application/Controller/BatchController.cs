@@ -89,19 +89,5 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
-        [Protected]
-        [HttpPut("is-for-sell/{id}")]
-        public async Task<IActionResult> BatchIsForSell(bool isForSell, Guid id)
-        {
-            try
-            {
-                var result = await _batchService.BatchIsForSell(isForSell, id);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
     }
 }

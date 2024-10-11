@@ -90,12 +90,12 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPut("isActive/{id}")]
-        public async Task<IActionResult> SetPromotionState(Guid id, bool IsActive)
+        [HttpPut("start/{id}")]
+        public async Task<IActionResult> SetPromotionState(Guid id)
         {
             try
             {
-                var result = await _promotionService.SetPromotionIsActive(id, IsActive);
+                var result = await _promotionService.StartPromotion(id);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -105,11 +105,11 @@ namespace KFS.src.Application.Controller
         }
         [Protected]
         [HttpPut("list-product/{promotionId}")]
-        public async Task<IActionResult> ListProductToPromotion(Guid promotionId, List<Guid> productId)
+        public async Task<IActionResult> ListProductToPromotion(Guid promotionId, PromotionAddRemoveItemDto productId)
         {
             try
             {
-                var result = await _promotionService.ListProductToPromotion(promotionId, productId);
+                var result = await _promotionService.UpdateProductToPromotion(promotionId, productId.listId);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -119,11 +119,11 @@ namespace KFS.src.Application.Controller
         }
         [Protected]
         [HttpPut("list-batch/{promotionId}")]
-        public async Task<IActionResult> ListBatchToPromotion(Guid promotionId, List<Guid> batchId)
+        public async Task<IActionResult> ListBatchToPromotion(Guid promotionId, PromotionAddRemoveItemDto batchId)
         {
             try
             {
-                var result = await _promotionService.ListBatchToPromotion(promotionId, batchId);
+                var result = await _promotionService.UpdateBatchToPromotion(promotionId, batchId.listId);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -133,11 +133,25 @@ namespace KFS.src.Application.Controller
         }
         [Protected]
         [HttpPut("list-category/{promotionId}")]
-        public async Task<IActionResult> ListCategoryToPromotion(Guid promotionId, List<Guid> categoryId)
+        public async Task<IActionResult> ListCategoryToPromotion(Guid promotionId, PromotionAddRemoveItemDto categoryId)
         {
             try
             {
-                var result = await _promotionService.ListCategoryToPromotion(promotionId, categoryId);
+                var result = await _promotionService.UpdateCategoryToPromotion(promotionId, categoryId.listId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [Protected]
+        [HttpPut("end/{promotionId}")]
+        public async Task<IActionResult> EndPromotion(Guid promotionId)
+        {
+            try
+            {
+                var result = await _promotionService.EndPromotion(promotionId);
                 return Ok(result);
             }
             catch (Exception ex)
