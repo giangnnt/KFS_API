@@ -74,7 +74,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpDelete("{id}")]
+        [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteById( Guid id)
         {
             try
@@ -88,7 +88,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPut ("id")]
+        [HttpPut ("update/id")]
         public async Task<IActionResult> UpdateProduct(Guid id,[FromBody] categoryv3 req)
         {
             try
@@ -101,20 +101,5 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteByProductById(Guid id)
-        {
-            try
-            {
-                var result = await _categoryService.DeleteProductByProId(id);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
     }
 }
