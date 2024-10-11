@@ -97,7 +97,12 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public async Task<ResponseDto> GetProductById(Guid id)
+        public Task<ResponseDto> GetProductById(Guid id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<ResponseDto> GetProductByName(Guid id)
         {
             var response = new ResponseDto();
             try

@@ -51,6 +51,7 @@ builder.Services.AddScoped<IConsignmentRepository, ConsignmentRepository>();
 builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>();
 builder.Services.AddScoped<IBatchRepository, BatchRpository>();
 builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
+builder.Services.AddScoped<ICategoryRepository,CategoryRepository>();
 // Add Service 
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICartService, CartService>();
@@ -64,6 +65,7 @@ builder.Services.AddScoped<IShipmentService, ShipmentService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IConsignmentService, ConsignmentService>();
 builder.Services.AddScoped<IPromotionService, PromotionService>();
+builder.Services.AddScoped<ICategoryService,Categoryservice>();
 builder.Services.AddScoped<IBatchService, BatchService>();
 // Add Mapper
 builder.Services.AddAutoMapper(typeof(Program));

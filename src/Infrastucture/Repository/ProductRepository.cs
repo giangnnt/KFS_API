@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using KFS.src.Domain.Entities;
 using KFS.src.Domain.IRepository;
 using KFS.src.Infrastucture.Context;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +16,7 @@ namespace KFS.src.Infrastucture.Repository
         {
             _context = context;
         }
-        public async Task<IEnumerable<Domain.Entities.Product>> GetProducts()
+        public async Task<IEnumerable<Product>> GetProducts()
         {
             return await _context.Products
             .Include(x => x.Category)
@@ -23,7 +24,7 @@ namespace KFS.src.Infrastucture.Repository
             .Include(x=>x.Batches)
             .ToListAsync();
         }
-        public async Task<Domain.Entities.Product> GetProductById(Guid id)
+        public async Task<Product> GetProductById(Guid id)
         {
             return await _context.Products
             .Include(x => x.Category)
@@ -31,14 +32,14 @@ namespace KFS.src.Infrastucture.Repository
             .Include(x=>x.Batches)
             .FirstOrDefaultAsync(x => x.Id == id) ?? throw new Exception("Product not found");
         }
-        public async Task<bool> CreateProduct(Domain.Entities.Product product)
+        public async Task<bool> CreateProduct(Product product)
         {
             product.CreatedAt = DateTime.Now;
             _context.Products.Add(product);
              int result = await _context.SaveChangesAsync();
             return result > 0;
         }
-        public async Task<bool> UpdateProduct(Domain.Entities.Product product)
+        public async Task<bool> UpdateProduct(Product product)
         {
             product.UpdatedAt = DateTime.Now;
             _context.Products.Update(product);
@@ -53,5 +54,7 @@ namespace KFS.src.Infrastucture.Repository
             int result = await _context.SaveChangesAsync();
             return result > 0;
         }
+
+      
     }
 }
