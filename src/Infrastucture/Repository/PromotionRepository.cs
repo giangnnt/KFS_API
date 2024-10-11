@@ -97,8 +97,9 @@ namespace KFS.src.Infrastucture.Repository
         public async Task<bool> UpdateProductPromotion(Promotion promotion, List<Product> product)
         {
             // get and remove product
-            foreach (var item in promotion.Products)
+            for (int i = promotion.Products.Count - 1; i >= 0; i--)
             {
+                var item = promotion.Products[i];
                 if (!product.Contains(item))
                 {
                     promotion.Products.Remove(item);

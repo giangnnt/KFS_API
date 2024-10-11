@@ -54,6 +54,33 @@ namespace KFS.src.Infrastucture.Context
                 .WithOne(b => b.Product)
                 .OnDelete(DeleteBehavior.Restrict);
             });
+            // seed batch
+            modelBuilder.Entity<Batch>().HasData(
+                new Batch
+                {
+                    Id = Guid.Parse("64141e04-9c9d-4bd1-94d2-84ee359f1e5b"),
+                    Name = "Batch 1",
+                    ProductId = Guid.Parse("2a9394e2-52b3-46d5-8a33-af4d6020e440"),
+                    Quantity = 10,
+                    Price = 10000,
+                },
+                new Batch
+                {
+                    Id = Guid.Parse("eb5707d1-1b02-4ad5-8d6b-27a78d00f322"),
+                    Name = "Batch 2",
+                    ProductId = Guid.Parse("8657ed40-1b9d-44e2-800d-40bb1a20af98"),
+                    Quantity = 10,
+                    Price = 20000,
+                },
+                new Batch
+                {
+                    Id = Guid.Parse("b6bfe977-ee7e-4e84-a65b-445c36d08d65"),
+                    Name = "Batch 3",
+                    ProductId = Guid.Parse("f3b3b3b4-1b9d-44e2-800d-40bb1a20af98"),
+                    Quantity = 10,
+                    Price = 30000,
+                }
+            );
             //config payment
             modelBuilder.Entity<Payment>(entity =>
             {
