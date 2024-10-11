@@ -32,5 +32,6 @@ namespace KFS.src.Domain.Entities
         public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
         public List<Batch> Batches { get; set; } = new List<Batch>();
         public List<Promotion> Promotions { get; set; } = new List<Promotion>();
+        public List<Media> Medias { get; set; } = new List<Media>();
     }
 }
