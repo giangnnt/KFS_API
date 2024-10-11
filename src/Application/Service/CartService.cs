@@ -55,7 +55,7 @@ namespace KFS.src.Application.Service
                 if (cartItem == null)
                 {
                     //check inventory
-                    if (batch.Quantity < req.Quantity)
+                    if (batch.Inventory < req.Quantity)
                     {
                         response.StatusCode = 400;
                         response.Message = "Batch quantity is not enough";
@@ -76,8 +76,15 @@ namespace KFS.src.Application.Service
                 }
                 else
                 {
+                    if(cartItem.IsBatch == false)
+                    {
+                        response.StatusCode = 400;
+                        response.Message = "You can only choose one of the two: product or cart";
+                        response.IsSuccess = false;
+                        return response;
+                    }
                     //check inventory
-                    if (batch.Quantity < cartItem.Quantity + req.Quantity)
+                    if (batch.Inventory < cartItem.Quantity + req.Quantity)
                     {
                         response.StatusCode = 400;
                         response.Message = "Batch quantity is not enough";
@@ -156,6 +163,13 @@ namespace KFS.src.Application.Service
                 }
                 else
                 {
+                    if(cartItem.IsBatch == true)
+                    {
+                        response.StatusCode = 400;
+                        response.Message = "You can only choose one of the two: product or cart";
+                        response.IsSuccess = false;
+                        return response;
+                    }
                     //check inventory
                     if (product.Inventory < cartItem.Quantity + req.Quantity)
                     {

@@ -19,7 +19,6 @@ namespace KFS.src.Application.Controller
         {
             _batchService = batchService;
         }
-        [Protected]
         [HttpGet("all")]
         public async Task<IActionResult> GetBatches()
         {
@@ -33,7 +32,6 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
-        [Protected]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetBatchById(Guid id)
         {

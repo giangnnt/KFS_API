@@ -63,6 +63,7 @@ namespace KFS.src.Infrastucture.Context
                     Name = "Batch 1",
                     ProductId = Guid.Parse("2a9394e2-52b3-46d5-8a33-af4d6020e440"),
                     Quantity = 10,
+                    Inventory = 10,
                     Price = 10000,
                 },
                 new Batch
@@ -71,6 +72,7 @@ namespace KFS.src.Infrastucture.Context
                     Name = "Batch 2",
                     ProductId = Guid.Parse("8657ed40-1b9d-44e2-800d-40bb1a20af98"),
                     Quantity = 10,
+                    Inventory = 10,
                     Price = 20000,
                 },
                 new Batch
@@ -79,6 +81,7 @@ namespace KFS.src.Infrastucture.Context
                     Name = "Batch 3",
                     ProductId = Guid.Parse("f3b3b3b4-1b9d-44e2-800d-40bb1a20af98"),
                     Quantity = 10,
+                    Inventory = 10,
                     Price = 30000,
                 }
             );
