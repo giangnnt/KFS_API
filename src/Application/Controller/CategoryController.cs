@@ -10,22 +10,17 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace KFS.src.Application.Controller
 {
-    [Route("api/[controller]")]
+    [Produces("application/json")]
+    [Route("api/category")]
     [ApiController]
     public class CategoryController : ControllerBase
     {
-        //Task<ResponseDto> GetAllCategories();
-        //Task<ResponseDto> GetCategoryById(int id);
-        //Task<ResponseDto> CreateCategory(Category category);
-        //Task<ResponseDto> UpdateCategory(Category category);
-        //Task<ResponseDto> DeleteCategory(int id);
         private readonly ICategoryService _categoryService;
         public CategoryController(ICategoryService categoryService)
         {
             _categoryService = categoryService;
         }
         [HttpGet]
-
         public async Task<IActionResult> GetCategory()
         {
             try
@@ -65,7 +60,7 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
-        [HttpGet("Id")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetCategoryById(Guid id)
         {
             try
@@ -80,7 +75,7 @@ namespace KFS.src.Application.Controller
         }
         [Protected]
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteById([FromRoute] Guid id)
+        public async Task<IActionResult> DeleteById( Guid id)
         {
             try
             {
@@ -93,8 +88,8 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPut ("{id}")]
-        public async Task<IActionResult> UpdateProduct([FromRoute] Guid id,[FromBody] categoryv3 req)
+        [HttpPut ("id")]
+        public async Task<IActionResult> UpdateProduct(Guid id,[FromBody] categoryv3 req)
         {
             try
             {
@@ -107,6 +102,19 @@ namespace KFS.src.Application.Controller
             }
         }
 
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteByProductById(Guid id)
+        {
+            try
+            {
+                var result = await _categoryService.DeleteProductByProId(id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
     }
 }

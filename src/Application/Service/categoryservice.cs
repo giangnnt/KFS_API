@@ -12,13 +12,13 @@ using System.Linq;
 
 namespace KFS.src.Application.Service
 {
-    public class categoryservice : ICategoryService
+    public class Categoryservice : ICategoryService
     {
         private readonly ICategoryRepository _categoryRepository;
         private readonly IMapper _mapper;
-        public  categoryservice(ICategoryRepository Caterepo, IMapper mapper)
+        public Categoryservice(ICategoryRepository Caterepo, IMapper mapper)
         {
-           
+
             _categoryRepository = Caterepo;
             _mapper = mapper;
         }
@@ -31,24 +31,24 @@ namespace KFS.src.Application.Service
                 //map product
                 var mappedCategory = _mapper.Map<Category>(category);
                 //check if category id is empty
-               mappedCategory.Id=Guid.NewGuid();
-               
+                mappedCategory.Id = Guid.NewGuid();
+
                 //get category by id
-                
+
                 //map category
-                
+
                 var result = await _categoryRepository.CreateCategory(mappedCategory);
                 if (result)
                 {
                     response.StatusCode = 201;
-                    response.Message = "Product created successfully";
+                    response.Message = "Category created successfully";
                     response.IsSuccess = true;
                     return response;
                 }
                 else
                 {
                     response.StatusCode = 400;
-                    response.Message = "Product creation failed";
+                    response.Message = "Category creation failed";
                     response.IsSuccess = false;
                     return response;
                 }
@@ -60,7 +60,7 @@ namespace KFS.src.Application.Service
             }
         }
 
-       
+
 
         public async Task<ResponseDto> DeleteCategory(Guid id)
         {
@@ -73,14 +73,14 @@ namespace KFS.src.Application.Service
 
                 {
                     response.StatusCode = 200;
-                    response.Message = "Product deleted successfully";
+                    response.Message = "Category deleted successfully";
                     response.IsSuccess = true;
                     return response;
                 }
                 else
                 {
                     response.StatusCode = 404;
-                    response.Message = "Product not found";
+                    response.Message = "Category not found";
                     response.IsSuccess = false;
                     return response;
                 }
@@ -93,59 +93,56 @@ namespace KFS.src.Application.Service
 
         public async Task<ResponseDto> GetAllCategories()
         {
-            
-                var response = new ResponseDto();
-                try
+
+            var response = new ResponseDto();
+            try
+            {
+                var result = await _categoryRepository.GetCategories();
+                var mappedCategories = _mapper.Map<List<CategoryDto>>(result);
+
+                if (mappedCategories != null && mappedCategories.Any())
                 {
-                    var result = await _categoryRepository.GetCategories();
-                    var mappedCategories = _mapper.Map<List<CategoryDto>>(result);
-
-                    if (mappedCategories != null && mappedCategories.Any())
+                    // Group products by category
+                    var categoriesWithProducts = mappedCategories.Select(category => new
                     {
-                        // Group products by category
-                        var categoriesWithProducts = mappedCategories.Select(category => new
+                        CategoryId = category.Id,
+                        CategoryName = category.Name,
+                        CategoryDescription = category.Description,
+                        Products = category.Products.Select(product => new
                         {
-                            CategoryId = category.Id,
-                            CategoryName = category.Name,
-                            CategoryDescription = category.Description,
-                            Products = category.Products.Select(product => new
-                            {
-                                ProductId = product.Id,
-                                ProductName = product.Name,
-                                ProductDescription = product.Description,
-                                Price = product.Price,
-                                // Add other product properties as needed
-                            }).ToList()
-                        }).ToList();
+                            ProductId = product.Id,
+                            ProductName = product.Name,
+                            ProductDescription = product.Description,
+                            Price = product.Price,
+                            // Add other product properties as needed
+                        }).ToList()
+                    }).ToList();
 
-                        response.StatusCode = 200;
-                        response.Message = "Categories with products found";
-                        response.IsSuccess = true;
-                        response.Result = new ResultDto
-                        {
-                            Data = categoriesWithProducts,
-                        };
-
-                        return response;
-                    }
-                    else
+                    response.StatusCode = 200;
+                    response.Message = "Categories with products found";
+                    response.IsSuccess = true;
+                    response.Result = new ResultDto
                     {
-                        response.StatusCode = 404;
-                        response.Message = "Categories not found";
-                        response.IsSuccess = false;
-                        return response;
-                    }
+                        Data = categoriesWithProducts,
+                    };
+
+                    return response;
                 }
-                catch (Exception ex)
+                else
                 {
-                    response.StatusCode = 500;
-                    response.Message = "An error occurred while fetching categories";
+                    response.StatusCode = 404;
+                    response.Message = "Categories not found";
                     response.IsSuccess = false;
-                return response;
+                    return response;
                 }
             }
-        
-        [HttpGet ("id")]
+            catch
+            {
+                throw;
+            }
+        }
+
+        [HttpGet("id")]
         public async Task<ResponseDto> GetCategoryById(Guid id)
         {
             var response = new ResponseDto();
@@ -187,12 +184,9 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                response.StatusCode = 500;
-                response.Message = "An error occurred while fetching the category";
-                response.IsSuccess = false;
-               
+                throw;
             }
 
             return response;
@@ -239,28 +233,74 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                response.StatusCode = 500;
-                response.Message = "An error occurred while fetching the category";
-                response.IsSuccess = false;
-
+                throw;
             }
 
             return response;
         }
 
-       
+
+
+        public async Task<ResponseDto> GetProductByCateId(Guid id)
+        {
+            var response = new ResponseDto();
+            try
+            {
+                var products = await _categoryRepository.GetProductBy(id);
+                if (products == null || !products.Any())
+                {
+                    response.StatusCode = 404;
+                    response.Message = "No products found for this category";
+                    response.IsSuccess = false;
+                    return response;
+                }
+
+                var mappedProducts = _mapper.Map<List<ProductDto1>>(products);
+                var simplifiedProducts = mappedProducts.Select(p => new
+                {
+                    id = p.Id,
+                    ProductName = p.Name,
+                    species = p.Species,
+                    length = p.Length,
+                    price = p.Price,
+                    origin = p.Origin,
+                    age = p.Age,
+                    color = p.Color,
+                    feedingvollume = p.FeedingVolumn,
+                    filter_rate = p.FilterRate,
+                    gender = p.Gender,
+                    inventory = p.Inventory,
+                    isforsell = p.IsForSell
+                }).ToList();
+
+                response.StatusCode = 200;
+                response.Message = "Products found";
+                response.IsSuccess = true;
+                response.Result = new ResultDto
+                {
+                    Data = simplifiedProducts
+                };
+            }
+            catch
+            {
+                throw;
+            }
+            return response;
+        }
 
         public async Task<ResponseDto> UpdateCategory(categoryv3 category, Guid id)
         {
             var response = new ResponseDto();
+
             try
             {
                 //get product by id
                 var categoryy = await _categoryRepository.GetCategoryById(id);
                 //map product
-                var mappedProduct = _mapper.Map(category,categoryy);
+                var mappedProduct = _mapper.Map(category, categoryy);
+
 
 
                 if (categoryy == null)
@@ -277,14 +317,41 @@ namespace KFS.src.Application.Service
                 if (result)
                 {
                     response.StatusCode = 200;
-                    response.Message = "Product updated successfully";
+                    response.Message = "Category updated successfully";
                     response.IsSuccess = true;
                     return response;
                 }
                 else
                 {
                     response.StatusCode = 400;
-                    response.Message = "Product update failed";
+                    response.Message = "Category update failed";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch
+            {
+                throw;
+            }
+
+        }
+        public async Task<ResponseDto> DeleteProductByProId(Guid id)
+        {
+            var response = new ResponseDto();
+            try
+            {
+                var result = await _categoryRepository.DeleteProduct(id);
+                if (result)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Product deleted successfully";
+                    response.IsSuccess = true;
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Product not found";
                     response.IsSuccess = false;
                     return response;
                 }
@@ -296,54 +363,8 @@ namespace KFS.src.Application.Service
         }
 
 
-
-        //public async Task<ResponseDto> UpdateCategory(Guid id ,categorydtov2 category)
-        //{
-        //    var response = new ResponseDto();
-        //    try
-        //    {
-        //        //get product by id
-        //        var product = await _categoryRepository.GetCategoryById(id);
-        //        //map product
-        //        var mappedCate = _mapper.Map<Category>(category);
-        //        mappedCate.Id=Guid.NewGuid(); 
-        //        if (req.C != null)
-        //        {
-        //            var Category = await _categoryRepository.GetCategoryById(req.CategoryId.Value);
-        //            mappedProduct.CategoryId = req.CategoryId.Value;
-        //            mappedProduct.Category = Category;
-        //            if (Category == null)
-        //            {
-        //                response.StatusCode = 404;
-        //                response.Message = "Category not found";
-        //                response.IsSuccess = false;
-        //                return response;
-        //            }
-        //        }
-        //        //update product
-        //        var result = await _productRepository.UpdateProduct(product);
-        //        //check resultF
-        //        if (result)
-        //        {
-        //            response.StatusCode = 200;
-        //            response.Message = "Product updated successfully";
-        //            response.IsSuccess = true;
-        //            return response;
-        //        }
-        //        else
-        //        {
-        //            response.StatusCode = 400;
-        //            response.Message = "Product update failed";
-        //            response.IsSuccess = false;
-        //            return response;
-        //        }
-        //    }
-        //    catch
-        //    {
-        //        throw;
-        //    }
-        //}
-
-
     }
 }
+
+
+
