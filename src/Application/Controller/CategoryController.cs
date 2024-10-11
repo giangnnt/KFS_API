@@ -20,8 +20,8 @@ namespace KFS.src.Application.Controller
         {
             _categoryService = categoryService;
         }
-        [HttpGet]
-        public async Task<IActionResult> GetCategory()
+        [HttpGet("all")]
+        public async Task<IActionResult> GetCategories()
         {
             try
             {

@@ -35,14 +35,15 @@ namespace KFS.src.Application.Service
             try
             {
                 var categories = await _categoryRepository.GetCategories();
-                if (categories != null)
+                var mappedCategories = _mapper.Map<IEnumerable<CategoryDto>>(categories);
+                if (mappedCategories != null && mappedCategories.Count() > 0)
                 {
                     response.StatusCode = 200;
                     response.Message = "Categories retrieved successfully";
                     response.IsSuccess = true;
                     response.Result = new ResultDto
                     {
-                        Data = categories
+                        Data = mappedCategories
                     };
                     return response;
                 }
@@ -69,14 +70,15 @@ namespace KFS.src.Application.Service
             try
             {
                 var category = await _categoryRepository.GetCategoryById(id);
-                if (category != null)
+                var mappedCategory = _mapper.Map<CategoryDto>(category);
+                if (mappedCategory != null)
                 {
                     response.StatusCode = 200;
                     response.Message = "Category found";
                     response.IsSuccess = true;
                     response.Result = new ResultDto
                     {
-                        Data = category
+                        Data = mappedCategory
                     };
                     return response;
                 }
