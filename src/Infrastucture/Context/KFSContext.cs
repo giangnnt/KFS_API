@@ -34,6 +34,7 @@ namespace KFS.src.Infrastucture.Context
         public DbSet<Shipment> Shipments { get; set; }
         public DbSet<Promotion> Promotions { get; set; }
         public DbSet<Batch> Batches { get; set; }
+        public DbSet<Media> Medias { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
