@@ -63,6 +63,7 @@ namespace KFS.src.Infrastucture.Context
                     Name = "Batch 1",
                     ProductId = Guid.Parse("2a9394e2-52b3-46d5-8a33-af4d6020e440"),
                     Quantity = 10,
+                    Inventory = 10,
                     Price = 10000,
                 },
                 new Batch
@@ -71,6 +72,7 @@ namespace KFS.src.Infrastucture.Context
                     Name = "Batch 2",
                     ProductId = Guid.Parse("8657ed40-1b9d-44e2-800d-40bb1a20af98"),
                     Quantity = 10,
+                    Inventory = 10,
                     Price = 20000,
                 },
                 new Batch
@@ -79,6 +81,7 @@ namespace KFS.src.Infrastucture.Context
                     Name = "Batch 3",
                     ProductId = Guid.Parse("f3b3b3b4-1b9d-44e2-800d-40bb1a20af98"),
                     Quantity = 10,
+                    Inventory = 10,
                     Price = 30000,
                 }
             );
@@ -111,7 +114,7 @@ namespace KFS.src.Infrastucture.Context
                     Inventory = 10,
                     CategoryId = Guid.Parse("5F18BF0C-7199-462C-B023-3CCF1FD9F806"),
                     Gender = GenderEnum.Male,
-                    CreatedAt = DateTime.Now
+                    CreatedAt = DateTime.Parse("2024-10-11")
                 },
                 new Product
                 {
@@ -122,7 +125,7 @@ namespace KFS.src.Infrastucture.Context
                     Inventory = 10,
                     CategoryId = Guid.Parse("3D4FC185-049D-4A96-851B-1D320E7DBBA8"),
                     Gender = GenderEnum.Female,
-                    CreatedAt = DateTime.Now
+                    CreatedAt = DateTime.Parse("2024-10-11")
                 },
                 new Product
                 {
@@ -133,7 +136,7 @@ namespace KFS.src.Infrastucture.Context
                     Inventory = 10,
                     CategoryId = Guid.Parse("9A17DCF5-1426-45EE-A32E-C23EE5FE40D9"),
                     Gender = GenderEnum.Male,
-                    CreatedAt = DateTime.Now
+                    CreatedAt = DateTime.Parse("2024-10-11")
                 }
             );
             //seed role
@@ -202,7 +205,7 @@ namespace KFS.src.Infrastucture.Context
                     Password = BCrypt.Net.BCrypt.HashPassword("123456"),
                     Phone = "0123456789",
                     Address = "HCM",
-                    CreatedAt = DateTime.Now,
+                    CreatedAt = DateTime.Parse("2024-10-11"),
                 }
                 // new User
                 // {
@@ -243,14 +246,14 @@ namespace KFS.src.Infrastucture.Context
                     Id = Guid.Parse("37ab9331-f39a-4072-80ad-4adc3684fcec"),
                     UserId = Guid.Parse("00000000-0000-0000-0000-000000000001"),
                     Status = CartStatusEnum.Active,
-                    CreatedAt = DateTime.Now
+                    CreatedAt = DateTime.Parse("2024-10-11")
                 },
                 new Cart
                 {
                     Id = Guid.Parse("da17c01a-de60-4b46-810e-f824a1936e14"),
                     UserId = Guid.Parse("00000000-0000-0000-0000-000000000001"),
                     Status = CartStatusEnum.Completed,
-                    CreatedAt = DateTime.Now
+                    CreatedAt = DateTime.Parse("2024-10-11")
                 }
             );
             //config cart item

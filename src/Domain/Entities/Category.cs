@@ -12,6 +12,6 @@ namespace KFS.src.Domain.Entities
         public string? Description { get; set; }
         public List<Product> Products { get; set; } = new List<Product>();
         public List<Promotion> Promotions { get; set; } = new List<Promotion>();
-        public string? image { get; set; }
+        public string? Image { get; set; }
     }
 }

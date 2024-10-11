@@ -22,7 +22,7 @@ namespace KFS.src.Application.Dto.PromotionDtos
         public bool IsActive { get; set; }
         public List<ProductDto> Products { get; set; } = new();
         public List<BatchDto> Batches { get; set; } = new();
-        public List<CategotyDto> Categories { get; set; } = new();
+        public List<CategoryDto> Categories { get; set; } = new();
     }
     public class PromotionProfile : Profile
     {

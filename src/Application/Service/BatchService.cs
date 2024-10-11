@@ -180,12 +180,12 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public async Task<ResponseDto> UpdateBatch(BatchUpdate batch, Guid id)
+        public async Task<ResponseDto> UpdateBatch(BatchUpdate req, Guid id)
         {
             var response = new ResponseDto();
             try
             {
-                var batchToUpdate = _batchRepository.GetBatchById(id);
+                var batchToUpdate = await _batchRepository.GetBatchById(id);
                 if (batchToUpdate == null)
                 {
                     response.StatusCode = 400;
@@ -193,7 +193,8 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
                     return response;
                 }
-                var mappedBatch = await _mapper.Map(batch, batchToUpdate);
+                
+                var mappedBatch = _mapper.Map(req, batchToUpdate);
                 var result = await _batchRepository.UpdateBatch(mappedBatch);
                 if (result)
                 {

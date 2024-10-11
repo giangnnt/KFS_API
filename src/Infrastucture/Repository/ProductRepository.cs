@@ -22,6 +22,7 @@ namespace KFS.src.Infrastucture.Repository
             .Include(x => x.Category)
             .Include(x=>x.Promotions)
             .Include(x=>x.Batches)
+            .Include(x=>x.Medias)
             .ToListAsync();
         }
         public async Task<Product> GetProductById(Guid id)
@@ -30,6 +31,7 @@ namespace KFS.src.Infrastucture.Repository
             .Include(x => x.Category)
             .Include(x=>x.Promotions)
             .Include(x=>x.Batches)
+            .Include(x=>x.Medias)
             .FirstOrDefaultAsync(x => x.Id == id) ?? throw new Exception("Product not found");
         }
         public async Task<bool> CreateProduct(Product product)

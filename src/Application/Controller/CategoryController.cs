@@ -20,25 +20,12 @@ namespace KFS.src.Application.Controller
         {
             _categoryService = categoryService;
         }
-        [HttpGet]
-        public async Task<IActionResult> GetCategory()
+        [HttpGet("all")]
+        public async Task<IActionResult> GetCategories()
         {
             try
             {
-                var result = await _categoryService.GetAllCategories();
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-        [HttpGet("name")]
-        public async Task<IActionResult> GetCategoryByName(string name)
-        {
-            try
-            {
-                var result = await _categoryService.GetCategoryByName(name);
+                var result = await _categoryService.GetCategories();
                 return Ok(result);
             }
             catch (Exception ex)
@@ -48,7 +35,7 @@ namespace KFS.src.Application.Controller
         }
         [Protected]
         [HttpPost("create")]
-        public async Task<IActionResult> CreateCategory([FromBody] categorydtov2 req)
+        public async Task<IActionResult> CreateCategory(CategoryCreate req)
         {
             try
             {
@@ -75,7 +62,7 @@ namespace KFS.src.Application.Controller
         }
         [Protected]
         [HttpDelete("delete/{id}")]
-        public async Task<IActionResult> DeleteById( Guid id)
+        public async Task<IActionResult> DeleteById(Guid id)
         {
             try
             {
@@ -88,12 +75,12 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPut ("update/id")]
-        public async Task<IActionResult> UpdateProduct(Guid id,[FromBody] categoryv3 req)
+        [HttpPut("update/id")]
+        public async Task<IActionResult> UpdateProduct(CategoryUpdate req, Guid id)
         {
             try
             {
-                var result = await _categoryService.UpdateCategory(req,id);
+                var result = await _categoryService.UpdateCategory(req, id);
                 return Ok(result);
             }
             catch (Exception ex)

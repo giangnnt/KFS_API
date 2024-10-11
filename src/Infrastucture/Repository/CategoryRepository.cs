@@ -22,11 +22,10 @@ namespace KFS.src.Infrastucture.Repository
         {
             return await _context.Categories
             .Include(x => x.Products)
+            .Include(x => x.Promotions)
             .ToListAsync();
-
         }
 
-       
         public async Task<bool> CreateCategory(Category category)
         {
             _context.Categories.Add(category);
@@ -50,34 +49,12 @@ namespace KFS.src.Infrastucture.Repository
             return result > 0;
         }
 
-        public async Task<Category> GetCategoryByName(string name)
-        {
-            return await _context.Categories
-            .Include(x => x.Products)
-            .FirstOrDefaultAsync(x => x.Name == name) ?? throw new Exception("Category not found");
-        }
-
         public async Task<Category> GetCategoryById(Guid id)
         {
             return await _context.Categories
             .Include(x => x.Products)
+            .Include(x => x.Promotions)
             .FirstOrDefaultAsync(x => x.Id == id) ?? throw new Exception("Category not found");
-        }
-
-        public async Task<List<Product>> GetProductBy(Guid categoryId)
-        {
-            return await _context.Products
-                .Where(p => p.CategoryId == categoryId)
-                .ToListAsync();
-        }
-
-        public async Task<bool> DeleteProduct(Guid id)
-        {
-          var product =await _context.Products.FirstOrDefaultAsync(x => x.Id == id);
-            if (product == null) throw new Exception("product not found");
-            _context.Products.Remove(product);
-            int result = await _context.SaveChangesAsync();
-            return result > 0;
         }
     }
 }
