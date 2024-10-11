@@ -90,12 +90,12 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPut("isActive/{id}")]
-        public async Task<IActionResult> SetPromotionState(Guid id, bool IsActive)
+        [HttpPut("start/{id}")]
+        public async Task<IActionResult> SetPromotionState(Guid id)
         {
             try
             {
-                var result = await _promotionService.SetPromotionIsActive(id, IsActive);
+                var result = await _promotionService.StartPromotion(id);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -146,12 +146,12 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPut("expire/{promotionId}")]
-        public async Task<IActionResult> ExpirePromotion(Guid promotionId)
+        [HttpPut("end/{promotionId}")]
+        public async Task<IActionResult> EndPromotion(Guid promotionId)
         {
             try
             {
-                var result = await _promotionService.PromotionExpire(promotionId);
+                var result = await _promotionService.EndPromotion(promotionId);
                 return Ok(result);
             }
             catch (Exception ex)

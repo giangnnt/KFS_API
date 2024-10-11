@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KFS.Migrations
 {
     [DbContext(typeof(KFSContext))]
-    [Migration("20241010082024_01")]
+    [Migration("20241011031249_01")]
     partial class _01
     {
         /// <inheritdoc />
@@ -91,6 +91,41 @@ namespace KFS.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("Batches");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("64141e04-9c9d-4bd1-94d2-84ee359f1e5b"),
+                            Inventory = 0,
+                            IsForSell = false,
+                            Name = "Batch 1",
+                            Price = 10000m,
+                            ProductId = new Guid("2a9394e2-52b3-46d5-8a33-af4d6020e440"),
+                            Quantity = 10,
+                            Status = 0
+                        },
+                        new
+                        {
+                            Id = new Guid("eb5707d1-1b02-4ad5-8d6b-27a78d00f322"),
+                            Inventory = 0,
+                            IsForSell = false,
+                            Name = "Batch 2",
+                            Price = 20000m,
+                            ProductId = new Guid("8657ed40-1b9d-44e2-800d-40bb1a20af98"),
+                            Quantity = 10,
+                            Status = 0
+                        },
+                        new
+                        {
+                            Id = new Guid("b6bfe977-ee7e-4e84-a65b-445c36d08d65"),
+                            Inventory = 0,
+                            IsForSell = false,
+                            Name = "Batch 3",
+                            Price = 30000m,
+                            ProductId = new Guid("f3b3b3b4-1b9d-44e2-800d-40bb1a20af98"),
+                            Quantity = 10,
+                            Status = 0
+                        });
                 });
 
             modelBuilder.Entity("KFS.src.Domain.Entities.Cart", b =>
@@ -132,7 +167,7 @@ namespace KFS.Migrations
                         new
                         {
                             Id = new Guid("37ab9331-f39a-4072-80ad-4adc3684fcec"),
-                            CreatedAt = new DateTime(2024, 10, 10, 15, 20, 24, 214, DateTimeKind.Local).AddTicks(3050),
+                            CreatedAt = new DateTime(2024, 10, 11, 10, 12, 49, 434, DateTimeKind.Local).AddTicks(2252),
                             Currency = "VND",
                             Status = "Active",
                             TotalItem = 0,
@@ -143,7 +178,7 @@ namespace KFS.Migrations
                         new
                         {
                             Id = new Guid("da17c01a-de60-4b46-810e-f824a1936e14"),
-                            CreatedAt = new DateTime(2024, 10, 10, 15, 20, 24, 214, DateTimeKind.Local).AddTicks(3056),
+                            CreatedAt = new DateTime(2024, 10, 11, 10, 12, 49, 434, DateTimeKind.Local).AddTicks(2260),
                             Currency = "VND",
                             Status = "Completed",
                             TotalItem = 0,
@@ -535,7 +570,7 @@ namespace KFS.Migrations
                         {
                             Id = new Guid("2a9394e2-52b3-46d5-8a33-af4d6020e440"),
                             CategoryId = new Guid("5f18bf0c-7199-462c-b023-3ccf1fd9f806"),
-                            CreatedAt = new DateTime(2024, 10, 10, 15, 20, 24, 93, DateTimeKind.Local).AddTicks(6700),
+                            CreatedAt = new DateTime(2024, 10, 11, 10, 12, 49, 242, DateTimeKind.Local).AddTicks(501),
                             Description = "Description for Product 1",
                             Gender = "Male",
                             Inventory = 10,
@@ -548,7 +583,7 @@ namespace KFS.Migrations
                         {
                             Id = new Guid("8657ed40-1b9d-44e2-800d-40bb1a20af98"),
                             CategoryId = new Guid("3d4fc185-049d-4a96-851b-1d320e7dbba8"),
-                            CreatedAt = new DateTime(2024, 10, 10, 15, 20, 24, 93, DateTimeKind.Local).AddTicks(6728),
+                            CreatedAt = new DateTime(2024, 10, 11, 10, 12, 49, 242, DateTimeKind.Local).AddTicks(516),
                             Description = "Description for Product 2",
                             Gender = "Female",
                             Inventory = 10,
@@ -561,7 +596,7 @@ namespace KFS.Migrations
                         {
                             Id = new Guid("f3b3b3b4-1b9d-44e2-800d-40bb1a20af98"),
                             CategoryId = new Guid("9a17dcf5-1426-45ee-a32e-c23ee5fe40d9"),
-                            CreatedAt = new DateTime(2024, 10, 10, 15, 20, 24, 93, DateTimeKind.Local).AddTicks(6731),
+                            CreatedAt = new DateTime(2024, 10, 11, 10, 12, 49, 242, DateTimeKind.Local).AddTicks(520),
                             Description = "Description for Product 3",
                             Gender = "Male",
                             Inventory = 10,
@@ -721,10 +756,10 @@ namespace KFS.Migrations
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000001"),
                             Address = "HCM",
-                            CreatedAt = new DateTime(2024, 10, 10, 15, 20, 24, 214, DateTimeKind.Local).AddTicks(340),
+                            CreatedAt = new DateTime(2024, 10, 11, 10, 12, 49, 433, DateTimeKind.Local).AddTicks(8837),
                             Email = "giangnnt260703@gmail.com",
                             FullName = "Truong Giang",
-                            Password = "$2a$11$b6xeLb0tNThbCyvOzWYzHOu8tdyIJVUI3lIkS5MZLR/PvVIhTM57m",
+                            Password = "$2a$11$gNdBuIt.heU4eWlKRE0BHudO13A9Sqenw2SgVNf0ORoHEIf9RpGqO",
                             Phone = "0123456789",
                             RoleId = 1,
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)

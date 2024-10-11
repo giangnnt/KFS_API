@@ -1,3 +1,4 @@
+using Hangfire;
 using KFS.src.Application.Core.Crypto;
 using KFS.src.Application.Core.Jwt;
 using KFS.src.Application.Service;
@@ -72,11 +73,21 @@ builder.Services.AddSwaggerGen();
 // Create a logger
 var logger = LoggerFactory.Create(loggingBuilder => loggingBuilder.AddConsole()).CreateLogger<Program>();
 
+// sql server configuration
 var connectionString = builder.Configuration.GetConnectionString("DatabaseConnection");
 builder.Services.AddDbContext<KFSContext>(options => options.UseSqlServer(connectionString).LogTo(Console.WriteLine, LogLevel.Information));
 
+// redis configuration
 Console.WriteLine($"Redis connection string: {builder.Configuration.GetConnectionString("RedisConnection")}");
 builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("RedisConnection")));
+
+// hangfire configuration
+Console.WriteLine($"Hangfire connection string: {builder.Configuration.GetConnectionString("DatabaseConnection")}");
+builder.Services.AddHangfire(config =>
+{
+    config.UseSqlServerStorage(builder.Configuration.GetConnectionString("DatabaseConnection"));
+});
+builder.Services.AddHangfireServer();
 
 // Log configuration sources and values
 logger.LogInformation("Logging configuration sources and values:");
@@ -127,6 +138,7 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
     //c.RoutePrefix = "swagger"; // Đặt Swagger UI ở root nếu muốn
 });
+app.UseHangfireDashboard();
 //app.UseHttpsRedirection();
 
 app.UseAuthorization();
