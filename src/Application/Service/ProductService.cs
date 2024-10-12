@@ -213,7 +213,7 @@ namespace KFS.src.Application.Service
                 //get product by id
                 var product = await _productRepository.GetProductById(id);
                 //map product
-                var mappedProduct = _mapper.Map<Product>(req);
+                var mappedProduct = _mapper.Map(req, product);
                 if (req.CategoryId != null)
                 {
                     var Category = await _categoryRepository.GetCategoryById(req.CategoryId.Value);

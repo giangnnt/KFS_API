@@ -24,9 +24,11 @@ namespace KFS.src.Application.Service
         private readonly IPaymentRepository _paymentRepository;
         private readonly IProductRepository _productRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IWalletRepository _walletRepository;
+        private readonly IPromotionRepository _promotionRepository;
 
         private readonly IMapper _mapper;
-        public OrderService(IOrderRepository orderRepository, IMapper mapper, IUserRepository userRepository, ICartRepository cartRepository, IVNPayService vNPayService, IHttpContextAccessor httpContextAccessor, IProductRepository productRepository, IPaymentRepository paymentRepository)
+        public OrderService(IOrderRepository orderRepository, IMapper mapper, IUserRepository userRepository, ICartRepository cartRepository, IVNPayService vNPayService, IHttpContextAccessor httpContextAccessor, IProductRepository productRepository, IPaymentRepository paymentRepository, IWalletRepository walletRepository, IPromotionRepository promotionRepository)
         {
             _orderRepository = orderRepository;
             _mapper = mapper;
@@ -36,6 +38,8 @@ namespace KFS.src.Application.Service
             _httpContextAccessor = httpContextAccessor;
             _paymentRepository = paymentRepository;
             _productRepository = productRepository;
+            _walletRepository = walletRepository;
+            _promotionRepository = promotionRepository;
         }
 
         public async Task<ResponseDto> CreateOrderFromCart(OrderCreateFromCart req)
@@ -70,11 +74,36 @@ namespace KFS.src.Application.Service
                 //set estimated delivery date
                 mappedOrder.EstimatedDeliveryDate = "3 days";
 
+                // Discount code
+                if (req.DiscountCode != null)
+                {
+                    var listPromotion = await _promotionRepository.GetAllPromotions();
+                    foreach (var promotion in listPromotion)
+                    {
+                        if (promotion.DiscountCode == req.DiscountCode)
+                        {
+                            mappedOrder.Discount = promotion.DiscountPercentage;
+                        }
+                    }
+                }
+
                 //set shipping fee
                 mappedOrder.ShippingFee = 30000;
 
-                //calculate total price
-                mappedOrder.TotalPrice = cart.TotalPrice + mappedOrder.ShippingFee - ((decimal)req.Discount / 100 * cart.TotalPrice);
+                // Use point from wallet
+                if (req.UsePoint == true)
+                {
+                    var wallet = await _walletRepository.GetWalletByUserId(cart.UserId);
+                    mappedOrder.TotalPrice = cart.TotalPrice + mappedOrder.ShippingFee - (mappedOrder.Discount / 100 * cart.TotalPrice) - wallet.Point;
+                    await _walletRepository.UsePoint(wallet.Id, wallet.Point);
+                }
+                else
+                {
+                    //calculate total price
+                    mappedOrder.TotalPrice = cart.TotalPrice + mappedOrder.ShippingFee - (mappedOrder.Discount / 100 * cart.TotalPrice);
+                }
+
+
 
                 //set order status
                 mappedOrder.Status = OrderStatusEnum.Processing;
@@ -172,7 +201,7 @@ namespace KFS.src.Application.Service
                     var payment = new Payment
                     {
                         Id = Guid.NewGuid(),
-                        Amount = decimal.Parse(vnPayResponseModel.Amount),
+                        Amount = decimal.Parse(vnPayResponseModel.Amount) / 100,
                         CreatedAt = DateTime.Now,
                         Currency = "VND",
                         OrderId = Guid.Parse(vnPayResponseModel.OrderId),
@@ -203,7 +232,7 @@ namespace KFS.src.Application.Service
                     var payment = new Payment
                     {
                         Id = Guid.NewGuid(),
-                        Amount = decimal.Parse(vnPayResponseModel.Amount),
+                        Amount = decimal.Parse(vnPayResponseModel.Amount) / 100,
                         CreatedAt = DateTime.Now,
                         Currency = "VND",
                         OrderId = Guid.Parse(vnPayResponseModel.OrderId),
@@ -216,10 +245,12 @@ namespace KFS.src.Application.Service
                     var carts = await _cartRepository.GetCartByUserId(payment.UserId);
                     var cart = new Cart();
                     var order = await _orderRepository.GetOrderById(payment.OrderId);
+                    var wallet = await _walletRepository.GetWalletByUserId(payment.UserId);
                     //create payment
                     var result = await _paymentRepository.CreatePayment(payment);
                     if (result)
                     {
+                        await _walletRepository.AddPoint(wallet.Id, (int)payment.Amount * 5 / 100);
                         foreach (var c in carts)
                         {
                             if (c.Status == CartStatusEnum.Active)
