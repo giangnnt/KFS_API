@@ -35,10 +35,90 @@ namespace KFS.src.Infrastucture.Context
         public DbSet<Promotion> Promotions { get; set; }
         public DbSet<Batch> Batches { get; set; }
         public DbSet<Media> Medias { get; set; }
+        public DbSet<Wallet> Wallets { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            //seed role
+            modelBuilder.Entity<Role>().HasData(
+                new Role
+                {
+                    RoleId = RoleConst.ADMIN_ID,
+                    Name = RoleConst.ADMIN
+                },
+                new Role
+                {
+                    RoleId = RoleConst.MANAGER_ID,
+                    Name = RoleConst.MANAGER
+                },
+                new Role
+                {
+                    RoleId = RoleConst.STAFF_ID,
+                    Name = RoleConst.STAFF
+                },
+                new Role
+                {
+                    RoleId = RoleConst.CUSTOMER_ID,
+                    Name = RoleConst.CUSTOMER
+                },
+                new Role
+                {
+                    RoleId = RoleConst.GUEST_ID,
+                    Name = RoleConst.GUEST
+                }
+            );
+            //seed permission
+            modelBuilder.Entity<Permission>()
+            .HasData(
+                new Permission { Slug = PermissionSlug.MANAGE_USER, Name = "Manage User" },
+                new Permission { Slug = PermissionSlug.MANAGE_OWN_USER, Name = "Manage Own User" },
+                new Permission { Slug = PermissionSlug.MANAGE_PERMISSION, Name = "Manage Permission" },
+                new Permission { Slug = PermissionSlug.MANAGE_ROLE, Name = "Manage Role" },
+                new Permission { Slug = PermissionSlug.MANAGE_PRODUCT, Name = "Manage Product" },
+                new Permission { Slug = PermissionSlug.MANAGE_ORDER, Name = "Manage Order" },
+                new Permission { Slug = PermissionSlug.MANAGE_CATEGORY, Name = "Manage Category" },
+                new Permission { Slug = PermissionSlug.MANAGE_FEEDBACK, Name = "Manage Feedback" },
+                new Permission { Slug = PermissionSlug.MANAGE_OWN_FEEDBACK, Name = "Manage Own Feedback" }
+            );
+            modelBuilder.Entity<Role>()
+                .HasMany(r => r.Permissions)
+                .WithMany(p => p.Roles)
+                .UsingEntity(j => j
+                .HasData(
+                    new { RolesRoleId = RoleConst.ADMIN_ID, PermissionsSlug = PermissionSlug.MANAGE_USER },
+                    new { RolesRoleId = RoleConst.ADMIN_ID, PermissionsSlug = PermissionSlug.MANAGE_OWN_USER },
+                    new { RolesRoleId = RoleConst.ADMIN_ID, PermissionsSlug = PermissionSlug.MANAGE_PERMISSION },
+                    new { RolesRoleId = RoleConst.ADMIN_ID, PermissionsSlug = PermissionSlug.MANAGE_ROLE },
+                    new { RolesRoleId = RoleConst.ADMIN_ID, PermissionsSlug = PermissionSlug.MANAGE_PRODUCT },
+                    new { RolesRoleId = RoleConst.ADMIN_ID, PermissionsSlug = PermissionSlug.MANAGE_ORDER },
+                    new { RolesRoleId = RoleConst.ADMIN_ID, PermissionsSlug = PermissionSlug.MANAGE_CATEGORY },
+                    new { RolesRoleId = RoleConst.ADMIN_ID, PermissionsSlug = PermissionSlug.MANAGE_FEEDBACK },
+                    new { RolesRoleId = RoleConst.ADMIN_ID, PermissionsSlug = PermissionSlug.MANAGE_OWN_FEEDBACK })
+);
+            // Seed user
+            modelBuilder.Entity<User>().HasData(
+                new User
+                {
+                    Id = Guid.Parse("00000000-0000-0000-0000-000000000001"),
+                    FullName = "Truong Giang",
+                    Email = "giangnnt260703@gmail.com",
+                    RoleId = RoleConst.ADMIN_ID,
+                    Password = BCrypt.Net.BCrypt.HashPassword("123456"),
+                    Phone = "0123456789",
+                    Address = "HCM",
+                    CreatedAt = DateTime.Parse("2024-10-11"),
+                }
+            );
 
+            // Seed wallet separately and specify the foreign key value
+            modelBuilder.Entity<Wallet>().HasData(
+                new Wallet
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = Guid.Parse("00000000-0000-0000-0000-000000000001"),
+                    Point = 20000
+                }
+            );
             //seed category
             modelBuilder.Entity<Category>().HasData(
                 new Category { Id = Guid.Parse("5F18BF0C-7199-462C-B023-3CCF1FD9F806"), Name = "Thuần chủng nhập khẩu" },
@@ -139,96 +219,7 @@ namespace KFS.src.Infrastucture.Context
                     CreatedAt = DateTime.Parse("2024-10-11")
                 }
             );
-            //seed role
-            modelBuilder.Entity<Role>().HasData(
-                new Role
-                {
-                    RoleId = RoleConst.ADMIN_ID,
-                    Name = RoleConst.ADMIN
-                },
-                new Role
-                {
-                    RoleId = RoleConst.MANAGER_ID,
-                    Name = RoleConst.MANAGER
-                },
-                new Role
-                {
-                    RoleId = RoleConst.STAFF_ID,
-                    Name = RoleConst.STAFF
-                },
-                new Role
-                {
-                    RoleId = RoleConst.CUSTOMER_ID,
-                    Name = RoleConst.CUSTOMER
-                },
-                new Role
-                {
-                    RoleId = RoleConst.GUEST_ID,
-                    Name = RoleConst.GUEST
-                }
-            );
-            modelBuilder.Entity<Permission>()
-            .HasData(
-                new Permission { Slug = PermissionSlug.MANAGE_USER, Name = "Manage User" },
-                new Permission { Slug = PermissionSlug.MANAGE_OWN_USER, Name = "Manage Own User" },
-                new Permission { Slug = PermissionSlug.MANAGE_PERMISSION, Name = "Manage Permission" },
-                new Permission { Slug = PermissionSlug.MANAGE_ROLE, Name = "Manage Role" },
-                new Permission { Slug = PermissionSlug.MANAGE_PRODUCT, Name = "Manage Product" },
-                new Permission { Slug = PermissionSlug.MANAGE_ORDER, Name = "Manage Order" },
-                new Permission { Slug = PermissionSlug.MANAGE_CATEGORY, Name = "Manage Category" },
-                new Permission { Slug = PermissionSlug.MANAGE_FEEDBACK, Name = "Manage Feedback" },
-                new Permission { Slug = PermissionSlug.MANAGE_OWN_FEEDBACK, Name = "Manage Own Feedback" }
-            );
-            modelBuilder.Entity<Role>()
-            .HasMany(r => r.Permissions)
-            .WithMany(p => p.Roles)
-            .UsingEntity(j => j
-                .HasData(
-                new { RolesRoleId = RoleConst.ADMIN_ID, PermissionsSlug = PermissionSlug.MANAGE_USER },
-                new { RolesRoleId = RoleConst.ADMIN_ID, PermissionsSlug = PermissionSlug.MANAGE_OWN_USER },
-                new { RolesRoleId = RoleConst.ADMIN_ID, PermissionsSlug = PermissionSlug.MANAGE_PERMISSION },
-                new { RolesRoleId = RoleConst.ADMIN_ID, PermissionsSlug = PermissionSlug.MANAGE_ROLE },
-                new { RolesRoleId = RoleConst.ADMIN_ID, PermissionsSlug = PermissionSlug.MANAGE_PRODUCT },
-                new { RolesRoleId = RoleConst.ADMIN_ID, PermissionsSlug = PermissionSlug.MANAGE_ORDER },
-                new { RolesRoleId = RoleConst.ADMIN_ID, PermissionsSlug = PermissionSlug.MANAGE_CATEGORY },
-                new { RolesRoleId = RoleConst.ADMIN_ID, PermissionsSlug = PermissionSlug.MANAGE_FEEDBACK },
-                new { RolesRoleId = RoleConst.ADMIN_ID, PermissionsSlug = PermissionSlug.MANAGE_OWN_FEEDBACK })
-            );
-            //seed user
-            modelBuilder.Entity<User>().HasData(
-                new User
-                {
-                    Id = Guid.Parse("00000000-0000-0000-0000-000000000001"),
-                    FullName = "Truong Giang",
-                    Email = "giangnnt260703@gmail.com",
-                    RoleId = RoleConst.ADMIN_ID,
-                    Password = BCrypt.Net.BCrypt.HashPassword("123456"),
-                    Phone = "0123456789",
-                    Address = "HCM",
-                    CreatedAt = DateTime.Parse("2024-10-11"),
-                }
-                // new User
-                // {
-                //     Id = Guid.NewGuid(),
-                //     FullName = "Jane Smith",
-                //     Email
-                // },
-                // new User
-                // {
-                //     Id = Guid.NewGuid(),
-                //     FullName = "Mike Johnson"
-                // }
-            );
-            //config cart
-            modelBuilder.Entity<Cart>(entity =>
-            {
-                entity.Property(entity => entity.Status)
-                .HasConversion(
-                    v => v.ToString(),
-                    v => v != null ? (CartStatusEnum)Enum.Parse(typeof(CartStatusEnum), v) : default)
-                .HasColumnType("nvarchar(20)");
 
-            });
             //config cart
             modelBuilder.Entity<Cart>(entity =>
             {
@@ -287,20 +278,20 @@ namespace KFS.src.Infrastucture.Context
                 .HasForeignKey(o => o.UserId)
                 .OnDelete(DeleteBehavior.Cascade); // Potential cascade path
 
-            entity.HasMany(o => o.OrderItems)
-                .WithOne(oi => oi.Order)
-                .HasForeignKey(oi => oi.OrderId)
-                .OnDelete(DeleteBehavior.Cascade); // Potential cascade path
+                entity.HasMany(o => o.OrderItems)
+                    .WithOne(oi => oi.Order)
+                    .HasForeignKey(oi => oi.OrderId)
+                    .OnDelete(DeleteBehavior.Cascade); // Potential cascade path
 
-            entity.HasOne(o => o.Payment)
-                .WithOne(p => p.Order)
-                .HasForeignKey<Payment>(p => p.OrderId)
-                .OnDelete(DeleteBehavior.Restrict); // Potential cascade path
+                entity.HasOne(o => o.Payment)
+                    .WithOne(p => p.Order)
+                    .HasForeignKey<Payment>(p => p.OrderId)
+                    .OnDelete(DeleteBehavior.Restrict); // Potential cascade path
 
-            entity.HasOne(o => o.Shipment)
-                .WithOne(s => s.Order)
-                .HasForeignKey<Shipment>(s => s.OrderId)
-                .OnDelete(DeleteBehavior.Cascade); // Potential cascade path
+                entity.HasOne(o => o.Shipment)
+                    .WithOne(s => s.Order)
+                    .HasForeignKey<Shipment>(s => s.OrderId)
+                    .OnDelete(DeleteBehavior.Cascade); // Potential cascade path
             });
             //config consignment
             modelBuilder.Entity<Consignment>(entity =>
@@ -318,6 +309,10 @@ namespace KFS.src.Infrastucture.Context
                     v => v != null ? (ConsignmentStatusEnum)Enum.Parse(typeof(ConsignmentStatusEnum), v) : default)
                 .HasColumnType("nvarchar(20)");
             });
+            //config promotion
+            modelBuilder.Entity<Promotion>()
+            .HasIndex(p => p.DiscountCode)
+            .IsUnique();
         }
     }
 }
