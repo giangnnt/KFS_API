@@ -77,16 +77,21 @@ namespace KFS.src.Application.Service
                 // Discount code
                 if (req.DiscountCode != null)
                 {
-                    var listPromotion = await _promotionRepository.GetAllPromotions();
-                    foreach (var promotion in listPromotion)
+                    var promotions = await _promotionRepository.GetAllPromotions();
+                    var targetPromotion = promotions.FirstOrDefault(x => x.DiscountCode == req.DiscountCode && x.IsActive);
+                    if (targetPromotion == null)
                     {
-                        if (promotion.DiscountCode == req.DiscountCode)
-                        {
-                            mappedOrder.Discount = promotion.DiscountPercentage;
-                        }
+                        response.StatusCode = 404;
+                        response.Message = "Promotion not found";
+                        response.IsSuccess = false;
+                        return response;
                     }
-                }
+                    else
+                    {
+                        mappedOrder.Discount = targetPromotion.DiscountPercentage;
+                    }
 
+                }
                 //set shipping fee
                 mappedOrder.ShippingFee = 30000;
 
@@ -94,13 +99,13 @@ namespace KFS.src.Application.Service
                 if (req.UsePoint == true)
                 {
                     var wallet = await _walletRepository.GetWalletByUserId(cart.UserId);
-                    mappedOrder.TotalPrice = cart.TotalPrice + mappedOrder.ShippingFee - (mappedOrder.Discount / 100 * cart.TotalPrice) - wallet.Point;
+                    mappedOrder.TotalPrice = cart.TotalPrice + mappedOrder.ShippingFee - (cart.TotalPrice * mappedOrder.Discount / 100) - wallet.Point;
                     await _walletRepository.UsePoint(wallet.Id, wallet.Point);
                 }
                 else
                 {
                     //calculate total price
-                    mappedOrder.TotalPrice = cart.TotalPrice + mappedOrder.ShippingFee - (mappedOrder.Discount / 100 * cart.TotalPrice);
+                    mappedOrder.TotalPrice = cart.TotalPrice + mappedOrder.ShippingFee - (cart.TotalPrice * mappedOrder.Discount / 100);
                 }
 
 

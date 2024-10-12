@@ -219,7 +219,7 @@ namespace KFS.src.Infrastucture.Context
                     CreatedAt = DateTime.Parse("2024-10-11")
                 }
             );
-        
+
             //config cart
             modelBuilder.Entity<Cart>(entity =>
             {
@@ -309,6 +309,10 @@ namespace KFS.src.Infrastucture.Context
                     v => v != null ? (ConsignmentStatusEnum)Enum.Parse(typeof(ConsignmentStatusEnum), v) : default)
                 .HasColumnType("nvarchar(20)");
             });
+            //config promotion
+            modelBuilder.Entity<Promotion>()
+            .HasIndex(p => p.DiscountCode)
+            .IsUnique();
         }
     }
 }
