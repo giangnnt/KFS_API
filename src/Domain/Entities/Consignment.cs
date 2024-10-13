@@ -17,6 +17,8 @@ namespace KFS.src.Domain.Entities
         public bool IsForSell { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+        public int ConsignmentFee { get; set; }
+        public DateOnly ExpiryDate { get; set; }
         public User User { get; set; } = null!;
         public Product Product { get; set; } = new();
     }

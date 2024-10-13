@@ -4,6 +4,8 @@ namespace KFS.src.Application.Enum
     {
         Pending,
         Approved,
-        Rejected
+        Rejected,
+        Active,
+        Expired
     }
 }

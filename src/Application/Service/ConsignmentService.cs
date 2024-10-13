@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Hangfire;
 using KFS.src.Application.Core.Jwt;
 using KFS.src.Application.Dto.ConsignmentDtos;
 using KFS.src.Application.Dto.ResponseDtos;
+using KFS.src.Application.Dto.VNPay;
 using KFS.src.Application.Enum;
 using KFS.src.Domain.Entities;
 using KFS.src.Domain.IRepository;
@@ -21,7 +23,10 @@ namespace KFS.src.Application.Service
         private readonly IProductRepository _productRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper _mapper;
-        public ConsignmentService(IOrderRepository orderRepository, IConsignmentRepository consignmentRepository, IProductRepository productRepository, IHttpContextAccessor httpContextAccessor, IOrderItemRepository orderItemRepository, IMapper mapper)
+        private readonly IBackgroundJobClient _backgroundJobClient;
+        private readonly IVNPayService _vNPayService;
+        private readonly IPaymentRepository _paymentRepository;
+        public ConsignmentService(IOrderRepository orderRepository, IConsignmentRepository consignmentRepository, IProductRepository productRepository, IHttpContextAccessor httpContextAccessor, IOrderItemRepository orderItemRepository, IMapper mapper, IBackgroundJobClient backgroundJobClient, IVNPayService vNPayService, IPaymentRepository paymentRepository)
         {
             _consignmentRepository = consignmentRepository;
             _orderRepository = orderRepository;
@@ -29,6 +34,9 @@ namespace KFS.src.Application.Service
             _productRepository = productRepository;
             _orderItemRepository = orderItemRepository;
             _mapper = mapper;
+            _backgroundJobClient = backgroundJobClient;
+            _vNPayService = vNPayService;
+            _paymentRepository = paymentRepository;
         }
         public async Task<ResponseDto> CreateConsignment(ConsignmentCreate req)
         {
@@ -156,6 +164,8 @@ namespace KFS.src.Application.Service
                     UserId = order.UserId,
                     Method = ConsignmentMethodEnum.Online,
                     CommissionPercentage = req.CommissionPercentage,
+                    ConsignmentFee = req.ConsignmentFee,
+                    ExpiryDate = req.ExpiryDate,
                     DealingAmount = req.DealingAmount,
                     Status = ConsignmentStatusEnum.Pending,
                     IsForSell = req.IsForSell,
@@ -352,9 +362,124 @@ namespace KFS.src.Application.Service
             }
         }
 
+        public async Task<ResponseDto> PayForConsignment(Guid consignmentId)
+        {
+            var response = new ResponseDto();
+            try
+            {
+                var consignment = await _consignmentRepository.GetConsignmentById(consignmentId);
+                if (consignment == null)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Consignment not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                if (consignment.Status != ConsignmentStatusEnum.Approved)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Consignment is not approved";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                var paymentUrl = GeneratePaymentUrl(consignment);
+                response.StatusCode = 200;
+                response.Message = "Payment url generated";
+                response.IsSuccess = true;
+                response.Result = new ResultDto
+                {
+                    Data = paymentUrl
+                };
+                return response;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
         public Task<ResponseDto> UpdateConsignment(Guid id)
         {
             throw new NotImplementedException();
+        }
+        public string GeneratePaymentUrl(Consignment consignment)
+        {
+            try
+            {
+                var httpContext = _httpContextAccessor.HttpContext;
+                if (httpContext == null)
+                {
+                    return "HttpContext is null";
+                }
+                return _vNPayService.CreatePaymentUrl(httpContext, new VNPayRequestModel
+                {
+                    Amount = consignment.ConsignmentFee,
+                    CreateDate = DateTime.Now,
+                    Description = "Payment for consignment" + consignment.Id.ToString(),
+                    FullName = consignment.User.FullName,
+                    OrderId = consignment.Id
+                });
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
+        public async Task<ResponseDto> GetResponsePaymentUrl()
+        {
+            var response = new ResponseDto();
+            try
+            {
+                //check http context 
+                var httpContext = _httpContextAccessor.HttpContext;
+                if (httpContext == null)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "HttpContext is null";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                //get query collection
+                var collection = httpContext.Request.Query;
+                //get response from vnpay
+                var vnPayResponseModel = _vNPayService.GetResponse(collection);
+                //check response
+                if (vnPayResponseModel.Success == false || vnPayResponseModel.VnPayResponseCode != "00" || vnPayResponseModel.TransactionStatus != "00")
+                {
+                    var payment = new Payment
+                    {
+                        Id = Guid.NewGuid(),
+                        Amount = decimal.Parse(vnPayResponseModel.Amount) / 100,
+                        CreatedAt = DateTime.Now,
+                        Currency = "VND",
+                        OrderId = Guid.Parse(vnPayResponseModel.OrderId),
+                        PaymentMethod = PaymentMethodEnum.VNPAY,
+                        Status = PaymentStatusEnum.Failed,
+                        TransactionId = vnPayResponseModel.PaymentId,
+                        UserId = _orderRepository.GetOrderById(Guid.Parse(vnPayResponseModel.OrderId)).Result.UserId
+                    };
+                    var result = await _paymentRepository.CreatePayment(payment);
+                    if (result)
+                    {
+                        response.StatusCode = 400;
+                        response.Message = "Payment created successfully" + vnPayResponseModel.VnPayResponseCode;
+                        response.IsSuccess = false;
+                        return response;
+                    }
+                    else
+                    {
+                        response.StatusCode = 400;
+                        response.Message = "Payment creation failed" + vnPayResponseModel.VnPayResponseCode;
+                        response.IsSuccess = false;
+                        return response;
+                    }
+                }
+            }
+            catch
+            {
+                throw;
+            }
         }
     }
 }
