@@ -21,7 +21,7 @@ namespace KFS.src.Application.Service
             _mapper = mapper;
         }
 
-        public async Task<ResponseDto> create(MediaCreate media)
+        public async Task<ResponseDto> Create(MediaCreate media)
         {
             var response = new ResponseDto();
             try
@@ -35,7 +35,7 @@ namespace KFS.src.Application.Service
 
                 //map category
 
-                var result = await _repo.CreateMedia(mappedMedia);
+                var result = await _repo.Create(mappedMedia);
                 if (result)
                 {
                     response.StatusCode = 201;
@@ -58,7 +58,7 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public async Task<ResponseDto> deletemedia(Guid id)
+        public async Task<ResponseDto> Delete(Guid id)
         {
             var response = new ResponseDto();
             try
@@ -94,12 +94,12 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public async Task<ResponseDto> getallmedia()
+        public async Task<ResponseDto> GetMedias()
         {
             var response = new ResponseDto();
             try
             {
-                var media = await _repo.GetAllMedia();
+                var media = await _repo.GetMedias();
                 if (media != null && media.Any())
                 {
                     var mappedMedia = _mapper.Map<List<MediaDto>>(media);
@@ -127,7 +127,7 @@ namespace KFS.src.Application.Service
             return response;
         }
 
-        public async Task<ResponseDto> getmediabyid(Guid id)
+        public async Task<ResponseDto> GetMediaById(Guid id)
         {
             var response = new ResponseDto();
             try
@@ -164,16 +164,12 @@ namespace KFS.src.Application.Service
 
 
 
-        public Task<ResponseDto> getproductbymediaid(Guid id)
-        {
-            throw new NotImplementedException();
-        }
-
+       
       
 
         
 
-        public async Task<ResponseDto> update(Guid id, MediaUpdate mediaUpdate)
+        public async Task<ResponseDto> Update(Guid id, MediaUpdate mediaUpdate)
         {
             var response = new ResponseDto();
 
@@ -196,7 +192,7 @@ namespace KFS.src.Application.Service
 
            
 
-            var result = await _repo.UpdateMedia(Media);
+            var result = await _repo.Update(Media);
 
             if (result)
             {

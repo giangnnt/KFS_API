@@ -7,12 +7,12 @@ namespace KFS.src.Domain.IService
 {
     public interface IMediaService
     {
-        public Task<ResponseDto> getallmedia();
-        public Task<ResponseDto> getmediabyid(Guid id);
-        public Task<ResponseDto> update(Guid id, MediaUpdate media);
-        public Task<ResponseDto> deletemedia(Guid id);
-        public Task<ResponseDto> create(MediaCreate media);
-        public Task<ResponseDto> getproductbymediaid(Guid id);
+        public Task<ResponseDto> GetMedias();
+        public Task<ResponseDto> GetMediaById(Guid id);
+        public Task<ResponseDto> Update(Guid id, MediaUpdate media);
+        public Task<ResponseDto> Delete(Guid id);
+        public Task<ResponseDto> Create(MediaCreate media);
+       
        
 
 

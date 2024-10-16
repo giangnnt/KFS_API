@@ -25,20 +25,17 @@ namespace KFS.src.Infrastucture.Repository
             return result > 0;
         }
 
-        public async Task<List<Media>> GetAllMedia()
+        public async Task<List<Media>> GetMedias()
         {
 
            return await _context.Medias
-                .Include(x=>x.Product)
-                .AsNoTracking()
-                
                 .ToListAsync();
         }
 
       
 
 
-        public async Task<bool> UpdateMedia(Guid id)
+        public async Task<bool> Update(Guid id)
         {
             var product = await _context.Medias.FirstOrDefaultAsync(x=>x.Id == id);
             if (product == null) throw new Exception("Media not found");
@@ -48,7 +45,7 @@ namespace KFS.src.Infrastucture.Repository
 
         }
 
-        public async Task<bool> CreateMedia(Media media)
+        public async Task<bool> Create(Media media)
         {
            await _context.Medias.AddAsync(media);
             int result= await _context.SaveChangesAsync();
@@ -65,12 +62,9 @@ namespace KFS.src.Infrastucture.Repository
             return await _context.Medias.FirstOrDefaultAsync(x => x.Id == id) ?? throw new("media not found");
         }
 
-        public async Task<Product> GetProductByMediaId(Guid id)
-        {
-            return await _context.Products.Include(x => x.Medias).FirstOrDefaultAsync(x => x.Id == id) ?? throw new("product not found");
-        }
+       
 
-        public async Task<bool> UpdateMedia(Media media)
+        public async Task<bool> Update(Media media)
         {
           
             _context.Medias.Update(media);

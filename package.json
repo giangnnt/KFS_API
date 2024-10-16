@@ -1,0 +1,19 @@
+{
+  "name": "kfs_api",
+  "version": "1.0.0",
+  "description": "https://koifarmshop.online/swagger/index.html \u0000",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "chai": "^5.1.1",
+    "codeceptjs": "^3.6.7"
+  }
+}

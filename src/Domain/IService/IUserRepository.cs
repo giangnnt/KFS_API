@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,10 +11,5 @@ namespace KFS.src.Domain.IRepository
         Task<User?> GetUserById(Guid id);
         Task<User?> GetUserByEmail(string email);
         Task<bool> CreateUser(User user);
-        Task<List<User>>GetAllUser();
-        Task<bool> UpdateUser(User user);
-        Task<bool> DeleteUser(Guid id);
-        Task<List<Order>> GetAllOrdersOfUserById();
-
     }
 }

@@ -16,32 +16,25 @@ namespace KFS.src.Application.Controller
         {
             _mediaService = mediaService;
         }
-        [HttpGet]
-        public async Task<IActionResult> getall()
+        [HttpGet("all")]
+        public async Task<IActionResult> GetMedias()
         {
             try
             {
-                var result = await _mediaService.getallmedia();
-                if (result.IsSuccess)
-                {
-                    return Ok(result);
-                }
-                else
-                {
-                    throw new Exception();
-                }
+                var result = await _mediaService.GetMedias();
+               return Ok (result);
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = $"An error occurred: {ex.Message}" });
             }
         }
-        [HttpPost]
+        [HttpPost("create")]
         public async Task<IActionResult> create(MediaCreate media)
         {
             try
             {
-                var result = await _mediaService.create(media);
+                var result = await _mediaService.Create(media);
                 return Ok(result);
             }
             catch
@@ -50,12 +43,12 @@ namespace KFS.src.Application.Controller
             }
 
         }
-        [HttpGet ("{id}")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
             try
             {
-                var result = await _mediaService.getmediabyid(id);
+                var result = await _mediaService.GetMediaById(id);
                 if (result.IsSuccess)
                 {
                     return Ok(result);
@@ -70,12 +63,12 @@ namespace KFS.src.Application.Controller
                 return StatusCode(500, new { message = $"An error occurred: {ex.Message}" });
             }
         }
-        [HttpPut("{id}")]
+        [HttpPut("Update/{id}")]
         public async Task<IActionResult> Update(Guid id, [FromBody] MediaUpdate media)
         {
             try
             {
-                var result = await _mediaService.update(id, media);
+                var result = await _mediaService.Update(id, media);
                 if (result.IsSuccess)
                 {
                     return Ok(result);
@@ -90,12 +83,12 @@ namespace KFS.src.Application.Controller
                 return StatusCode(500, new { message = $"An error occurred: {ex.Message}" });
             }
         }
-        [HttpDelete ("{id}")]
+        [HttpDelete("Delete/{id}")]
         public async Task<IActionResult> delete(Guid id)
 {
     try
     {
-        var result = await _mediaService.deletemedia(id);
+        var result = await _mediaService.Delete(id);
         if (result.IsSuccess)
         {
             return Ok(result);

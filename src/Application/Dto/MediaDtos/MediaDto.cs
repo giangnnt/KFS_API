@@ -18,7 +18,7 @@ namespace KFS.src.Application.Dto.MediaDtos
     {
         public MediaProfile()
         {
-            CreateMap<Media, MediaDto>();
+            CreateMap<Media, MediaDto>().ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
            
 
