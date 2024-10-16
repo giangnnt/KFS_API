@@ -6,6 +6,7 @@ namespace KFS.src.Application.Enum
         Approved,
         Rejected,
         Active,
+        Deactive,
         Expired
     }
 }

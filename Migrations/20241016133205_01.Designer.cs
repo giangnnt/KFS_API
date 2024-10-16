@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KFS.Migrations
 {
     [DbContext(typeof(KFSContext))]
-    [Migration("20241012053134_01")]
+    [Migration("20241016133205_01")]
     partial class _01
     {
         /// <inheritdoc />
@@ -108,7 +108,7 @@ namespace KFS.Migrations
                         {
                             Id = new Guid("eb5707d1-1b02-4ad5-8d6b-27a78d00f322"),
                             Inventory = 10,
-                            IsForSell = false,
+                            IsForSell = true,
                             Name = "Batch 2",
                             Price = 20000m,
                             ProductId = new Guid("8657ed40-1b9d-44e2-800d-40bb1a20af98"),
@@ -119,7 +119,7 @@ namespace KFS.Migrations
                         {
                             Id = new Guid("b6bfe977-ee7e-4e84-a65b-445c36d08d65"),
                             Inventory = 10,
-                            IsForSell = false,
+                            IsForSell = true,
                             Name = "Batch 3",
                             Price = 30000m,
                             ProductId = new Guid("f3b3b3b4-1b9d-44e2-800d-40bb1a20af98"),
@@ -194,6 +194,9 @@ namespace KFS.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("BatchId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("CartId")
                         .HasColumnType("uniqueidentifier");
 
@@ -265,11 +268,20 @@ namespace KFS.Migrations
                     b.Property<int?>("CommissionPercentage")
                         .HasColumnType("int");
 
+                    b.Property<int>("ConsignmentFee")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<int?>("DealingAmount")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("ExpiryDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsBatch")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsForSell")
                         .HasColumnType("bit");
@@ -384,6 +396,9 @@ namespace KFS.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("BatchId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<bool>("IsBatch")
                         .HasColumnType("bit");
 
@@ -427,12 +442,18 @@ namespace KFS.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("OrderId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(21)
+                        .HasColumnType("nvarchar(21)");
 
                     b.Property<string>("PaymentMethod")
                         .IsRequired()
                         .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("PaymentType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -449,10 +470,11 @@ namespace KFS.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OrderId")
-                        .IsUnique();
-
                     b.ToTable("Payments");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("Payment");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("KFS.src.Domain.Entities.Permission", b =>
@@ -574,6 +596,9 @@ namespace KFS.Migrations
                     b.Property<string>("Species")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -595,10 +620,11 @@ namespace KFS.Migrations
                             CreatedAt = new DateTime(2024, 10, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Description for Product 1",
                             Gender = "Male",
-                            Inventory = 10,
+                            Inventory = 100,
                             IsForSell = false,
                             Name = "Product 1",
                             Price = 10000m,
+                            Status = 0,
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
@@ -608,10 +634,11 @@ namespace KFS.Migrations
                             CreatedAt = new DateTime(2024, 10, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Description for Product 2",
                             Gender = "Female",
-                            Inventory = 10,
-                            IsForSell = false,
+                            Inventory = 50,
+                            IsForSell = true,
                             Name = "Product 2",
                             Price = 20000m,
+                            Status = 0,
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
@@ -621,10 +648,11 @@ namespace KFS.Migrations
                             CreatedAt = new DateTime(2024, 10, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Description for Product 3",
                             Gender = "Male",
-                            Inventory = 10,
-                            IsForSell = false,
+                            Inventory = 150,
+                            IsForSell = true,
                             Name = "Product 3",
                             Price = 30000m,
+                            Status = 0,
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
                 });
@@ -785,7 +813,7 @@ namespace KFS.Migrations
                             CreatedAt = new DateTime(2024, 10, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "giangnnt260703@gmail.com",
                             FullName = "Truong Giang",
-                            Password = "$2a$11$6L1YhlpQutqH7V21C7nkp.pw3CmeTzac7MU.OJpL32kVGYkYgDsxK",
+                            Password = "$2a$11$fGoq/2rvFm667qNuSdQu5uwu/RF8YnPHSAHtuWsSipuV0gEGzrrS2",
                             Phone = "0123456789",
                             RoleId = 1,
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -814,7 +842,7 @@ namespace KFS.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("7ada61bb-df22-4b28-bad8-7b69a09f0170"),
+                            Id = new Guid("634ec760-84f0-4239-9e2b-3e857e3b5eb0"),
                             Point = 20000,
                             UserId = new Guid("00000000-0000-0000-0000-000000000001")
                         });
@@ -895,6 +923,34 @@ namespace KFS.Migrations
                     b.HasIndex("PromotionsId");
 
                     b.ToTable("ProductPromotion");
+                });
+
+            modelBuilder.Entity("KFS.src.Domain.Entities.PaymentConsignment", b =>
+                {
+                    b.HasBaseType("KFS.src.Domain.Entities.Payment");
+
+                    b.Property<Guid>("ConsignmentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasIndex("ConsignmentId")
+                        .IsUnique()
+                        .HasFilter("[ConsignmentId] IS NOT NULL");
+
+                    b.HasDiscriminator().HasValue("PaymentConsignment");
+                });
+
+            modelBuilder.Entity("KFS.src.Domain.Entities.PaymentOrder", b =>
+                {
+                    b.HasBaseType("KFS.src.Domain.Entities.Payment");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasIndex("OrderId")
+                        .IsUnique()
+                        .HasFilter("[OrderId] IS NOT NULL");
+
+                    b.HasDiscriminator().HasValue("PaymentOrder");
                 });
 
             modelBuilder.Entity("BatchPromotion", b =>
@@ -1018,17 +1074,6 @@ namespace KFS.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("KFS.src.Domain.Entities.Payment", b =>
-                {
-                    b.HasOne("KFS.src.Domain.Entities.Order", "Order")
-                        .WithOne("Payment")
-                        .HasForeignKey("KFS.src.Domain.Entities.Payment", "OrderId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Order");
-                });
-
             modelBuilder.Entity("KFS.src.Domain.Entities.Product", b =>
                 {
                     b.HasOne("KFS.src.Domain.Entities.Category", "Category")
@@ -1109,6 +1154,28 @@ namespace KFS.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("KFS.src.Domain.Entities.PaymentConsignment", b =>
+                {
+                    b.HasOne("KFS.src.Domain.Entities.Consignment", "Consignment")
+                        .WithOne("Payment")
+                        .HasForeignKey("KFS.src.Domain.Entities.PaymentConsignment", "ConsignmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Consignment");
+                });
+
+            modelBuilder.Entity("KFS.src.Domain.Entities.PaymentOrder", b =>
+                {
+                    b.HasOne("KFS.src.Domain.Entities.Order", "Order")
+                        .WithOne("Payment")
+                        .HasForeignKey("KFS.src.Domain.Entities.PaymentOrder", "OrderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+                });
+
             modelBuilder.Entity("KFS.src.Domain.Entities.Cart", b =>
                 {
                     b.Navigation("CartItems");
@@ -1121,6 +1188,8 @@ namespace KFS.Migrations
 
             modelBuilder.Entity("KFS.src.Domain.Entities.Consignment", b =>
                 {
+                    b.Navigation("Payment");
+
                     b.Navigation("Product")
                         .IsRequired();
                 });

@@ -38,9 +38,24 @@ namespace KFS.src.Infrastucture.Repository
 
         public async Task<IEnumerable<Payment>> GetPayments()
         {
-            return await _context.Payments
-            .Include(x => x.Order)
-            .ToListAsync();
+            // Lấy các PaymentOrder và bao gồm Order
+            var paymentOrders = await _context.Payments
+                .OfType<PaymentOrder>() // Chỉ lấy các PaymentOrder
+                .Include(po => po.Order) // Include thông tin Order
+                .ToListAsync();
+
+            // Lấy các PaymentConsignment và bao gồm Consignment
+            var paymentConsignments = await _context.Payments
+                .OfType<PaymentConsignment>() // Chỉ lấy các PaymentConsignment
+                .Include(pc => pc.Consignment) // Include thông tin Consignment
+                .ToListAsync();
+
+            // Kết hợp cả hai loại Payment lại thành một danh sách duy nhất
+            var allPayments = new List<Payment>();
+            allPayments.AddRange(paymentOrders);
+            allPayments.AddRange(paymentConsignments);
+
+            return allPayments;
         }
 
         public async Task<bool> UpdatePayment(Payment payment)

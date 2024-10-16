@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Hangfire;
+using Hangfire.Common;
 using KFS.src.Application.Core.Jwt;
 using KFS.src.Application.Dto.ConsignmentDtos;
 using KFS.src.Application.Dto.ResponseDtos;
@@ -158,18 +159,65 @@ namespace KFS.src.Application.Service
                     req.CommissionPercentage = 0;
                     req.DealingAmount = 0;
                 }
-                // create consignment
-                var consignment = new Consignment
+                // check if order item is batch
+                var consignment = new Consignment();
+                if (orderItem.IsBatch)
                 {
-                    UserId = order.UserId,
-                    Method = ConsignmentMethodEnum.Online,
-                    CommissionPercentage = req.CommissionPercentage,
-                    ConsignmentFee = req.ConsignmentFee,
-                    ExpiryDate = req.ExpiryDate,
-                    DealingAmount = req.DealingAmount,
-                    Status = ConsignmentStatusEnum.Pending,
-                    IsForSell = req.IsForSell,
-                    Product = new Product
+                    consignment.UserId = order.UserId;
+                    consignment.Method = ConsignmentMethodEnum.Online;
+                    consignment.CommissionPercentage = req.CommissionPercentage;
+                    consignment.ConsignmentFee = req.ConsignmentFee;
+                    consignment.ExpiryDate = req.ExpiryDate;
+                    consignment.DealingAmount = req.DealingAmount;
+                    consignment.Status = ConsignmentStatusEnum.Pending;
+                    consignment.IsForSell = req.IsForSell;
+                    consignment.User = order.User;
+                    consignment.IsBatch = true;
+                    consignment.Product = new Product
+                    {
+                        IsForSell = false,
+                        Name = product.Name,
+                        Description = product.Description,
+                        Price = 0,
+                        Origin = product.Origin,
+                        Category = product.Category,
+                        CategoryId = product.CategoryId,
+                        Age = product.Age,
+                        Length = product.Length,
+                        Species = product.Species,
+                        Color = product.Color,
+                        FeedingVolumn = product.FeedingVolumn,
+                        FilterRate = product.FilterRate,
+                        Inventory = 0,
+                        Status = ProductStatusEnum.Consignment,
+                    };
+                    foreach (var batch in product.Batches)
+                    {
+                        consignment.Product.Batches.Add(new Batch
+                        {
+                            Name = batch.Name,
+                            Description = batch.Description,
+                            Price = req.DealingAmount,
+                            Quantity = batch.Quantity,
+                            Inventory = batch.Inventory,
+                            Status = ProductStatusEnum.Consignment,
+                            IsForSell = false,
+                        });
+                    }
+                }
+                else
+                {
+                    consignment.UserId = order.UserId;
+                    consignment.Method = ConsignmentMethodEnum.Online;
+                    consignment.CommissionPercentage = req.CommissionPercentage;
+                    consignment.ConsignmentFee = req.ConsignmentFee;
+                    consignment.ExpiryDate = req.ExpiryDate;
+                    consignment.DealingAmount = req.DealingAmount;
+                    consignment.Status = ConsignmentStatusEnum.Pending;
+                    consignment.IsForSell = req.IsForSell;
+                    consignment.User = order.User;
+                    consignment.IsBatch = false;
+                    consignment.Product = new Product
                     {
                         IsForSell = false,
                         Name = product.Name,
@@ -184,10 +232,8 @@ namespace KFS.src.Application.Service
                         Color = product.Color,
                         FeedingVolumn = product.FeedingVolumn,
                         FilterRate = product.FilterRate,
-                        Gender = product.Gender,
-                        Inventory = orderItem.Quantity,
-                        CreatedAt = DateTime.Now,
-                    }
+                        Status = ProductStatusEnum.Consignment,
+                    };
                 };
                 var result = await _consignmentRepository.CreateConsignment(consignment);
                 if (result == false)
@@ -271,11 +317,6 @@ namespace KFS.src.Application.Service
                 }
                 // update consignment status
                 consignment.Status = isApproved ? ConsignmentStatusEnum.Approved : ConsignmentStatusEnum.Rejected;
-                // update product status
-                if (consignment.IsForSell)
-                {
-                    consignment.Product.IsForSell = isApproved;
-                }
                 var result = await _consignmentRepository.UpdateConsignment(consignment);
                 if (result)
                 {
@@ -415,10 +456,10 @@ namespace KFS.src.Application.Service
                 {
                     Amount = consignment.ConsignmentFee,
                     CreateDate = DateTime.Now,
-                    Description = "Payment for consignment" + consignment.Id.ToString(),
+                    Description = "Payment for consignment " + consignment.Id.ToString(),
                     FullName = consignment.User.FullName,
                     OrderId = consignment.Id
-                });
+                }, "consignment");
             }
             catch (Exception ex)
             {
@@ -447,17 +488,18 @@ namespace KFS.src.Application.Service
                 //check response
                 if (vnPayResponseModel.Success == false || vnPayResponseModel.VnPayResponseCode != "00" || vnPayResponseModel.TransactionStatus != "00")
                 {
-                    var payment = new Payment
+                    var payment = new PaymentConsignment
                     {
                         Id = Guid.NewGuid(),
+                        PaymentType = "Consignment",
                         Amount = decimal.Parse(vnPayResponseModel.Amount) / 100,
                         CreatedAt = DateTime.Now,
                         Currency = "VND",
-                        OrderId = Guid.Parse(vnPayResponseModel.OrderId),
+                        ConsignmentId = Guid.Parse(vnPayResponseModel.OrderId),
                         PaymentMethod = PaymentMethodEnum.VNPAY,
                         Status = PaymentStatusEnum.Failed,
                         TransactionId = vnPayResponseModel.PaymentId,
-                        UserId = _orderRepository.GetOrderById(Guid.Parse(vnPayResponseModel.OrderId)).Result.UserId
+                        UserId = _consignmentRepository.GetConsignmentById(Guid.Parse(vnPayResponseModel.OrderId)).Result.UserId
                     };
                     var result = await _paymentRepository.CreatePayment(payment);
                     if (result)
@@ -475,6 +517,105 @@ namespace KFS.src.Application.Service
                         return response;
                     }
                 }
+                else
+                {
+                    //create payment
+                    var payment = new PaymentConsignment
+                    {
+                        Id = Guid.NewGuid(),
+                        PaymentType = "Consignment",
+                        Amount = decimal.Parse(vnPayResponseModel.Amount) / 100,
+                        CreatedAt = DateTime.Now,
+                        Currency = "VND",
+                        ConsignmentId = Guid.Parse(vnPayResponseModel.OrderId),
+                        PaymentMethod = PaymentMethodEnum.VNPAY,
+                        Status = PaymentStatusEnum.Completed,
+                        TransactionId = vnPayResponseModel.PaymentId,
+                        UserId = _consignmentRepository.GetConsignmentById(Guid.Parse(vnPayResponseModel.OrderId)).Result.UserId
+                    };
+                    var consignment = await _consignmentRepository.GetConsignmentById(Guid.Parse(vnPayResponseModel.OrderId));
+                    //update consignment status active
+                    await SetStatusConsignment(ConsignmentStatusEnum.Active, Guid.Parse(vnPayResponseModel.OrderId));
+                    //job for expire consignment
+                    _backgroundJobClient.Enqueue(() => JobExpireConsignment(Guid.Parse(vnPayResponseModel.OrderId)));
+                    var result = await _paymentRepository.CreatePayment(payment);
+                    if (result)
+                    {
+                        response.StatusCode = 200;
+                        response.Message = "Payment created successfully";
+                        response.IsSuccess = true;
+                        return response;
+                    }
+                    else
+                    {
+                        response.StatusCode = 400;
+                        response.Message = "Payment creation failed";
+                        response.IsSuccess = false;
+                        return response;
+                    }
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+        protected async Task SetStatusConsignment(ConsignmentStatusEnum status, Guid id)
+        {
+            try
+            {
+                //update consignment status
+                var consignment = await _consignmentRepository.GetConsignmentById(id);
+                consignment.Status = status;
+                //update product status
+                var product = consignment.Product;
+                if (status == ConsignmentStatusEnum.Active)
+                {
+                    product.IsForSell = true;
+                    if (consignment.IsBatch)
+                    {
+                        foreach (var batch in product.Batches)
+                        {
+                            batch.IsForSell = true;
+                        }
+                    }
+                }
+                else
+                {
+                    product.IsForSell = false;
+                    product.Status = ProductStatusEnum.Deactive;
+                    if (consignment.IsBatch)
+                    {
+                        foreach (var batch in product.Batches)
+                        {
+                            batch.IsForSell = false;
+                            batch.Status = ProductStatusEnum.Deactive;
+                        }
+                    }
+                }
+                var result = await _consignmentRepository.UpdateConsignment(consignment);
+                if (result)
+                {
+                    Console.WriteLine("Consignment status updated");
+                    return;
+                }
+                else
+                {
+                    Console.WriteLine("Failed to update consignment status");
+                    return;
+                }
+
+            }
+            catch
+            {
+                throw;
+            }
+        }
+        protected async Task JobExpireConsignment(Guid consignmentId)
+        {
+            try
+            {
+                await SetStatusConsignment(ConsignmentStatusEnum.Expired, consignmentId);
             }
             catch
             {

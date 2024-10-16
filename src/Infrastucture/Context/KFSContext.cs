@@ -36,6 +36,8 @@ namespace KFS.src.Infrastucture.Context
         public DbSet<Batch> Batches { get; set; }
         public DbSet<Media> Medias { get; set; }
         public DbSet<Wallet> Wallets { get; set; }
+        public DbSet<PaymentOrder> PaymentOrders { get; set; }
+        public DbSet<PaymentConsignment> PaymentConsignments { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -154,6 +156,7 @@ namespace KFS.src.Infrastucture.Context
                     Quantity = 10,
                     Inventory = 10,
                     Price = 20000,
+                    IsForSell = true
                 },
                 new Batch
                 {
@@ -163,6 +166,7 @@ namespace KFS.src.Infrastucture.Context
                     Quantity = 10,
                     Inventory = 10,
                     Price = 30000,
+                    IsForSell = true
                 }
             );
             //config payment
@@ -191,7 +195,7 @@ namespace KFS.src.Infrastucture.Context
                     Name = "Product 1",
                     Description = "Description for Product 1",
                     Price = 10000,
-                    Inventory = 10,
+                    Inventory = 100,
                     CategoryId = Guid.Parse("5F18BF0C-7199-462C-B023-3CCF1FD9F806"),
                     Gender = GenderEnum.Male,
                     CreatedAt = DateTime.Parse("2024-10-11")
@@ -202,10 +206,11 @@ namespace KFS.src.Infrastucture.Context
                     Name = "Product 2",
                     Description = "Description for Product 2",
                     Price = 20000,
-                    Inventory = 10,
+                    Inventory = 50,
                     CategoryId = Guid.Parse("3D4FC185-049D-4A96-851B-1D320E7DBBA8"),
                     Gender = GenderEnum.Female,
-                    CreatedAt = DateTime.Parse("2024-10-11")
+                    CreatedAt = DateTime.Parse("2024-10-11"),
+                    IsForSell = true
                 },
                 new Product
                 {
@@ -213,10 +218,11 @@ namespace KFS.src.Infrastucture.Context
                     Name = "Product 3",
                     Description = "Description for Product 3",
                     Price = 30000,
-                    Inventory = 10,
+                    Inventory = 150,
                     CategoryId = Guid.Parse("9A17DCF5-1426-45EE-A32E-C23EE5FE40D9"),
                     Gender = GenderEnum.Male,
-                    CreatedAt = DateTime.Parse("2024-10-11")
+                    CreatedAt = DateTime.Parse("2024-10-11"),
+                    IsForSell = true
                 }
             );
 
@@ -260,8 +266,6 @@ namespace KFS.src.Infrastucture.Context
             //config order
             modelBuilder.Entity<Order>(entity =>
             {
-                entity.HasOne(entity => entity.Payment)
-                .WithOne(entity => entity.Order);
                 entity.HasOne(entity => entity.Shipment)
                 .WithOne(entity => entity.Order);
                 entity.Property(entity => entity.Status)
@@ -285,7 +289,7 @@ namespace KFS.src.Infrastucture.Context
 
                 entity.HasOne(o => o.Payment)
                     .WithOne(p => p.Order)
-                    .HasForeignKey<Payment>(p => p.OrderId)
+                    .HasForeignKey<PaymentOrder>(p => p.OrderId)
                     .OnDelete(DeleteBehavior.Restrict); // Potential cascade path
 
                 entity.HasOne(o => o.Shipment)

@@ -54,6 +54,7 @@ namespace KFS.src.Application.Dto.OrderDtos
             .ForMember(dest => dest.TotalPrice, opt => opt.Ignore())
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<Cart, Order>()
+            .ForMember(dest => dest.User, opt => opt.MapFrom(src => src.User))
             .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
             .ForMember(dest => dest.TotalItem, opt => opt.MapFrom(src => src.TotalItem))
             .ForMember(dest => dest.TotalPrice, opt => opt.Ignore())

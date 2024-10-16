@@ -15,21 +15,28 @@ namespace KFS.src.Application.Service
         {
             _config = config;
         }
-        public string CreatePaymentUrl(HttpContext context, VNPayRequestModel request)
+        public string CreatePaymentUrl(HttpContext context, VNPayRequestModel request, string UrlPartern)
         {
             var tick = DateTime.Now.Ticks.ToString();
             var vnpay = new VNPayLibrary();
             vnpay.AddRequestData("vnp_Version", _config["VNPay:Version"]);
             vnpay.AddRequestData("vnp_Command", _config["VNPay:Command"]);
             vnpay.AddRequestData("vnp_TmnCode", _config["VNPay:TmnCode"]);
-            vnpay.AddRequestData("vnp_Amount", (request.Amount*100).ToString());
+            vnpay.AddRequestData("vnp_Amount", (request.Amount * 100).ToString());
             vnpay.AddRequestData("vnp_CreateDate", request.CreateDate.ToString("yyyyMMddHHmmss"));
             vnpay.AddRequestData("vnp_CurrCode", _config["VNPay:CurrCode"]);
             vnpay.AddRequestData("vnp_IpAddr", Utils.GetIpAddress(context));
             vnpay.AddRequestData("vnp_Locale", _config["VNPay:Locale"]);
             vnpay.AddRequestData("vnp_OrderInfo", "Payment for order" + request.OrderId.ToString());
             vnpay.AddRequestData("vnp_OrderType", "billpayment");
-            vnpay.AddRequestData("vnp_ReturnUrl", _config["VNPay:PaymentBackReturnUrl"]);
+            if (UrlPartern == "order")
+            {
+                vnpay.AddRequestData("vnp_ReturnUrl", _config["VNPay:PaymentBackReturnUrlOrder"]);
+            }
+            if (UrlPartern == "consignment")
+            {
+                vnpay.AddRequestData("vnp_ReturnUrl", _config["VNPay:PaymentBackReturnUrlConsignment"]);
+            }
             vnpay.AddRequestData("vnp_TxnRef", request.OrderId.ToString());
             var paymentUrl = vnpay.CreateRequestUrl(_config["VNPay:BaseUrl"], _config["VNPay:HashSecret"]);
             return paymentUrl;

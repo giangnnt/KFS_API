@@ -11,7 +11,7 @@ namespace KFS.src.Application.Dto.ConsignmentDtos
         public Guid OrderItemId { get; set; }
         public int CommissionPercentage { get; set; }
         public int ConsignmentFee { get; set; }
-        public DateOnly ExpiryDate { get; set; }
+        public DateTime ExpiryDate { get; set; }
         public int DealingAmount { get; set; }
         public bool IsForSell { get; set; }
     }

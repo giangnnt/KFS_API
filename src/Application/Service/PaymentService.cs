@@ -57,9 +57,10 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
                     return response;
                 }
-                var payment = new Payment
+                var payment = new PaymentOrder
                 {
                     OrderId = orderId,
+                    PaymentType = "Order",
                     UserId = order.UserId,
                     PaymentMethod = order.PaymentMethod,
                     Amount = order.TotalPrice,
