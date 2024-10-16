@@ -25,6 +25,21 @@ namespace KFS.src.Infrastucture.Repository
             return result > 0;
         }
 
+        public Task<bool> DeleteUser(Guid id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<Order>> GetAllOrdersOfUserById()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<User>> GetAllUser()
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<User?> GetUserByEmail(string email)
         {
             return await _context.Users.Where(x => x.Email == email)
@@ -34,6 +49,11 @@ namespace KFS.src.Infrastucture.Repository
         public async Task<User?> GetUserById(Guid id)
         {
             return await _context.Users.FindAsync(id) ?? throw new Exception("User not found");
+        }
+
+        public Task<bool> UpdateUser(User user)
+        {
+            throw new NotImplementedException();
         }
     }
 }
