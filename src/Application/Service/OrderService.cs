@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using KFS.src.Application.Dto.BatchDtos;
 using KFS.src.Application.Dto.OrderDtos;
+using KFS.src.Application.Dto.ProductDtos;
 using KFS.src.Application.Dto.ResponseDtos;
 using KFS.src.Application.Dto.VNPay;
 using KFS.src.Application.Enum;
@@ -26,9 +28,10 @@ namespace KFS.src.Application.Service
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IWalletRepository _walletRepository;
         private readonly IPromotionRepository _promotionRepository;
+        private readonly IBatchRepository _batchRepository;
 
         private readonly IMapper _mapper;
-        public OrderService(IOrderRepository orderRepository, IMapper mapper, IUserRepository userRepository, ICartRepository cartRepository, IVNPayService vNPayService, IHttpContextAccessor httpContextAccessor, IProductRepository productRepository, IPaymentRepository paymentRepository, IWalletRepository walletRepository, IPromotionRepository promotionRepository)
+        public OrderService(IOrderRepository orderRepository, IMapper mapper, IUserRepository userRepository, ICartRepository cartRepository, IVNPayService vNPayService, IHttpContextAccessor httpContextAccessor, IProductRepository productRepository, IPaymentRepository paymentRepository, IWalletRepository walletRepository, IPromotionRepository promotionRepository, IBatchRepository batchRepository)
         {
             _orderRepository = orderRepository;
             _mapper = mapper;
@@ -40,6 +43,7 @@ namespace KFS.src.Application.Service
             _productRepository = productRepository;
             _walletRepository = walletRepository;
             _promotionRepository = promotionRepository;
+            _batchRepository = batchRepository;
         }
 
         public async Task<ResponseDto> CreateOrderFromCart(OrderCreateFromCart req)
@@ -172,10 +176,10 @@ namespace KFS.src.Application.Service
                 {
                     Amount = (double)order.TotalPrice,
                     CreateDate = DateTime.Now,
-                    Description = "Payment for order" + order.Id.ToString(),
+                    Description = "Payment for order " + order.Id.ToString(),
                     FullName = order.ContactName,
                     OrderId = order.Id
-                });
+                }, "order");
             }
             catch (Exception ex)
             {
@@ -203,7 +207,7 @@ namespace KFS.src.Application.Service
                 //check response
                 if (vnPayResponseModel.Success == false || vnPayResponseModel.VnPayResponseCode != "00" || vnPayResponseModel.TransactionStatus != "00")
                 {
-                    var payment = new Payment
+                    var payment = new PaymentOrder
                     {
                         Id = Guid.NewGuid(),
                         Amount = decimal.Parse(vnPayResponseModel.Amount) / 100,
@@ -234,7 +238,7 @@ namespace KFS.src.Application.Service
                 else
                 {
                     //create payment
-                    var payment = new Payment
+                    var payment = new PaymentOrder
                     {
                         Id = Guid.NewGuid(),
                         Amount = decimal.Parse(vnPayResponseModel.Amount) / 100,
@@ -244,6 +248,7 @@ namespace KFS.src.Application.Service
                         PaymentMethod = PaymentMethodEnum.VNPAY,
                         Status = PaymentStatusEnum.Completed,
                         TransactionId = vnPayResponseModel.PaymentId,
+                        PaymentType = "Order",
                         UserId = _orderRepository.GetOrderById(Guid.Parse(vnPayResponseModel.OrderId)).Result.UserId
                     };
                     //get and update cart, order
@@ -379,6 +384,8 @@ namespace KFS.src.Application.Service
             {
                 var orders = await _orderRepository.GetOrderByUserId(userId);
                 var mappedOrders = _mapper.Map<List<OrderDto>>(orders);
+                //map by format
+                await GetOrdersFormat(mappedOrders);
 
                 if (orders != null && orders.Count() > 0)
                 {
@@ -404,6 +411,41 @@ namespace KFS.src.Application.Service
                 throw;
             }
         }
+        public async Task GetCartFormat(OrderDto mappedOrder)
+        {
+            foreach (var orderItem in mappedOrder.OrderItems)
+            {
+                if (orderItem.IsBatch == true)
+                {
+                    var batch = await _batchRepository.GetBatchById(orderItem.BatchId);
+                    orderItem.Batch = _mapper.Map<BatchDto>(batch);
+                }
+                else
+                {
+                    var product = await _productRepository.GetProductById(orderItem.ProductId);
+                    orderItem.Product = _mapper.Map<ProductDto>(product);
+                }
+            }
+        }
+        public async Task GetOrdersFormat(List<OrderDto> mappedOrders)
+        {
+            foreach (var order in mappedOrders)
+            {
+                foreach (var orderItem in order.OrderItems)
+                {
+                    if (orderItem.IsBatch == true)
+                    {
+                        var batch = await _batchRepository.GetBatchById(orderItem.BatchId);
+                        orderItem.Batch = _mapper.Map<BatchDto>(batch);
+                    }
+                    else
+                    {
+                        var product = await _productRepository.GetProductById(orderItem.ProductId);
+                        orderItem.Product = _mapper.Map<ProductDto>(product);
+                    }
+                }
+            }
+        }
 
         public async Task<ResponseDto> GetOrders()
         {
@@ -412,6 +454,8 @@ namespace KFS.src.Application.Service
             {
                 var orders = await _orderRepository.GetOrders();
                 var mappedOrders = _mapper.Map<List<OrderDto>>(orders);
+                //map by format
+                await GetOrdersFormat(mappedOrders);
 
                 if (orders != null && orders.Count() > 0)
                 {

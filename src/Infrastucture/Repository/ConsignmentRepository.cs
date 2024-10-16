@@ -36,6 +36,7 @@ namespace KFS.src.Infrastucture.Repository
             return await _context.Consignments
             .Include(x => x.Product)
             .ThenInclude(x => x.Category)
+            .Include(x => x.User)
             .FirstOrDefaultAsync(x => x.Id == id) ?? throw new Exception("Consignment not found");
         }
 
@@ -45,6 +46,7 @@ namespace KFS.src.Infrastucture.Repository
             return await _context.Consignments
             .Include(x => x.Product)
             .ThenInclude(x => x.Category)
+            .Include(x => x.User)
             .ToListAsync();
         }
 

@@ -10,6 +10,7 @@ namespace KFS.src.Domain.Entities
         public Guid Id { get; set; }
         public Guid OrderId { get; set; }
         public Guid ProductId { get; set; }
+        public Guid BatchId { get; set; }
         public int Quantity { get; set; }
         public decimal Price { get; set; }
         public bool IsBatch { get; set; } = false;

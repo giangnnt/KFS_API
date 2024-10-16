@@ -23,7 +23,7 @@ namespace KFS.src.Application.Service
             _mapper = mapper;
             _productRepository = productRepository;
         }
-        
+
         public async Task<ResponseDto> CreateBatchFromProduct(BatchCreate batch, Guid productId)
         {
             var response = new ResponseDto();
@@ -37,33 +37,46 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
                     return response;
                 }
-                if (batch.Quantity == 0)
+                var result = false;
+                // check if batch exists
+                var batchExists = product.Batches.Where(b => b.Quantity == batch.Quantity).FirstOrDefault();
+                if (batchExists == null)
                 {
-                    response.StatusCode = 400;
-                    response.Message = "Batch quantity is required";
-                    response.IsSuccess = false;
-                    return response;
-                }
-                if (batch.Inventory == 0)
-                {
-                    response.StatusCode = 400;
-                    response.Message = "Batch inventory is required";
-                    response.IsSuccess = false;
-                    return response;
-                }
-                if (batch.Inventory * batch.Quantity > product.Inventory)
-                {
-                    response.StatusCode = 400;
-                    response.Message = "Batch quantity is greater than product quantity";
-                    response.IsSuccess = false;
-                    return response;
-                }
-                var mappedBatch = _mapper.Map<Batch>(batch);
-                mappedBatch.ProductId = productId;
-                mappedBatch.Status = ProductStatusEnum.Deactive;
-                mappedBatch.IsForSell = false;
+                    if (batch.Quantity == 0)
+                    {
+                        response.StatusCode = 400;
+                        response.Message = "Batch quantity is required";
+                        response.IsSuccess = false;
+                        return response;
+                    }
+                    if (batch.Inventory == 0)
+                    {
+                        response.StatusCode = 400;
+                        response.Message = "Batch inventory is required";
+                        response.IsSuccess = false;
+                        return response;
+                    }
+                    if (batch.Inventory * batch.Quantity > product.Inventory)
+                    {
+                        response.StatusCode = 400;
+                        response.Message = "Batch quantity is greater than product quantity";
+                        response.IsSuccess = false;
+                        return response;
+                    }
+                    
+                    var mappedBatch = _mapper.Map<Batch>(batch);
+                    mappedBatch.ProductId = productId;
+                    mappedBatch.Status = ProductStatusEnum.Deactive;
+                    mappedBatch.IsForSell = false;
 
-                var result = await _batchRepository.CreateBatch(mappedBatch);
+                    result = await _batchRepository.CreateBatch(mappedBatch);
+                }
+                else
+                {
+                    batchExists.Inventory += batch.Inventory;
+                    result = await _batchRepository.UpdateBatch(batchExists);
+                }
+                
                 if (result)
                 {
                     // update product inventory
@@ -193,7 +206,7 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
                     return response;
                 }
-                
+
                 var mappedBatch = _mapper.Map(req, batchToUpdate);
                 var result = await _batchRepository.UpdateBatch(mappedBatch);
                 if (result)

@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using KFS.src.Application.Core.Jwt;
+using KFS.src.Application.Dto.BatchDtos;
 using KFS.src.Application.Dto.CartDtos;
+using KFS.src.Application.Dto.ProductDtos;
 using KFS.src.Application.Dto.ResponseDtos;
 using KFS.src.Application.Enum;
 using KFS.src.Domain.Entities;
@@ -50,10 +52,19 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
                     return response;
                 }
-                //check if any cart item exists
-                var cartItem = cart.CartItems.FirstOrDefault(x => x.ProductId == batch.ProductId);
+                //check if any cart item exists rules: same product, is a batch, same quantity
+                var cartItem = cart.CartItems.Where(x => x.ProductId == batch.ProductId && x.IsBatch == true && x.Quantity == batch.Quantity).FirstOrDefault();
                 if (cartItem == null)
                 {
+                    // check if any cart item is a same product but not a batch
+                    var cartItem2 = cart.CartItems.Where(x => x.ProductId == batch.ProductId && x.IsBatch == false);
+                    if (cartItem2 != null && cartItem2.Count() > 0)
+                    {
+                        response.StatusCode = 400;
+                        response.Message = "You can only choose one out of two: product or cart";
+                        response.IsSuccess = false;
+                        return response;
+                    }
                     //check inventory
                     if (batch.Inventory < req.Quantity)
                     {
@@ -63,26 +74,20 @@ namespace KFS.src.Application.Service
                         return response;
                     }
                     //create new cart item
-                    cartItem = new CartItem
+                    var cartItemToAdd = new CartItem
                     {
                         CartId = req.CartId,
                         ProductId = batch.ProductId,
+                        BatchId = batch.Id,
                         Quantity = req.Quantity,
                         Price = batch.Price * req.Quantity,
                         IsBatch = true,
                         Product = product
                     };
-                    cart.CartItems.Add(cartItem);
+                    cart.CartItems.Add(cartItemToAdd);
                 }
                 else
                 {
-                    if(cartItem.IsBatch == false)
-                    {
-                        response.StatusCode = 400;
-                        response.Message = "You can only choose one of the two: product or cart";
-                        response.IsSuccess = false;
-                        return response;
-                    }
                     //check inventory
                     if (batch.Inventory < cartItem.Quantity + req.Quantity)
                     {
@@ -139,9 +144,17 @@ namespace KFS.src.Application.Service
                 }
 
                 //check if any cart item exists
-                var cartItem = cart.CartItems.FirstOrDefault(x => x.ProductId == req.ProductId);
+                var cartItem = cart.CartItems.FirstOrDefault(x => x.ProductId == req.ProductId && x.IsBatch == false);
                 if (cartItem == null)
                 {
+                    var cartItem2 = cart.CartItems.Where(x => x.ProductId == req.ProductId && x.IsBatch == true);
+                    if (cartItem2 != null && cartItem2.Count() > 0)
+                    {
+                        response.StatusCode = 400;
+                        response.Message = "You can only choose one out of two: product or cart";
+                        response.IsSuccess = false;
+                        return response;
+                    }
                     //check inventory
                     if (product.Inventory < req.Quantity)
                     {
@@ -163,13 +176,6 @@ namespace KFS.src.Application.Service
                 }
                 else
                 {
-                    if(cartItem.IsBatch == true)
-                    {
-                        response.StatusCode = 400;
-                        response.Message = "You can only choose one of the two: product or cart";
-                        response.IsSuccess = false;
-                        return response;
-                    }
                     //check inventory
                     if (product.Inventory < cartItem.Quantity + req.Quantity)
                     {
@@ -246,7 +252,7 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
                     return response;
                 }
-                
+
                 //map user
                 if (user != null)
                 {
@@ -325,6 +331,9 @@ namespace KFS.src.Application.Service
             {
                 var cart = await _cartRepository.GetCartById(id);
                 var mappedCart = _mapper.Map<CartDto>(cart);
+                //map by format
+                await GetCartFormat(mappedCart);
+                
                 if (cart != null)
                 {
                     response.StatusCode = 200;
@@ -349,6 +358,41 @@ namespace KFS.src.Application.Service
                 throw;
             }
         }
+        public async Task GetCartFormat(CartDto mappedCart)
+        {
+            foreach (var cartItem in mappedCart.CartItems)
+            {
+                if (cartItem.IsBatch == true)
+                {
+                    var batch = await _batchRepository.GetBatchById(cartItem.BatchId);
+                    cartItem.Batch = _mapper.Map<BatchDto>(batch);
+                }
+                else
+                {
+                    var product = await _productRepository.GetProductById(cartItem.ProductId);
+                    cartItem.Product = _mapper.Map<ProductDto>(product);
+                }
+            }
+        }
+        public async Task GetCartsFormat(List<CartDto> mappedCarts)
+        {
+            foreach (var cart in mappedCarts)
+            {
+                foreach (var cartItem in cart.CartItems)
+                {
+                    if (cartItem.IsBatch == true)
+                    {
+                        var batch = await _batchRepository.GetBatchById(cartItem.BatchId);
+                        cartItem.Batch = _mapper.Map<BatchDto>(batch);
+                    }
+                    else
+                    {
+                        var product = await _productRepository.GetProductById(cartItem.ProductId);
+                        cartItem.Product = _mapper.Map<ProductDto>(product);
+                    }
+                }
+            }
+        }
 
         public async Task<ResponseDto> GetCarts()
         {
@@ -357,6 +401,9 @@ namespace KFS.src.Application.Service
             {
                 var carts = await _cartRepository.GetCarts();
                 var mappedCarts = _mapper.Map<List<CartDto>>(carts);
+                //map by format
+                await GetCartsFormat(mappedCarts);
+
                 if (carts != null && carts.Count() > 0)
                 {
                     response.StatusCode = 200;
@@ -532,10 +579,10 @@ namespace KFS.src.Application.Service
                         }
                     }
                 }
-                
+
                 //map cart
                 var mappedCart = _mapper.Map(req, cart);
-                
+
                 //update cart
                 var result = await _cartRepository.UpdateCart(mappedCart);
                 if (result)

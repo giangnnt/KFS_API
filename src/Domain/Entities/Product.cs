@@ -26,6 +26,7 @@ namespace KFS.src.Domain.Entities
         public Guid CategoryId { get; set; }
         public Guid? ConsignmentId { get; set; }
         public bool IsForSell { get; set; } = false;
+        public ProductStatusEnum Status { get; set; }
         public Category Category { get; set; } = null!;
         public Consignment? Consignment { get; set; }
         public List<CartItem> CartItems { get; set; } = new List<CartItem>();

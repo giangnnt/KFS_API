@@ -26,7 +26,7 @@ namespace KFS.src.Domain.Entities
         public DateTime UpdatedAt { get; set; }
         public User User { get; set; } = null!;
         public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
-        public Payment? Payment { get; set; }
+        public PaymentOrder? Payment { get; set; }
         public Shipment Shipment { get; set; } = null!;
     }
 }
