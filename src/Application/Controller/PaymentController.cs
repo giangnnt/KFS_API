@@ -102,5 +102,19 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
+        [Protected]
+        [HttpGet("by-user/{userId}")]
+        public async Task<IActionResult> GetPaymentByUser(Guid userId)
+        {
+            try
+            {
+                var result = await _paymentService.GetPaymentByUser(userId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

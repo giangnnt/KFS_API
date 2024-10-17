@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using KFS.src.Application.Dto.PaymentDtos;
 using KFS.src.Application.Dto.ResponseDtos;
 using KFS.src.Application.Enum;
 using KFS.src.Domain.Entities;
@@ -17,13 +19,15 @@ namespace KFS.src.Application.Service
         private readonly ICartRepository _cartRepository;
         private readonly IProductRepository _productRepository;
         private readonly IShipmentRepository _shipmentRepository;
-        public PaymentService(IPaymentRepository paymentRepository, IOrderRepository orderRepository, ICartRepository cartRepository, IProductRepository productRepository, IShipmentRepository shipmentRepository)
+        private readonly IMapper _mapper;
+        public PaymentService(IPaymentRepository paymentRepository, IOrderRepository orderRepository, ICartRepository cartRepository, IProductRepository productRepository, IShipmentRepository shipmentRepository, IMapper mapper)
         {
             _paymentRepository = paymentRepository;
             _orderRepository = orderRepository;
             _cartRepository = cartRepository;
             _productRepository = productRepository;
             _shipmentRepository = shipmentRepository;
+            _mapper = mapper;
         }
         public Task<ResponseDto> CreatePayment()
         {
@@ -159,14 +163,101 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public Task<ResponseDto> GetPaymentById(Guid id)
+        public async Task<ResponseDto> GetPaymentById(Guid id)
         {
-            throw new NotImplementedException();
+            var response = new ResponseDto();
+            try
+            {
+                var payment = await _paymentRepository.GetPaymentById(id);
+                var mappedPayment = _mapper.Map<PaymentDto>(payment);
+                if (payment != null)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Payment found";
+                    response.IsSuccess = true;
+                    response.Result = new ResultDto
+                    {
+                        Data = mappedPayment
+                    };
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Payment not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch
+            {
+                throw;
+            }
         }
 
-        public Task<ResponseDto> GetPayments()
+        public async Task<ResponseDto> GetPaymentByUser(Guid userId)
         {
-            throw new NotImplementedException();
+            var response = new ResponseDto();
+            try
+            {
+                var payments = await _paymentRepository.GetPayments();
+                payments = payments.Where(p => p.UserId == userId);
+                var mappedPayments = _mapper.Map<IEnumerable<PaymentDto>>(payments);
+                if (payments != null && payments.Count() > 0)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Payments found";
+                    response.IsSuccess = true;
+                    response.Result = new ResultDto
+                    {
+                        Data = mappedPayments
+                    };
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Payments not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public async Task<ResponseDto> GetPayments()
+        {
+            var response = new ResponseDto();
+            try
+            {
+                var payments = await _paymentRepository.GetPayments();
+                var mappedPayments = _mapper.Map<IEnumerable<PaymentDto>>(payments);
+                if (payments != null && payments.Count() > 0)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Payments found";
+                    response.IsSuccess = true;
+                    response.Result = new ResultDto
+                    {
+                        Data = mappedPayments
+                    };
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Payments not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch
+            {
+                throw;
+            }
         }
 
         public Task<ResponseDto> UpdatePayment()

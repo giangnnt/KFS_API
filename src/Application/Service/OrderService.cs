@@ -361,6 +361,8 @@ namespace KFS.src.Application.Service
                 }
 
                 var mappedOrder = _mapper.Map<OrderDto>(order);
+                //map by format
+                await GetCartFormat(mappedOrder);
 
                 response.StatusCode = 200;
                 response.Message = "Order found";

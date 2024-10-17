@@ -333,7 +333,7 @@ namespace KFS.src.Application.Service
                 var mappedCart = _mapper.Map<CartDto>(cart);
                 //map by format
                 await GetCartFormat(mappedCart);
-                
+
                 if (cart != null)
                 {
                     response.StatusCode = 200;
@@ -596,6 +596,40 @@ namespace KFS.src.Application.Service
                 {
                     response.StatusCode = 400;
                     response.Message = "Cart update failed";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public async Task<ResponseDto> GetCartByUserId(Guid userId)
+        {
+            var response = new ResponseDto();
+            try
+            {
+                var cart = _cartRepository.GetCartByUserId(userId);
+                var mappedCart = _mapper.Map<CartDto>(cart);
+                //map by format
+                await GetCartFormat(mappedCart);
+                if (mappedCart != null)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Cart found";
+                    response.IsSuccess = true;
+                    response.Result = new ResultDto
+                    {
+                        Data = mappedCart
+                    };
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Cart not found";
                     response.IsSuccess = false;
                     return response;
                 }

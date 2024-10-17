@@ -622,5 +622,37 @@ namespace KFS.src.Application.Service
                 throw;
             }
         }
+
+        public Task<ResponseDto> GetConsignmentByUserId(Guid userId)
+        {
+            var response = new ResponseDto();
+            try
+            {
+                var consignments = _consignmentRepository.GetConsignments().Result.Where(x => x.UserId == userId);
+                var mappedConsignment = _mapper.Map<List<ConsignmentDto>>(consignments);
+                if (consignments != null && consignments.Count() > 0)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Consignments found";
+                    response.IsSuccess = true;
+                    response.Result = new ResultDto
+                    {
+                        Data = mappedConsignment
+                    };
+                    return Task.FromResult(response);
+                }
+                else
+                {
+                    response.StatusCode = 404;
+                    response.Message = "No consignment found";
+                    response.IsSuccess = false;
+                    return Task.FromResult(response);
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
     }
 }

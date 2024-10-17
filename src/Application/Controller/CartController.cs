@@ -151,5 +151,19 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
+        [Protected]
+        [HttpGet("by-user/{userId}")]
+        public async Task<IActionResult> GetCartByUserId(Guid userId)
+        {
+            try
+            {
+                var result = await _cartService.GetCartByUserId(userId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
