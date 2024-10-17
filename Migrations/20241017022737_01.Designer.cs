@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KFS.Migrations
 {
     [DbContext(typeof(KFSContext))]
-    [Migration("20241016133205_01")]
+    [Migration("20241017022737_01")]
     partial class _01
     {
         /// <inheritdoc />
@@ -68,7 +68,9 @@ namespace KFS.Migrations
                         .HasColumnType("int");
 
                     b.Property<bool>("IsForSell")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -794,7 +796,9 @@ namespace KFS.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("RoleId")
-                        .HasColumnType("int");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(4);
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -813,7 +817,7 @@ namespace KFS.Migrations
                             CreatedAt = new DateTime(2024, 10, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "giangnnt260703@gmail.com",
                             FullName = "Truong Giang",
-                            Password = "$2a$11$fGoq/2rvFm667qNuSdQu5uwu/RF8YnPHSAHtuWsSipuV0gEGzrrS2",
+                            Password = "$2a$11$zMpUT5KNzahGUVCMQCUmU.Wf.hD/CJBbfObSAXS6fOFZP575GDNXK",
                             Phone = "0123456789",
                             RoleId = 1,
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -842,7 +846,7 @@ namespace KFS.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("634ec760-84f0-4239-9e2b-3e857e3b5eb0"),
+                            Id = new Guid("8b60f50a-f3f8-4dcc-ae6f-b1aefe81fa2b"),
                             Point = 20000,
                             UserId = new Guid("00000000-0000-0000-0000-000000000001")
                         });
@@ -1016,7 +1020,7 @@ namespace KFS.Migrations
                     b.HasOne("KFS.src.Domain.Entities.Product", "Product")
                         .WithMany("CartItems")
                         .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Cart");
@@ -1066,7 +1070,7 @@ namespace KFS.Migrations
                     b.HasOne("KFS.src.Domain.Entities.Product", "Product")
                         .WithMany("OrderItems")
                         .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Order");
@@ -1084,7 +1088,8 @@ namespace KFS.Migrations
 
                     b.HasOne("KFS.src.Domain.Entities.Consignment", "Consignment")
                         .WithOne("Product")
-                        .HasForeignKey("KFS.src.Domain.Entities.Product", "ConsignmentId");
+                        .HasForeignKey("KFS.src.Domain.Entities.Product", "ConsignmentId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Category");
 
@@ -1107,7 +1112,7 @@ namespace KFS.Migrations
                     b.HasOne("KFS.src.Domain.Entities.Role", "Role")
                         .WithMany("Users")
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Role");
@@ -1159,7 +1164,7 @@ namespace KFS.Migrations
                     b.HasOne("KFS.src.Domain.Entities.Consignment", "Consignment")
                         .WithOne("Payment")
                         .HasForeignKey("KFS.src.Domain.Entities.PaymentConsignment", "ConsignmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Consignment");

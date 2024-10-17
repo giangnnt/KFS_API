@@ -234,6 +234,10 @@ namespace KFS.src.Infrastucture.Context
                     v => v.ToString(),
                     v => v != null ? (CartStatusEnum)Enum.Parse(typeof(CartStatusEnum), v) : default)
                 .HasColumnType("nvarchar(20)");
+                entity.HasOne(entity => entity.User)
+                .WithMany(entity => entity.Carts)
+                .HasForeignKey(entity => entity.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
             });
 
             //seed cart
@@ -257,11 +261,19 @@ namespace KFS.src.Infrastucture.Context
             modelBuilder.Entity<CartItem>(entity =>
             {
                 entity.Property(entity => entity.Id).ValueGeneratedOnAdd();
+                entity.HasOne(entity => entity.Product)
+                .WithMany(entity => entity.CartItems)
+                .HasForeignKey(entity => entity.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
             });
             //config order item
             modelBuilder.Entity<OrderItem>(entity =>
             {
                 entity.Property(entity => entity.Id).ValueGeneratedOnAdd();
+                entity.HasOne(entity => entity.Product)
+                .WithMany(entity => entity.OrderItems)
+                .HasForeignKey(entity => entity.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
             });
             //config order
             modelBuilder.Entity<Order>(entity =>
@@ -312,11 +324,47 @@ namespace KFS.src.Infrastucture.Context
                     v => v.ToString(),
                     v => v != null ? (ConsignmentStatusEnum)Enum.Parse(typeof(ConsignmentStatusEnum), v) : default)
                 .HasColumnType("nvarchar(20)");
+                entity.HasOne(c => c.User)
+                .WithMany(u => u.Consignments)
+                .HasForeignKey(c => c.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(c => c.Product)
+                .WithOne(p => p.Consignment)
+                .HasForeignKey<Product>(p => p.ConsignmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(c => c.Payment)
+                .WithOne(p => p.Consignment)
+                .HasForeignKey<PaymentConsignment>(p => p.ConsignmentId)
+                .OnDelete(DeleteBehavior.Restrict);
             });
             //config promotion
             modelBuilder.Entity<Promotion>()
             .HasIndex(p => p.DiscountCode)
             .IsUnique();
+            //config batch
+            modelBuilder.Entity<Batch>(entity =>
+            {
+                entity.Property(entity => entity.Id).ValueGeneratedOnAdd();
+                entity.Property(entity => entity.IsForSell).HasDefaultValue(false);
+                entity.HasOne(b => b.Product)
+                .WithMany(p => p.Batches)
+                .HasForeignKey(b => b.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+            });
+            //config user
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.Property(entity => entity.Id).ValueGeneratedOnAdd();
+                entity.Property(entity => entity.RoleId).HasDefaultValue(RoleConst.CUSTOMER_ID);
+                entity.HasOne(u => u.Role)
+                .WithMany(r => r.Users)
+                .HasForeignKey(u => u.RoleId)
+                .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(u => u.Wallet)
+                .WithOne(w => w.Owner)
+                .HasForeignKey<Wallet>(w => w.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            });
         }
     }
 }

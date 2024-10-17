@@ -128,7 +128,7 @@ namespace KFS.Migrations
                     FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RoleId = table.Column<int>(type: "int", nullable: false),
+                    RoleId = table.Column<int>(type: "int", nullable: false, defaultValue: 4),
                     Avatar = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -143,7 +143,7 @@ namespace KFS.Migrations
                         column: x => x.RoleId,
                         principalTable: "Roles",
                         principalColumn: "RoleId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -286,7 +286,8 @@ namespace KFS.Migrations
                         name: "FK_Products_Consignments_ConsignmentId",
                         column: x => x.ConsignmentId,
                         principalTable: "Consignments",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -315,7 +316,7 @@ namespace KFS.Migrations
                         column: x => x.ConsignmentId,
                         principalTable: "Consignments",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Payments_Orders_OrderId",
                         column: x => x.OrderId,
@@ -355,7 +356,7 @@ namespace KFS.Migrations
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    IsForSell = table.Column<bool>(type: "bit", nullable: false)
+                    IsForSell = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
                 },
                 constraints: table =>
                 {
@@ -394,7 +395,7 @@ namespace KFS.Migrations
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -442,7 +443,7 @@ namespace KFS.Migrations
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -560,14 +561,18 @@ namespace KFS.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "Address", "Avatar", "CreatedAt", "Email", "FullName", "Password", "Phone", "RoleId", "UpdatedAt" },
-                values: new object[] { new Guid("00000000-0000-0000-0000-000000000001"), "HCM", null, new DateTime(2024, 10, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), "giangnnt260703@gmail.com", "Truong Giang", "$2a$11$fGoq/2rvFm667qNuSdQu5uwu/RF8YnPHSAHtuWsSipuV0gEGzrrS2", "0123456789", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
+                values: new object[] { new Guid("00000000-0000-0000-0000-000000000001"), "HCM", null, new DateTime(2024, 10, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), "giangnnt260703@gmail.com", "Truong Giang", "$2a$11$zMpUT5KNzahGUVCMQCUmU.Wf.hD/CJBbfObSAXS6fOFZP575GDNXK", "0123456789", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
+
+            migrationBuilder.InsertData(
+                table: "Batches",
+                columns: new[] { "Id", "Description", "Inventory", "Name", "Price", "ProductId", "Quantity", "Status" },
+                values: new object[] { new Guid("64141e04-9c9d-4bd1-94d2-84ee359f1e5b"), null, 10, "Batch 1", 10000m, new Guid("2a9394e2-52b3-46d5-8a33-af4d6020e440"), 10, 0 });
 
             migrationBuilder.InsertData(
                 table: "Batches",
                 columns: new[] { "Id", "Description", "Inventory", "IsForSell", "Name", "Price", "ProductId", "Quantity", "Status" },
                 values: new object[,]
                 {
-                    { new Guid("64141e04-9c9d-4bd1-94d2-84ee359f1e5b"), null, 10, false, "Batch 1", 10000m, new Guid("2a9394e2-52b3-46d5-8a33-af4d6020e440"), 10, 0 },
                     { new Guid("b6bfe977-ee7e-4e84-a65b-445c36d08d65"), null, 10, true, "Batch 3", 30000m, new Guid("f3b3b3b4-1b9d-44e2-800d-40bb1a20af98"), 10, 0 },
                     { new Guid("eb5707d1-1b02-4ad5-8d6b-27a78d00f322"), null, 10, true, "Batch 2", 20000m, new Guid("8657ed40-1b9d-44e2-800d-40bb1a20af98"), 10, 0 }
                 });
@@ -584,7 +589,7 @@ namespace KFS.Migrations
             migrationBuilder.InsertData(
                 table: "Wallets",
                 columns: new[] { "Id", "Point", "UserId" },
-                values: new object[] { new Guid("634ec760-84f0-4239-9e2b-3e857e3b5eb0"), 20000, new Guid("00000000-0000-0000-0000-000000000001") });
+                values: new object[] { new Guid("8b60f50a-f3f8-4dcc-ae6f-b1aefe81fa2b"), 20000, new Guid("00000000-0000-0000-0000-000000000001") });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Batches_ProductId",
