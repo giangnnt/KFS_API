@@ -18,6 +18,7 @@ namespace KFS.src.Domain.IService
         Task<ResponseDto> DeleteOrder(Guid id);
         Task<ResponseDto> GetOrderByUserId(Guid userId);
         Task<ResponseDto> GetResponsePaymentUrl();
+        Task<ResponseDto> CreateOrderOffline(OrderCreateOffline req);
         //Task<ResponseDto> CancelOrder(Guid id);
     }
 }

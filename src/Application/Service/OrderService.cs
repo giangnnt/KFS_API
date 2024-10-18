@@ -577,5 +577,10 @@ namespace KFS.src.Application.Service
                 throw;
             }
         }
+
+        public Task<ResponseDto> CreateOrderOffline(OrderCreateOffline req)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
