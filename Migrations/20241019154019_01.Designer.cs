@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KFS.Migrations
 {
     [DbContext(typeof(KFSContext))]
-    [Migration("20241019012516_01")]
+    [Migration("20241019154019_01")]
     partial class _01
     {
         /// <inheritdoc />
@@ -874,7 +874,7 @@ namespace KFS.Migrations
                             CreatedAt = new DateTime(2024, 10, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "giangnnt260703@gmail.com",
                             FullName = "Truong Giang",
-                            Password = "$2a$11$oEbnuLTTq8GTwErMVutRheyiCUQgZ3BFfrSIeSXgPBWGnuwxN7xiG",
+                            Password = "$2a$11$zG546U333pIZBzJ8m2GXtuedAk8HlCRabnATYC1gZcepLlg4VXWkK",
                             Phone = "0123456789",
                             RoleId = 1,
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -903,7 +903,7 @@ namespace KFS.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("6440a4f0-973f-4042-aaaa-cc84bc26f2b9"),
+                            Id = new Guid("943e7be4-5643-4b56-bc30-78415c17a0ae"),
                             Point = 20000,
                             UserId = new Guid("00000000-0000-0000-0000-000000000001")
                         });

@@ -55,6 +55,7 @@ builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
 builder.Services.AddScoped<ICategoryRepository,CategoryRepository>();
 builder.Services.AddScoped<IWalletRepository, WalletRepository>();
 builder.Services.AddScoped<ICredentialRepositoty, CredentialRepository>();
+builder.Services.AddScoped<IMediaRepository, MediaRepository>();
 // Add Service 
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICartService, CartService>();
@@ -72,6 +73,7 @@ builder.Services.AddScoped<ICategoryService,CategoryService>();
 builder.Services.AddScoped<IBatchService, BatchService>();
 builder.Services.AddScoped<IGCService, GCService>();
 builder.Services.AddScoped<ICredentialService, CredentialService>();
+builder.Services.AddScoped<IMediaService, MediaService>();
 // Add Mapper
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddEndpointsApiExplorer();

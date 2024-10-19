@@ -630,7 +630,7 @@ namespace KFS.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "Address", "Avatar", "CreatedAt", "Email", "FullName", "Password", "Phone", "RoleId", "UpdatedAt" },
-                values: new object[] { new Guid("00000000-0000-0000-0000-000000000001"), "HCM", null, new DateTime(2024, 10, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), "giangnnt260703@gmail.com", "Truong Giang", "$2a$11$oEbnuLTTq8GTwErMVutRheyiCUQgZ3BFfrSIeSXgPBWGnuwxN7xiG", "0123456789", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
+                values: new object[] { new Guid("00000000-0000-0000-0000-000000000001"), "HCM", null, new DateTime(2024, 10, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), "giangnnt260703@gmail.com", "Truong Giang", "$2a$11$zG546U333pIZBzJ8m2GXtuedAk8HlCRabnATYC1gZcepLlg4VXWkK", "0123456789", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
 
             migrationBuilder.InsertData(
                 table: "Batches",
@@ -658,7 +658,7 @@ namespace KFS.Migrations
             migrationBuilder.InsertData(
                 table: "Wallets",
                 columns: new[] { "Id", "Point", "UserId" },
-                values: new object[] { new Guid("6440a4f0-973f-4042-aaaa-cc84bc26f2b9"), 20000, new Guid("00000000-0000-0000-0000-000000000001") });
+                values: new object[] { new Guid("943e7be4-5643-4b56-bc30-78415c17a0ae"), 20000, new Guid("00000000-0000-0000-0000-000000000001") });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Batches_ProductId",
