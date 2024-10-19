@@ -120,9 +120,12 @@ namespace KFS.src.Application.Service
                     return response;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
 
@@ -209,9 +212,12 @@ namespace KFS.src.Application.Service
                 }
 
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
 
@@ -291,9 +297,12 @@ namespace KFS.src.Application.Service
                     return response;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
 
@@ -318,9 +327,12 @@ namespace KFS.src.Application.Service
                     return response;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
 
@@ -353,9 +365,12 @@ namespace KFS.src.Application.Service
                     return response;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
         public async Task GetCartFormat(CartDto mappedCart)
@@ -423,9 +438,12 @@ namespace KFS.src.Application.Service
                     return response;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
 
@@ -483,9 +501,12 @@ namespace KFS.src.Application.Service
                     return response;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
 
@@ -544,9 +565,12 @@ namespace KFS.src.Application.Service
                     return response;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
 
@@ -600,9 +624,12 @@ namespace KFS.src.Application.Service
                     return response;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
 
@@ -634,9 +661,12 @@ namespace KFS.src.Application.Service
                     return response;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
     }

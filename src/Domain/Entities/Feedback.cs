@@ -5,13 +5,14 @@ using System.Threading.Tasks;
 
 namespace KFS.src.Domain.Entities
 {
-    public class Credential
+    public class Feedback
     {
         public Guid Id { get; set; }
-        public string Name { get; set; } = null!;
         public string? Description { get; set; }
-        public string? CredentialFile { get; set; }
+        public int Rating { get; set; }
         public Guid ProductId { get; set; }
+        public Guid UserId { get; set; }
         public Product Product { get; set; } = null!;
+        public User User { get; set; } = null!;
     }
 }

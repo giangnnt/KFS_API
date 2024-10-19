@@ -34,5 +34,7 @@ namespace KFS.src.Domain.Entities
         public List<Batch> Batches { get; set; } = new List<Batch>();
         public List<Promotion> Promotions { get; set; } = new List<Promotion>();
         public List<Media> Medias { get; set; } = new List<Media>();
+        public List<Credential> Credentials { get; set; } = new List<Credential>();
+        public List<Feedback> Feedbacks { get; set; } = new List<Feedback>();
     }
 }

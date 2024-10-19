@@ -92,9 +92,12 @@ namespace KFS.src.Application.Service
                 };
                 return response;
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
 
@@ -155,9 +158,12 @@ namespace KFS.src.Application.Service
                 };
                 return response;
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
 
@@ -201,9 +207,12 @@ namespace KFS.src.Application.Service
                 }
                 return response;
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
         private static string GenerateRefreshTk()
@@ -264,9 +273,12 @@ namespace KFS.src.Application.Service
                 return response;
 
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
     }

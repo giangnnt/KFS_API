@@ -38,6 +38,8 @@ namespace KFS.src.Infrastucture.Context
         public DbSet<Wallet> Wallets { get; set; }
         public DbSet<PaymentOrder> PaymentOrders { get; set; }
         public DbSet<PaymentConsignment> PaymentConsignments { get; set; }
+        public DbSet<Feedback> Feedbacks { get; set; }
+        public DbSet<Credential> Credentials { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
