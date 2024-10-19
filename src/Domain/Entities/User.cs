@@ -20,7 +20,8 @@ namespace KFS.src.Domain.Entities
         public Role Role { get; set; } = null!;
         public List<Cart> Carts { get; set; } = new List<Cart>();
         public List<Order> Orders { get; set; } = new List<Order>();    
-        public List<Consignment> Consignments { get; set; } = new List<Consignment>();    
+        public List<Consignment> Consignments { get; set; } = new List<Consignment>();  
+        public List<Feedback> Feedbacks { get; set; } = new List<Feedback>();  
         public Wallet Wallet { get; set; } = null!;
     }
 }

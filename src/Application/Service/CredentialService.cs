@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using KFS.src.Application.Dto.ProductDtos;
+using KFS.src.Application.Dto.CredentialDtos;
 using KFS.src.Application.Dto.ResponseDtos;
 using KFS.src.Domain.Entities;
 using KFS.src.Domain.IRepository;
@@ -11,58 +11,59 @@ using KFS.src.Domain.IService;
 
 namespace KFS.src.Application.Service
 {
-    public class ProductService : IProductService
+    public class CredentialService : ICredentialService
     {
+        private readonly ICredentialRepositoty _credentialRepositoty;
         private readonly IProductRepository _productRepository;
-        private readonly ICategoryRepository _categoryRepository;
         private readonly IMapper _mapper;
-        private readonly IBatchRepository _batchRepository;
-        public ProductService(IProductRepository productRepository, ICategoryRepository categoryRepository, IMapper mapper, IBatchRepository batchRepository)
+        public CredentialService(ICredentialRepositoty credentialRepositoty, IProductRepository productRepository, IMapper mapper)
         {
+            _credentialRepositoty = credentialRepositoty;
             _productRepository = productRepository;
-            _categoryRepository = categoryRepository;
             _mapper = mapper;
-            _batchRepository = batchRepository;
         }
 
-        public async Task<ResponseDto> CreateProduct(ProductCreate req)
+        public async Task<ResponseDto> CreateCredential(CreadentialCreate req)
         {
             var response = new ResponseDto();
             try
             {
-                //map product
-                var mappedProduct = _mapper.Map<Product>(req);
-                //check if category id is empty
-                if (req.CategoryId == Guid.Empty)
+                //check if product id is empty
+                if (req.ProductId == Guid.Empty)
                 {
                     response.StatusCode = 400;
-                    response.Message = "Category Id is required";
+                    response.Message = "Product Id is required";
                     response.IsSuccess = false;
                     return response;
                 }
-                //get category by id
-                var Category = await _categoryRepository.GetCategoryById(req.CategoryId);
-                //map category
-                if (Category != null)
+                //get product by id
+                var product = await _productRepository.GetProductById(req.ProductId);
+                if (product == null)
                 {
-                    mappedProduct.Category = Category;
+                    response.StatusCode = 404;
+                    response.Message = "Product not found";
+                    response.IsSuccess = false;
+                    return response;
                 }
-                var result = await _productRepository.CreateProduct(mappedProduct);
+                //map credential
+                var mappedCredential = _mapper.Map<Credential>(req);
+                mappedCredential.Product = product;
+
+                var result = await _credentialRepositoty.CreateCredential(mappedCredential);
                 if (result)
                 {
                     response.StatusCode = 201;
-                    response.Message = "Product created successfully";
+                    response.Message = "Credential created successfully";
                     response.IsSuccess = true;
                     return response;
                 }
                 else
                 {
                     response.StatusCode = 400;
-                    response.Message = "Product creation failed";
+                    response.Message = "Failed to create credential";
                     response.IsSuccess = false;
                     return response;
                 }
-
             }
             catch (Exception ex)
             {
@@ -73,23 +74,23 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public async Task<ResponseDto> DeleteProduct(Guid id)
+        public async Task<ResponseDto> DeleteCredential(Guid id)
         {
             var response = new ResponseDto();
             try
             {
-                var result = await _productRepository.DeleteProduct(id);
+                var result = await _credentialRepositoty.DeleteCredential(id);
                 if (result)
                 {
                     response.StatusCode = 200;
-                    response.Message = "Product deleted successfully";
+                    response.Message = "Credential deleted successfully";
                     response.IsSuccess = true;
                     return response;
                 }
                 else
                 {
                     response.StatusCode = 404;
-                    response.Message = "Product not found";
+                    response.Message = "Credential not found";
                     response.IsSuccess = false;
                     return response;
                 }
@@ -103,28 +104,63 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public async Task<ResponseDto> GetProductById(Guid id)
+        public async Task<ResponseDto> GetCredentialById(Guid id)
         {
             var response = new ResponseDto();
             try
             {
-                var result = await _productRepository.GetProductById(id);
-                var mappedProduct = _mapper.Map<ProductDto>(result);
-                if (result != null)
+                var result = await _credentialRepositoty.GetCredentialById(id);
+                var mappedCredential = _mapper.Map<CredentialDto>(result);
+                if (mappedCredential == null)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Credential not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                else
                 {
                     response.StatusCode = 200;
-                    response.Message = "Product found";
+                    response.Message = "Credential found";
                     response.IsSuccess = true;
                     response.Result = new ResultDto
                     {
-                        Data = mappedProduct
+                        Data = mappedCredential
+                    };
+                    return response;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
+            }
+        }
+
+        public async Task<ResponseDto> GetCredentials()
+        {
+            var response = new ResponseDto();
+            try
+            {
+                var result = await _credentialRepositoty.GetCredentials();
+                var mappedCredentials = _mapper.Map<List<CredentialDto>>(result);
+                if (result != null && result.Count > 0)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Credentials found";
+                    response.IsSuccess = true;
+                    response.Result = new ResultDto
+                    {
+                        Data = mappedCredentials
                     };
                     return response;
                 }
                 else
                 {
                     response.StatusCode = 404;
-                    response.Message = "Product not found";
+                    response.Message = "Credentials not found";
                     response.IsSuccess = false;
                     return response;
                 }
@@ -138,28 +174,28 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public async Task<ResponseDto> GetProducts()
+        public async Task<ResponseDto> GetCredentialsByProductId(Guid productId)
         {
             var response = new ResponseDto();
             try
             {
-                var result = await _productRepository.GetProducts();
-                var mappedProduct = _mapper.Map<List<ProductDto>>(result);
-                if (result != null && result.Count() > 0)
+                var result = await _credentialRepositoty.GetCredentialsByProductId(productId);
+                var mappedCredentials = _mapper.Map<List<CredentialDto>>(result);
+                if (result != null && result.Count > 0)
                 {
                     response.StatusCode = 200;
-                    response.Message = "Products found";
+                    response.Message = "Credentials found";
                     response.IsSuccess = true;
                     response.Result = new ResultDto
                     {
-                        Data = mappedProduct
+                        Data = mappedCredentials
                     };
                     return response;
                 }
                 else
                 {
                     response.StatusCode = 404;
-                    response.Message = "Products not found";
+                    response.Message = "Credentials not found";
                     response.IsSuccess = false;
                     return response;
                 }
@@ -173,92 +209,36 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public async Task<ResponseDto> UpdateIsForSell(bool isForSell, Guid id)
+        public async Task<ResponseDto> UpdateCredential(CredentialUpdate req, Guid id)
         {
             var response = new ResponseDto();
             try
             {
-                //get product by id
-                var product = await _productRepository.GetProductById(id);
-                if (product != null)
-                {
-                    product.IsForSell = isForSell;
-                    foreach (var batch in product.Batches)
-                    {
-                        batch.IsForSell = isForSell;
-                    }
-                    var result = _productRepository.UpdateProduct(product);
-                    if (result.Result)
-                    {
-                        response.StatusCode = 200;
-                        response.Message = "Product updated successfully";
-                        response.IsSuccess = true;
-                        return response;
-                    }
-                    else
-                    {
-                        response.StatusCode = 400;
-                        response.Message = "Product update failed";
-                        response.IsSuccess = false;
-                        return response;
-                    }
-                }
-                else
+                var credential = await _credentialRepositoty.GetCredentialById(id);
+                if (credential == null)
                 {
                     response.StatusCode = 404;
-                    response.Message = "Product not found";
+                    response.Message = "Credential not found";
                     response.IsSuccess = false;
                     return response;
                 }
-            }
-            catch (Exception ex)
-            {
-                response.StatusCode = 500;
-                response.Message = ex.Message;
-                response.IsSuccess = false;
-                return response;
-            }
-        }
-
-        public async Task<ResponseDto> UpdateProduct(ProductUpdate req, Guid id)
-        {
-            var response = new ResponseDto();
-            try
-            {
-                //get product by id
-                var product = await _productRepository.GetProductById(id);
-                //map product
-                var mappedProduct = _mapper.Map(req, product);
-                if (req.CategoryId != null)
-                {
-                    var Category = await _categoryRepository.GetCategoryById(req.CategoryId.Value);
-                    mappedProduct.CategoryId = req.CategoryId.Value;
-                    mappedProduct.Category = Category;
-                    if (Category == null)
-                    {
-                        response.StatusCode = 404;
-                        response.Message = "Category not found";
-                        response.IsSuccess = false;
-                        return response;
-                    }
-                }
-                //update product
-                var result = await _productRepository.UpdateProduct(product);
-                //check resultF
+                var mappedCredential = _mapper.Map(req, credential);
+                var result = await _credentialRepositoty.UpdateCredential(mappedCredential);
                 if (result)
                 {
                     response.StatusCode = 200;
-                    response.Message = "Product updated successfully";
+                    response.Message = "Credential updated successfully";
                     response.IsSuccess = true;
                     return response;
                 }
                 else
                 {
                     response.StatusCode = 400;
-                    response.Message = "Product update failed";
+                    response.Message = "Failed to update credential";
                     response.IsSuccess = false;
                     return response;
                 }
+
             }
             catch (Exception ex)
             {

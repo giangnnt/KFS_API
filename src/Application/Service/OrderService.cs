@@ -158,9 +158,12 @@ namespace KFS.src.Application.Service
                 }
                 return response;
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
         public string GeneratePaymentUrl(Order order)
@@ -300,9 +303,12 @@ namespace KFS.src.Application.Service
                     return response;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
 
@@ -340,9 +346,12 @@ namespace KFS.src.Application.Service
                     return response;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
 
@@ -361,6 +370,8 @@ namespace KFS.src.Application.Service
                 }
 
                 var mappedOrder = _mapper.Map<OrderDto>(order);
+                //map by format
+                await GetCartFormat(mappedOrder);
 
                 response.StatusCode = 200;
                 response.Message = "Order found";
@@ -371,9 +382,12 @@ namespace KFS.src.Application.Service
                 response.IsSuccess = true;
                 return response;
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
 
@@ -406,9 +420,12 @@ namespace KFS.src.Application.Service
                     return response;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
         public async Task GetCartFormat(OrderDto mappedOrder)
@@ -476,9 +493,12 @@ namespace KFS.src.Application.Service
                     return response;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
 
@@ -527,13 +547,16 @@ namespace KFS.src.Application.Service
                     return response;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
 
-        public Task<ResponseDto> UpdateOrderStatus(OrderUpdateStatus req)
+        public async Task<ResponseDto> UpdateOrderStatus(OrderUpdateStatus req)
         {
             var response = new ResponseDto();
             try
@@ -545,14 +568,14 @@ namespace KFS.src.Application.Service
                     response.StatusCode = 404;
                     response.Message = "Order not found";
                     response.IsSuccess = false;
-                    return Task.FromResult(response);
+                    return response;
                 }
 
                 //set order status
                 order.Status = req.Status;
 
                 //update order
-                var result = _orderRepository.UpdateOrder(order).Result;
+                var result = await _orderRepository.UpdateOrder(order);
 
                 //check result
                 if (result)
@@ -560,20 +583,28 @@ namespace KFS.src.Application.Service
                     response.StatusCode = 200;
                     response.Message = "Order status updated successfully";
                     response.IsSuccess = true;
-                    return Task.FromResult(response);
+                    return response;
                 }
                 else
                 {
                     response.StatusCode = 400;
                     response.Message = "Order status update failed";
                     response.IsSuccess = false;
-                    return Task.FromResult(response);
+                    return response;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
+        }
+
+        public Task<ResponseDto> CreateOrderOffline(OrderCreateOffline req)
+        {
+            throw new NotImplementedException();
         }
     }
 }

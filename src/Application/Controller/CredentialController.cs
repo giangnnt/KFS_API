@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using KFS.src.Application.Dto.CredentialDtos;
 using KFS.src.Application.Middleware;
 using KFS.src.Domain.IService;
 using Microsoft.AspNetCore.Mvc;
@@ -10,21 +11,22 @@ namespace KFS.src.Application.Controller
 {
     [Produces("application/json")]
     [ApiController]
-    [Route("api/payment")]
-    public class PaymentController : ControllerBase
+    [Route("api/credential")]
+    public class CredentialController : ControllerBase
     {
-        private readonly IPaymentService _paymentService;
-        public PaymentController(IPaymentService paymentService)
+        private readonly ICredentialService _credentialService;
+
+        public CredentialController(ICredentialService credentialService)
         {
-            _paymentService = paymentService;
+            _credentialService = credentialService;
         }
         [Protected]
-        [HttpGet]
-        public async Task<IActionResult> GetPayments()
+        [HttpGet("all")]
+        public async Task<IActionResult> GetCredentials()
         {
             try
             {
-                var result = await _paymentService.GetPayments();
+                var result = await _credentialService.GetCredentials();
                 return Ok(result);
             }
             catch (Exception ex)
@@ -34,11 +36,11 @@ namespace KFS.src.Application.Controller
         }
         [Protected]
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetPaymentById(Guid id)
+        public async Task<IActionResult> GetCredentialById(Guid id)
         {
             try
             {
-                var result = await _paymentService.GetPaymentById(id);
+                var result = await _credentialService.GetCredentialById(id);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -47,12 +49,12 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPost]
-        public async Task<IActionResult> CreatePayment()
+        [HttpPost("create")]
+        public async Task<IActionResult> CreateCredential(CreadentialCreate req)
         {
             try
             {
-                var result = await _paymentService.CreatePayment();
+                var result = await _credentialService.CreateCredential(req);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -61,12 +63,12 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPut]
-        public async Task<IActionResult> UpdatePayment()
+        [HttpPut("update/{id}")]
+        public async Task<IActionResult> UpdateCredential(CredentialUpdate req, Guid id)
         {
             try
             {
-                var result = await _paymentService.UpdatePayment();
+                var result = await _credentialService.UpdateCredential(req, id);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -75,12 +77,12 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePayment(Guid id)
+        [HttpDelete("delete/{id}")]
+        public async Task<IActionResult> DeleteCredential(Guid id)
         {
             try
             {
-                var result = await _paymentService.DeletePayment(id);
+                var result = await _credentialService.DeleteCredential(id);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -89,26 +91,12 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPost("create-by-order-id")]
-        public async Task<IActionResult> CreatePaymentByOrderId(Guid orderId)
+        [HttpGet("product/{id}")]
+        public async Task<IActionResult> GetCredentialsByProductId(Guid id)
         {
             try
             {
-                var result = await _paymentService.CreatePaymentByOrderIdCOD(orderId);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-        [Protected]
-        [HttpGet("by-user/{userId}")]
-        public async Task<IActionResult> GetPaymentByUser(Guid userId)
-        {
-            try
-            {
-                var result = await _paymentService.GetPaymentByUser(userId);
+                var result = await _credentialService.GetCredentialsByProductId(id);
                 return Ok(result);
             }
             catch (Exception ex)

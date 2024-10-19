@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KFS.Migrations
 {
     [DbContext(typeof(KFSContext))]
-    [Migration("20241016133205_01")]
+    [Migration("20241019012516_01")]
     partial class _01
     {
         /// <inheritdoc />
@@ -68,7 +68,9 @@ namespace KFS.Migrations
                         .HasColumnType("int");
 
                     b.Property<bool>("IsForSell")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -307,21 +309,78 @@ namespace KFS.Migrations
                     b.ToTable("Consignments");
                 });
 
+            modelBuilder.Entity("KFS.src.Domain.Entities.Credential", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CredentialFile")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("Credentials");
+                });
+
+            modelBuilder.Entity("KFS.src.Domain.Entities.Feedback", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Feedbacks");
+                });
+
             modelBuilder.Entity("KFS.src.Domain.Entities.Media", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("ProductId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Url")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
 
                     b.ToTable("Medias");
                 });
@@ -794,7 +853,9 @@ namespace KFS.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("RoleId")
-                        .HasColumnType("int");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(4);
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -813,7 +874,7 @@ namespace KFS.Migrations
                             CreatedAt = new DateTime(2024, 10, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "giangnnt260703@gmail.com",
                             FullName = "Truong Giang",
-                            Password = "$2a$11$fGoq/2rvFm667qNuSdQu5uwu/RF8YnPHSAHtuWsSipuV0gEGzrrS2",
+                            Password = "$2a$11$oEbnuLTTq8GTwErMVutRheyiCUQgZ3BFfrSIeSXgPBWGnuwxN7xiG",
                             Phone = "0123456789",
                             RoleId = 1,
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -842,10 +903,25 @@ namespace KFS.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("634ec760-84f0-4239-9e2b-3e857e3b5eb0"),
+                            Id = new Guid("6440a4f0-973f-4042-aaaa-cc84bc26f2b9"),
                             Point = 20000,
                             UserId = new Guid("00000000-0000-0000-0000-000000000001")
                         });
+                });
+
+            modelBuilder.Entity("MediaProduct", b =>
+                {
+                    b.Property<Guid>("MediasId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProductsId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("MediasId", "ProductsId");
+
+                    b.HasIndex("ProductsId");
+
+                    b.ToTable("MediaProduct");
                 });
 
             modelBuilder.Entity("PermissionRole", b =>
@@ -1016,7 +1092,7 @@ namespace KFS.Migrations
                     b.HasOne("KFS.src.Domain.Entities.Product", "Product")
                         .WithMany("CartItems")
                         .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Cart");
@@ -1035,13 +1111,34 @@ namespace KFS.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("KFS.src.Domain.Entities.Media", b =>
+            modelBuilder.Entity("KFS.src.Domain.Entities.Credential", b =>
                 {
                     b.HasOne("KFS.src.Domain.Entities.Product", "Product")
-                        .WithMany("Medias")
-                        .HasForeignKey("ProductId");
+                        .WithMany("Credentials")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("KFS.src.Domain.Entities.Feedback", b =>
+                {
+                    b.HasOne("KFS.src.Domain.Entities.Product", "Product")
+                        .WithMany("Feedbacks")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("KFS.src.Domain.Entities.User", "User")
+                        .WithMany("Feedbacks")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("KFS.src.Domain.Entities.Order", b =>
@@ -1066,7 +1163,7 @@ namespace KFS.Migrations
                     b.HasOne("KFS.src.Domain.Entities.Product", "Product")
                         .WithMany("OrderItems")
                         .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Order");
@@ -1084,7 +1181,8 @@ namespace KFS.Migrations
 
                     b.HasOne("KFS.src.Domain.Entities.Consignment", "Consignment")
                         .WithOne("Product")
-                        .HasForeignKey("KFS.src.Domain.Entities.Product", "ConsignmentId");
+                        .HasForeignKey("KFS.src.Domain.Entities.Product", "ConsignmentId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Category");
 
@@ -1107,7 +1205,7 @@ namespace KFS.Migrations
                     b.HasOne("KFS.src.Domain.Entities.Role", "Role")
                         .WithMany("Users")
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Role");
@@ -1122,6 +1220,21 @@ namespace KFS.Migrations
                         .IsRequired();
 
                     b.Navigation("Owner");
+                });
+
+            modelBuilder.Entity("MediaProduct", b =>
+                {
+                    b.HasOne("KFS.src.Domain.Entities.Media", null)
+                        .WithMany()
+                        .HasForeignKey("MediasId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("KFS.src.Domain.Entities.Product", null)
+                        .WithMany()
+                        .HasForeignKey("ProductsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("PermissionRole", b =>
@@ -1159,7 +1272,7 @@ namespace KFS.Migrations
                     b.HasOne("KFS.src.Domain.Entities.Consignment", "Consignment")
                         .WithOne("Payment")
                         .HasForeignKey("KFS.src.Domain.Entities.PaymentConsignment", "ConsignmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Consignment");
@@ -1210,7 +1323,9 @@ namespace KFS.Migrations
 
                     b.Navigation("CartItems");
 
-                    b.Navigation("Medias");
+                    b.Navigation("Credentials");
+
+                    b.Navigation("Feedbacks");
 
                     b.Navigation("OrderItems");
                 });
@@ -1225,6 +1340,8 @@ namespace KFS.Migrations
                     b.Navigation("Carts");
 
                     b.Navigation("Consignments");
+
+                    b.Navigation("Feedbacks");
 
                     b.Navigation("Orders");
 

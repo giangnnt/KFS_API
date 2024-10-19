@@ -27,35 +27,35 @@ namespace KFS.src.Application.Controller
             return Ok(response);
         }
         [Protected]
-        [HttpPost("create-consignment")]
+        [HttpPost("create")]
         public async Task<IActionResult> CreateConsignment([FromBody] ConsignmentCreate req)
         {
             var response = await _consignmentService.CreateConsignment(req);
             return Ok(response);
         }
         [Protected]
-        [HttpPut("update-consignment/{id}")]
+        [HttpPut("update/{id}")]
         public async Task<IActionResult> UpdateConsignment(Guid id)
         {
             var response = await _consignmentService.UpdateConsignment(id);
             return Ok(response);
         }
         [Protected]
-        [HttpDelete("delete-consignment/{id}")]
+        [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteConsignment(Guid id)
         {
             var response = await _consignmentService.DeleteConsignment(id);
             return Ok(response);
         }
         [Protected]
-        [HttpGet("get-consignments")]
+        [HttpGet("all")]
         public async Task<IActionResult> GetConsignments()
         {
             var response = await _consignmentService.GetConsignments();
             return Ok(response);
         }
         [Protected]
-        [HttpGet("get-consignment-by-id/{id}")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetConsignmentById(Guid id)
         {
             var response = await _consignmentService.GetConsignmentById(id);

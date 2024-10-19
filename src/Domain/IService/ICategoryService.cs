@@ -15,5 +15,6 @@ namespace KFS.src.Domain.IService
         Task<ResponseDto> UpdateCategory(CategoryUpdate category, Guid id);
         Task<ResponseDto> DeleteCategory(Guid id);
         Task<ResponseDto> GetCategoryById(Guid id);
+        Task<ResponseDto> GetProductByCategory(Guid id);
     }
 }

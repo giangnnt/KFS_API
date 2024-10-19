@@ -88,5 +88,18 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
+        [HttpGet("product/{id}")]
+        public async Task<IActionResult> GetProductByCategory(Guid id)
+        {
+            try
+            {
+                var result = await _categoryService.GetProductByCategory(id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

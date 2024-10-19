@@ -99,6 +99,41 @@ namespace KFS.src.Application.Service
             }
         }
 
+        public async Task<ResponseDto> GetProductByCategory(Guid id)
+        {
+            var response = new ResponseDto();
+            try
+            {
+                var category = await _categoryRepository.GetCategoryById(id);
+                var mappedCategory = _mapper.Map<CategoryDto>(category);
+                if (mappedCategory != null)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Category found";
+                    response.IsSuccess = true;
+                    response.Result = new ResultDto
+                    {
+                        Data = mappedCategory
+                    };
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Category not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
+            }
+        }
+
         public Task<ResponseDto> UpdateCategory(CategoryUpdate category, Guid id)
         {
             throw new NotImplementedException();

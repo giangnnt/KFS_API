@@ -18,5 +18,6 @@ namespace KFS.src.Domain.IService
         Task<ResponseDto> EvaluateConsignment(bool isApproved, Guid id);
         Task<ResponseDto> PayForConsignment(Guid id);
         Task<ResponseDto> GetResponsePaymentUrl();
+        Task<ResponseDto> GetConsignmentByUserId(Guid userId);
     }
 }

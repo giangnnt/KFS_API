@@ -108,9 +108,12 @@ namespace KFS.src.Application.Service
                     return response;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
 
@@ -254,9 +257,12 @@ namespace KFS.src.Application.Service
                 }
 
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
 
@@ -289,9 +295,12 @@ namespace KFS.src.Application.Service
                     return response;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
 
@@ -333,9 +342,12 @@ namespace KFS.src.Application.Service
                     return response;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
 
@@ -365,9 +377,12 @@ namespace KFS.src.Application.Service
                     return response;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
 
@@ -397,9 +412,12 @@ namespace KFS.src.Application.Service
                     return response;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
 
@@ -433,9 +451,12 @@ namespace KFS.src.Application.Service
                 };
                 return response;
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
 
@@ -555,9 +576,12 @@ namespace KFS.src.Application.Service
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
         protected async Task SetStatusConsignment(ConsignmentStatusEnum status, Guid id)
@@ -606,9 +630,10 @@ namespace KFS.src.Application.Service
                 }
 
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                Console.WriteLine(ex.Message);
+                return;
             }
         }
         protected async Task JobExpireConsignment(Guid consignmentId)
@@ -617,9 +642,46 @@ namespace KFS.src.Application.Service
             {
                 await SetStatusConsignment(ConsignmentStatusEnum.Expired, consignmentId);
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                Console.WriteLine(ex.Message);
+                return;
+            }
+        }
+
+        public async Task<ResponseDto> GetConsignmentByUserId(Guid userId)
+        {
+            var response = new ResponseDto();
+            try
+            {
+                var consignments = await _consignmentRepository.GetConsignments();
+                consignments = consignments.Where(x => x.UserId == userId).ToList();
+                var mappedConsignment = _mapper.Map<List<ConsignmentDto>>(consignments);
+                if (consignments != null && consignments.Count() > 0)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Consignments found";
+                    response.IsSuccess = true;
+                    response.Result = new ResultDto
+                    {
+                        Data = mappedConsignment
+                    };
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 404;
+                    response.Message = "No consignment found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
     }

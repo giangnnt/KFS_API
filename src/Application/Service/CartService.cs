@@ -120,9 +120,12 @@ namespace KFS.src.Application.Service
                     return response;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
 
@@ -209,9 +212,12 @@ namespace KFS.src.Application.Service
                 }
 
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
 
@@ -291,9 +297,12 @@ namespace KFS.src.Application.Service
                     return response;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
 
@@ -318,9 +327,12 @@ namespace KFS.src.Application.Service
                     return response;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
 
@@ -333,7 +345,7 @@ namespace KFS.src.Application.Service
                 var mappedCart = _mapper.Map<CartDto>(cart);
                 //map by format
                 await GetCartFormat(mappedCart);
-                
+
                 if (cart != null)
                 {
                     response.StatusCode = 200;
@@ -353,9 +365,12 @@ namespace KFS.src.Application.Service
                     return response;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
         public async Task GetCartFormat(CartDto mappedCart)
@@ -423,9 +438,12 @@ namespace KFS.src.Application.Service
                     return response;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
 
@@ -483,9 +501,12 @@ namespace KFS.src.Application.Service
                     return response;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
 
@@ -544,9 +565,12 @@ namespace KFS.src.Application.Service
                     return response;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
 
@@ -600,9 +624,49 @@ namespace KFS.src.Application.Service
                     return response;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
+            }
+        }
+
+        public async Task<ResponseDto> GetCartByUserId(Guid userId)
+        {
+            var response = new ResponseDto();
+            try
+            {
+                var cart = _cartRepository.GetCartByUserId(userId);
+                var mappedCart = _mapper.Map<CartDto>(cart);
+                //map by format
+                await GetCartFormat(mappedCart);
+                if (mappedCart != null)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Cart found";
+                    response.IsSuccess = true;
+                    response.Result = new ResultDto
+                    {
+                        Data = mappedCart
+                    };
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Cart not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
             }
         }
     }

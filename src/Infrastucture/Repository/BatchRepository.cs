@@ -32,12 +32,16 @@ namespace KFS.src.Infrastucture.Repository
 
         public async Task<List<Batch>> GetAllBatches()
         {
-            return await _context.Batches.ToListAsync();
+            return await _context.Batches
+            .Include(x => x.Promotions)
+            .ToListAsync();
         }
 
         public async Task<Batch> GetBatchById(Guid id)
         {
-            return await _context.Batches.FindAsync(id) ?? throw new Exception("Batch not found");
+            return await _context.Batches
+            .Include(x => x.Promotions)
+            .FirstOrDefaultAsync(x => x.Id == id) ?? throw new Exception("Batch not found");
         }
 
         public async Task<bool> UpdateBatch(Batch batch)
