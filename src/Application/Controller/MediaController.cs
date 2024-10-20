@@ -17,7 +17,8 @@ namespace KFS.src.Application.Controller
     public class MediaController : ControllerBase
     {
         
-            private readonly IMediaService _mediaService;
+        private readonly IMediaService _mediaService;
+        public MediaController(IMediaService mediaService)
 
             public MediaController(IMediaService merService)
             {
@@ -73,26 +74,30 @@ namespace KFS.src.Application.Controller
                     return Ok(result);
                 }
                 catch (Exception ex)
-                {
+        {
+            _mediaService = mediaService;
                     return BadRequest(ex.Message);
                 }
-            }
-            [Protected]
+        }
+        [Protected]
+        [HttpPost("upload")]
+        public async Task<IActionResult> UploadMedia([FromForm] IFormFile file, [FromForm] string type)
             [HttpDelete("delete/{id}")]
             public async Task<IActionResult> DeleteMedia(Guid id)
+        {
+            try
             {
-                try
-                {
+                var result = await _mediaService.UploadMedia(file, type);
                     var result = await _mediaService.Delete(id);
-                    return Ok(result);
-                }
-                catch (Exception ex)
-                {
-                    return BadRequest(ex.Message);
-                }
+                return Ok(result);
             }
-          
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
+          
+    }
+}
     
 
