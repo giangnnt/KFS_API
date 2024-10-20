@@ -1,5 +1,6 @@
 using Hangfire;
 using KFS.src.Application.Core;
+using KFS.src.Application.Core;
 using KFS.src.Application.Core.Crypto;
 using KFS.src.Application.Core.Jwt;
 using KFS.src.Application.Service;
@@ -72,6 +73,9 @@ builder.Services.AddScoped<ICategoryService,CategoryService>();
 builder.Services.AddScoped<IBatchService, BatchService>();
 builder.Services.AddScoped<IGCService, GCService>();
 builder.Services.AddScoped<ICredentialService, CredentialService>();
+builder.Services.AddScoped<IGCService, GCService>();
+builder.Services.AddScoped<ICredentialService, CredentialService>();
+builder.Services.AddScoped<IMediaService, MediaService>();
 // Add Mapper
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddEndpointsApiExplorer();
