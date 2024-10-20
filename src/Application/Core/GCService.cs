@@ -23,8 +23,8 @@ namespace KFS.src.Application.Core
             // Initialize the Google Cloud Storage client
             string credentialsPath = "firebase.json"; // Replace with your Service Account Key path
 
-            var credentials = GoogleCredential.FromFile(credentialsPath);
-            StorageClient = StorageClient.Create(credentials);
+            //var credentials = GoogleCredential.FromFile(credentialsPath);
+            //StorageClient = StorageClient.Create(credentials);
             BucketName = PROJECT_ID + ".appspot.com"; // Default Firebase Storage bucket
             FilePrefix = "https://storage.googleapis.com/" + BucketName + "/";
         }
