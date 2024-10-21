@@ -1,12 +1,9 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
-using KFS.src.Application.Dto.MediaDtos;
-using KFS.src.Application.Dto.ProductDtos;
-
+using KFS.src.Application.Dto.FeedbackDtos;
 using KFS.src.Application.Middleware;
 using KFS.src.Domain.IService;
 using Microsoft.AspNetCore.Mvc;
@@ -15,22 +12,22 @@ namespace KFS.src.Application.Controller
 {
     [Produces("application/json")]
     [ApiController]
-    [Route("api/media")]
-    public class MediaController : ControllerBase
+    [Route("api/feedback")]
+    public class FeedbackController : ControllerBase
     {
+        private readonly IFeedbackService _feedbackService;
 
-        private readonly IMediaService _mediaService;
-
-        public MediaController(IMediaService merService)
+        public FeedbackController(IFeedbackService feedbackService)
         {
-            _mediaService = merService;
+            _feedbackService = feedbackService;
         }
+
         [HttpGet("all")]
-        public async Task<IActionResult> GetMedia()
+        public async Task<IActionResult> GetAll()
         {
             try
             {
-                var result = await _mediaService.GetMedias();
+                var result = await _feedbackService.GetAll();
                 return Ok(result);
             }
             catch (Exception ex)
@@ -38,12 +35,13 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
+
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetMediaById(Guid id)
+        public async Task<IActionResult> GetFeedbackById(Guid id)
         {
             try
             {
-                var result = await _mediaService.GetMediaById(id);
+                var result = await _feedbackService.GetFeedbackById(id);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -51,13 +49,14 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
+
         [Protected]
         [HttpPost("create")]
-        public async Task<IActionResult> CreateProduct([FromBody] MediaCreate req)
+        public async Task<IActionResult> CreateFeedback([FromBody] FeedbackCreate req)
         {
             try
             {
-                var result = await _mediaService.Create(req);
+                var result = await _feedbackService.Create(req);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -65,13 +64,14 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
+
         [Protected]
         [HttpPut("update/{id}")]
-        public async Task<IActionResult> UpdateProduct([FromBody] MediaUpdate req, Guid id)
+        public async Task<IActionResult> UpdateFeedback([FromBody] FeedbackUpdate req, Guid id)
         {
             try
             {
-                var result = await _mediaService.Update(id, req);
+                var result = await _feedbackService.Update(id, req);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -79,13 +79,14 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
+
         [Protected]
         [HttpDelete("delete/{id}")]
-        public async Task<IActionResult> DeleteMedia(Guid id)
+        public async Task<IActionResult> DeleteFeedback(Guid id)
         {
             try
             {
-                var result = await _mediaService.Delete(id);
+                var result = await _feedbackService.Delete(id);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -93,27 +94,5 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
-
-
-
-
-
-
-        [Protected]
-        [HttpPost("upload")]
-        public async Task<IActionResult> UploadMedia([FromForm] IFormFile file, [FromForm] string type)
-        {
-            try
-            {
-                var result = await _mediaService.UploadMedia(file, type);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-
     }
 }
