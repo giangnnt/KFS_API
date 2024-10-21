@@ -50,6 +50,16 @@ namespace KFS.src.Infrastucture.Repository
             .ToListAsync();
         }
 
+        public async Task<IEnumerable<Consignment>> GetConsignmentsByUserId(Guid userId)
+        {
+            return await _context.Consignments
+            .Include(x => x.Product)
+            .ThenInclude(x => x.Category)
+            .Include(x => x.User)
+            .Where(x => x.UserId == userId)
+            .ToListAsync();
+        }
+
         public async Task<bool> UpdateConsignment(Consignment consignment)
         {
             _context.Consignments.Update(consignment);

@@ -16,5 +16,6 @@ namespace KFS.src.Domain.IService
         Task<ResponseDto> DeletePayment(Guid id);
         Task<ResponseDto> CreatePaymentByOrderIdCOD(Guid orderId);
         Task<ResponseDto> GetPaymentByUser(Guid userId);
+        Task<ResponseDto> GetOwnPayment();
     }
 }

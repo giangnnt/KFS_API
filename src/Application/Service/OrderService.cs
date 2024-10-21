@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using KFS.src.Application.Core.Jwt;
 using KFS.src.Application.Dto.BatchDtos;
 using KFS.src.Application.Dto.OrderDtos;
 using KFS.src.Application.Dto.ProductDtos;
@@ -605,6 +606,61 @@ namespace KFS.src.Application.Service
         public Task<ResponseDto> CreateOrderOffline(OrderCreateOffline req)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<ResponseDto> GetOwnOrder()
+        {
+            var response = new ResponseDto();
+            try
+            {
+                var HttpContext = _httpContextAccessor.HttpContext;
+                if (HttpContext == null)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "HttpContext is null";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                var payload = HttpContext.Items["payload"] as Payload;
+                if (payload == null)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Payload is null";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                var userId = payload.UserId;
+                var orders = await _orderRepository.GetOrderByUserId(userId);
+                var mappedOrders = _mapper.Map<List<OrderDto>>(orders);
+                //map by format
+                await GetOrdersFormat(mappedOrders);
+
+                if (orders != null && orders.Count() > 0)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Orders found";
+                    response.Result = new ResultDto
+                    {
+                        Data = mappedOrders
+                    };
+                    response.IsSuccess = true;
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Orders not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
+            }
         }
     }
 }

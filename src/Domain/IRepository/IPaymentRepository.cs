@@ -13,5 +13,6 @@ namespace KFS.src.Domain.IRepository
         Task<Payment> GetPaymentById(Guid id);
         Task<bool> UpdatePayment(Payment payment);
         Task<bool> DeletePayment(Payment payment);
+        Task<IEnumerable<Payment>> GetPaymentsByUserId(Guid userId);
     }
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using KFS.src.Application.Dto.BatchDtos;
 using KFS.src.Application.Dto.CategoryDtos;
+using KFS.src.Application.Dto.MediaDtos;
 using KFS.src.Application.Dto.PromotionDtos;
 using KFS.src.Application.Enum;
 using KFS.src.Domain.Entities;
@@ -34,7 +35,7 @@ namespace KFS.src.Application.Dto.ProductDtos
         public DateTime UpdatedAt { get; set; }
         public List<BatchDto>? Batches { get; set; }
         public List<PromotionDto>? Promotions { get; set; }
-        public List<Media>? Medias { get; set; }
+        public List<MediaDto>? Medias { get; set; }
     }
     public class ProductProfile : Profile
     {

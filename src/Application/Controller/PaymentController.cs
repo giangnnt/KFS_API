@@ -116,5 +116,19 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
+        [Protected]
+        [HttpGet("get-own-payment")]
+        public async Task<IActionResult> GetOwnPayment()
+        {
+            try
+            {
+                var result = await _paymentService.GetOwnPayment();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

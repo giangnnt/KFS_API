@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KFS.Migrations
 {
     [DbContext(typeof(KFSContext))]
-    [Migration("20241019012516_01")]
+    [Migration("20241021040559_01")]
     partial class _01
     {
         /// <inheritdoc />
@@ -53,6 +53,21 @@ namespace KFS.Migrations
                     b.HasIndex("PromotionsId");
 
                     b.ToTable("CategoryPromotion");
+                });
+
+            modelBuilder.Entity("CredentialMedia", b =>
+                {
+                    b.Property<Guid>("CredentialsId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("MediasId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("CredentialsId", "MediasId");
+
+                    b.HasIndex("MediasId");
+
+                    b.ToTable("CredentialMedia");
                 });
 
             modelBuilder.Entity("KFS.src.Domain.Entities.Batch", b =>
@@ -371,13 +386,15 @@ namespace KFS.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Url")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -874,7 +891,7 @@ namespace KFS.Migrations
                             CreatedAt = new DateTime(2024, 10, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "giangnnt260703@gmail.com",
                             FullName = "Truong Giang",
-                            Password = "$2a$11$oEbnuLTTq8GTwErMVutRheyiCUQgZ3BFfrSIeSXgPBWGnuwxN7xiG",
+                            Password = "$2a$11$U2BLelaBEJzrvFxO9Ca6Gej6lyzkesTTTsXVhRa.wZW2QpTmHgqAG",
                             Phone = "0123456789",
                             RoleId = 1,
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -903,7 +920,7 @@ namespace KFS.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("6440a4f0-973f-4042-aaaa-cc84bc26f2b9"),
+                            Id = new Guid("5f81940e-d1f8-400c-8e7a-5da21a175eaa"),
                             Point = 20000,
                             UserId = new Guid("00000000-0000-0000-0000-000000000001")
                         });
@@ -1055,6 +1072,21 @@ namespace KFS.Migrations
                     b.HasOne("KFS.src.Domain.Entities.Promotion", null)
                         .WithMany()
                         .HasForeignKey("PromotionsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("CredentialMedia", b =>
+                {
+                    b.HasOne("KFS.src.Domain.Entities.Credential", null)
+                        .WithMany()
+                        .HasForeignKey("CredentialsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("KFS.src.Domain.Entities.Media", null)
+                        .WithMany()
+                        .HasForeignKey("MediasId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

@@ -13,5 +13,6 @@ namespace KFS.src.Domain.Entities
         public string? CredentialFile { get; set; }
         public Guid ProductId { get; set; }
         public Product Product { get; set; } = null!;
+        public List<Media> Medias { get; set; } = new List<Media>();
     }
 }

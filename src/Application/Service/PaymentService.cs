@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using KFS.src.Application.Core.Jwt;
 using KFS.src.Application.Dto.PaymentDtos;
 using KFS.src.Application.Dto.ResponseDtos;
 using KFS.src.Application.Enum;
@@ -20,7 +21,8 @@ namespace KFS.src.Application.Service
         private readonly IProductRepository _productRepository;
         private readonly IShipmentRepository _shipmentRepository;
         private readonly IMapper _mapper;
-        public PaymentService(IPaymentRepository paymentRepository, IOrderRepository orderRepository, ICartRepository cartRepository, IProductRepository productRepository, IShipmentRepository shipmentRepository, IMapper mapper)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public PaymentService(IPaymentRepository paymentRepository, IOrderRepository orderRepository, ICartRepository cartRepository, IProductRepository productRepository, IShipmentRepository shipmentRepository, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             _paymentRepository = paymentRepository;
             _orderRepository = orderRepository;
@@ -28,6 +30,7 @@ namespace KFS.src.Application.Service
             _productRepository = productRepository;
             _shipmentRepository = shipmentRepository;
             _mapper = mapper;
+            _httpContextAccessor = httpContextAccessor;
         }
         public Task<ResponseDto> CreatePayment()
         {
@@ -167,6 +170,63 @@ namespace KFS.src.Application.Service
                 response.IsSuccess = false;
                 return response;
             }
+        }
+
+        public async Task<ResponseDto> GetOwnPayment()
+        {
+            var response = new ResponseDto();
+            try
+            {
+                var httpContext = _httpContextAccessor.HttpContext;
+                // check httpContext
+                if (httpContext == null)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Http context is required";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                // get payload
+                var payload = httpContext.Items["payload"] as Payload;
+                // check payload
+                if (payload == null)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Payload is required";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                // get userId
+                var userId = payload.UserId;
+                var payments = await _paymentRepository.GetPaymentsByUserId(userId);
+                var mappedPayments = _mapper.Map<IEnumerable<PaymentDto>>(payments);
+                if (payments != null && payments.Count() > 0)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Payments found";
+                    response.IsSuccess = true;
+                    response.Result = new ResultDto
+                    {
+                        Data = mappedPayments
+                    };
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Payments not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
+            }
+
         }
 
         public async Task<ResponseDto> GetPaymentById(Guid id)

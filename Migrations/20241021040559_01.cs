@@ -32,8 +32,8 @@ namespace KFS.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Url = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Type = table.Column<int>(type: "int", nullable: false),
+                    Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -563,6 +563,30 @@ namespace KFS.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "CredentialMedia",
+                columns: table => new
+                {
+                    CredentialsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    MediasId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CredentialMedia", x => new { x.CredentialsId, x.MediasId });
+                    table.ForeignKey(
+                        name: "FK_CredentialMedia_Credentials_CredentialsId",
+                        column: x => x.CredentialsId,
+                        principalTable: "Credentials",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CredentialMedia_Medias_MediasId",
+                        column: x => x.MediasId,
+                        principalTable: "Medias",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.InsertData(
                 table: "Categories",
                 columns: new[] { "Id", "Description", "Image", "Name" },
@@ -630,7 +654,7 @@ namespace KFS.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "Address", "Avatar", "CreatedAt", "Email", "FullName", "Password", "Phone", "RoleId", "UpdatedAt" },
-                values: new object[] { new Guid("00000000-0000-0000-0000-000000000001"), "HCM", null, new DateTime(2024, 10, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), "giangnnt260703@gmail.com", "Truong Giang", "$2a$11$oEbnuLTTq8GTwErMVutRheyiCUQgZ3BFfrSIeSXgPBWGnuwxN7xiG", "0123456789", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
+                values: new object[] { new Guid("00000000-0000-0000-0000-000000000001"), "HCM", null, new DateTime(2024, 10, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), "giangnnt260703@gmail.com", "Truong Giang", "$2a$11$U2BLelaBEJzrvFxO9Ca6Gej6lyzkesTTTsXVhRa.wZW2QpTmHgqAG", "0123456789", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
 
             migrationBuilder.InsertData(
                 table: "Batches",
@@ -658,7 +682,7 @@ namespace KFS.Migrations
             migrationBuilder.InsertData(
                 table: "Wallets",
                 columns: new[] { "Id", "Point", "UserId" },
-                values: new object[] { new Guid("6440a4f0-973f-4042-aaaa-cc84bc26f2b9"), 20000, new Guid("00000000-0000-0000-0000-000000000001") });
+                values: new object[] { new Guid("5f81940e-d1f8-400c-8e7a-5da21a175eaa"), 20000, new Guid("00000000-0000-0000-0000-000000000001") });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Batches_ProductId",
@@ -694,6 +718,11 @@ namespace KFS.Migrations
                 name: "IX_Consignments_UserId",
                 table: "Consignments",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CredentialMedia_MediasId",
+                table: "CredentialMedia",
+                column: "MediasId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Credentials_ProductId",
@@ -804,7 +833,7 @@ namespace KFS.Migrations
                 name: "CategoryPromotion");
 
             migrationBuilder.DropTable(
-                name: "Credentials");
+                name: "CredentialMedia");
 
             migrationBuilder.DropTable(
                 name: "Feedbacks");
@@ -835,6 +864,9 @@ namespace KFS.Migrations
 
             migrationBuilder.DropTable(
                 name: "Carts");
+
+            migrationBuilder.DropTable(
+                name: "Credentials");
 
             migrationBuilder.DropTable(
                 name: "Medias");

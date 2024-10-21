@@ -58,6 +58,13 @@ namespace KFS.src.Infrastucture.Repository
             return allPayments;
         }
 
+        public async Task<IEnumerable<Payment>> GetPaymentsByUserId(Guid userId)
+        {
+            return await _context.Payments
+                .Where(x => x.UserId == userId)
+                .ToListAsync();
+        }
+
         public async Task<bool> UpdatePayment(Payment payment)
         {
             _context.Update(payment);
