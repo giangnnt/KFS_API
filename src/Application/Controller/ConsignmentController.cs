@@ -82,5 +82,12 @@ namespace KFS.src.Application.Controller
             var response = await _consignmentService.GetResponsePaymentUrl();
             return Ok(response);
         }
+        [Protected]
+        [HttpGet("get-consignment-by-user-id/{userId}")]
+        public async Task<IActionResult> GetConsignmentByUserId(Guid userId)
+        {
+            var response = await _consignmentService.GetConsignmentByUserId(userId);
+            return Ok(response);
+        }
     }
 }

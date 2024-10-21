@@ -97,12 +97,11 @@ namespace KFS.src.Infrastucture.Repository
         public async Task<bool> UpdateProductPromotion(Promotion promotion, List<Product> product)
         {
             // get and remove product
-            for (int i = promotion.Products.Count - 1; i >= 0; i--)
+            for (int i = 0; i < promotion.Products.Count; i++)
             {
-                var item = promotion.Products[i];
-                if (!product.Contains(item))
+                if (!product.Contains(promotion.Products[i]))
                 {
-                    promotion.Products.Remove(item);
+                    promotion.Products.RemoveAt(i);
                 }
             }
             // add new product

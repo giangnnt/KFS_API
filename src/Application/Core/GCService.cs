@@ -10,6 +10,7 @@ namespace KFS.src.Application.Core
     public interface IGCService
     {
         Task<string?> UploadFileAsync(Stream fileStream, string destinationFileName, string contentType);
+        Task<bool> DeleteFileAsync(string fileUrl);
     }
     public class GCService : IGCService
     {
@@ -50,6 +51,25 @@ namespace KFS.src.Application.Core
                 // Handle any exceptions that may occur during the upload
                 Console.WriteLine($"Error uploading file: {ex.Message}");
                 return null;
+            }
+        }
+        public async Task<bool> DeleteFileAsync(string fileUrl)
+        {
+            try
+            {
+                // Get the file name from the file URL
+                var fileName = fileUrl.Replace(FilePrefix, "");
+
+                // Delete the file from Firebase Storage
+                await StorageClient.DeleteObjectAsync(BucketName, fileName);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // Handle any exceptions that may occur during the delete
+                Console.WriteLine($"Error deleting file: {ex.Message}");
+                return false;
             }
         }
     }

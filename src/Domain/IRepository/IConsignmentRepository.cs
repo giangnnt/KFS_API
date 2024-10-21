@@ -13,5 +13,6 @@ namespace KFS.src.Domain.IRepository
         Task<bool> DeleteConsignment(Consignment consignment);
         Task<Consignment> GetConsignmentById(Guid id);
         Task<IEnumerable<Consignment>> GetConsignments();
+        Task<IEnumerable<Consignment>> GetConsignmentsByUserId(Guid userId);
     }
 }

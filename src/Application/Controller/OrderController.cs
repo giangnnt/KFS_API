@@ -132,5 +132,33 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
+        [Protected]
+        [HttpPost("create-offline")]
+        public async Task<IActionResult> CreateOrderOffline(OrderCreateOffline req)
+        {
+            try
+            {
+                var result = await _orderService.CreateOrderOffline(req);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [Protected]
+        [HttpGet("get-own-order")]
+        public async Task<IActionResult> GetOwnOrder()
+        {
+            try
+            {
+                var result = await _orderService.GetOwnOrder();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

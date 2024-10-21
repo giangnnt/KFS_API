@@ -684,5 +684,56 @@ namespace KFS.src.Application.Service
                 return response;
             }
         }
+
+        public async Task<ResponseDto> GetOwnConsignment()
+        {
+            var response = new ResponseDto();
+            try
+            {
+                var httpContext = _httpContextAccessor.HttpContext;
+                if (httpContext == null)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Unauthorized";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                var payload = httpContext.Items["payload"] as Payload;
+                if (payload == null)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Unauthorized";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                var consignments = await _consignmentRepository.GetConsignmentsByUserId(payload.UserId);
+                var mappedConsignment = _mapper.Map<List<ConsignmentDto>>(consignments);
+                if (consignments != null && consignments.Count() > 0)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Consignments found";
+                    response.IsSuccess = true;
+                    response.Result = new ResultDto
+                    {
+                        Data = mappedConsignment
+                    };
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 404;
+                    response.Message = "No consignment found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
+            }
+        }
     }
 }

@@ -1,6 +1,5 @@
 using Hangfire;
 using KFS.src.Application.Core;
-using KFS.src.Application.Core;
 using KFS.src.Application.Core.Crypto;
 using KFS.src.Application.Core.Jwt;
 using KFS.src.Application.Service;
@@ -56,6 +55,7 @@ builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
 builder.Services.AddScoped<ICategoryRepository,CategoryRepository>();
 builder.Services.AddScoped<IWalletRepository, WalletRepository>();
 builder.Services.AddScoped<ICredentialRepositoty, CredentialRepository>();
+builder.Services.AddScoped<IMediaRepository, MediaRepository>();
 // Add Service 
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICartService, CartService>();

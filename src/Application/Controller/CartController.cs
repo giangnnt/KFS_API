@@ -165,5 +165,19 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
+        [Protected]
+        [HttpGet("own-cart")]
+        public async Task<IActionResult> GetOwnCart()
+        {
+            try
+            {
+                var result = await _cartService.GetOwnCart();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
