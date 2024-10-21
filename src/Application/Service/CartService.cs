@@ -696,18 +696,18 @@ namespace KFS.src.Application.Service
                 }
                 // get userId
                 var userId = payload.UserId;
-                var cart = _cartRepository.GetCartByUserId(userId);
-                var mappedCart = _mapper.Map<CartDto>(cart);
+                var carts = await _cartRepository.GetCartByUserId(userId);
+                var mappedCarts = _mapper.Map<List<CartDto>>(carts);
                 //map by format
-                await GetCartFormat(mappedCart);
-                if (mappedCart != null)
+                await GetCartsFormat(mappedCarts);
+                if (mappedCarts != null)
                 {
                     response.StatusCode = 200;
                     response.Message = "Cart found";
                     response.IsSuccess = true;
                     response.Result = new ResultDto
                     {
-                        Data = mappedCart
+                        Data = mappedCarts
                     };
                     return response;
                 }

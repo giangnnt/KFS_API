@@ -621,7 +621,7 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
                     return response;
                 }
-                var payload = HttpContext.Items["Payload"] as Payload;
+                var payload = HttpContext.Items["payload"] as Payload;
                 if (payload == null)
                 {
                     response.StatusCode = 400;

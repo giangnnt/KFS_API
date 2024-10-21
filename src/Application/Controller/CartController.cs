@@ -166,7 +166,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpGet("own-cart")]
+        [HttpGet("get-own-cart")]
         public async Task<IActionResult> GetOwnCart()
         {
             try
