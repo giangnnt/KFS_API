@@ -6,6 +6,7 @@ using KFS.src.Application.Constant;
 using KFS.src.Application.Dto.OrderDtos;
 using KFS.src.Application.Enum;
 using KFS.src.Application.Middleware;
+using KFS.src.Domain.Entities;
 using KFS.src.Domain.IService;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,11 +24,11 @@ namespace KFS.src.Application.Controller
         }
         [Protected]
         [HttpGet("all")]
-        public async Task<IActionResult> GetOrders()
+        public async Task<IActionResult> GetOrders(OrderQuery req)
         {
             try
             {
-                var result = await _orderService.GetOrders();
+                var result = await _orderService.GetOrders(req);
                 return Ok(result);
             }
             catch (Exception ex)

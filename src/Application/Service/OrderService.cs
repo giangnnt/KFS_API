@@ -16,6 +16,7 @@ using KFS.src.Domain.IService;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.VisualBasic;
+using static KFS.src.Application.Dto.Pagination.Pagination;
 
 namespace KFS.src.Application.Service
 {
@@ -486,23 +487,29 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public async Task<ResponseDto> GetOrders()
+        public async Task<ResponseDto> GetOrders(OrderQuery req)
         {
             var response = new ResponseDto();
             try
             {
-                var orders = await _orderRepository.GetOrders();
+                var orders = await _orderRepository.GetOrders(req);
                 var mappedOrders = _mapper.Map<List<OrderDto>>(orders);
                 //map by format
                 await GetOrdersFormat(mappedOrders);
 
-                if (orders != null && orders.Count() > 0)
+                if (orders != null && orders.List.Count() > 0)
                 {
                     response.StatusCode = 200;
                     response.Message = "Orders found";
                     response.Result = new ResultDto
                     {
-                        Data = mappedOrders
+                        Data = mappedOrders,
+                        PaginationResp = new PaginationResp
+                        {
+                            Page = req.Page,
+                            PageSize = req.PageSize,
+                            Total = orders.Total
+                        }
                     };
                     response.IsSuccess = true;
                     return response;

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using KFS.src.Application.Dto.PaymentDtos;
 using KFS.src.Application.Middleware;
 using KFS.src.Domain.IService;
 using Microsoft.AspNetCore.Mvc;
@@ -20,11 +21,11 @@ namespace KFS.src.Application.Controller
         }
         [Protected]
         [HttpGet]
-        public async Task<IActionResult> GetPayments()
+        public async Task<IActionResult> GetPayments(PaymentQuery paymentQuery)
         {
             try
             {
-                var result = await _paymentService.GetPayments();
+                var result = await _paymentService.GetPayments(paymentQuery);
                 return Ok(result);
             }
             catch (Exception ex)
