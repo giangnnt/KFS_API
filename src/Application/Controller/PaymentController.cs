@@ -61,20 +61,6 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPut]
-        public async Task<IActionResult> UpdatePayment()
-        {
-            try
-            {
-                var result = await _paymentService.UpdatePayment();
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-        [Protected]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePayment(Guid id)
         {

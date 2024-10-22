@@ -37,4 +37,9 @@ namespace KFS.src.Domain.Entities
         public List<Credential> Credentials { get; set; } = new List<Credential>();
         public List<Feedback> Feedbacks { get; set; } = new List<Feedback>();
     }
+    public class ProductResponse
+    {
+        public IEnumerable<Product> Products { get; set; } = new List<Product>();
+        public int Total { get; set; }
+    }
 }

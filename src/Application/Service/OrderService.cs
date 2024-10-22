@@ -13,6 +13,7 @@ using KFS.src.Application.Enum;
 using KFS.src.Domain.Entities;
 using KFS.src.Domain.IRepository;
 using KFS.src.Domain.IService;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.VisualBasic;
 
@@ -270,11 +271,13 @@ namespace KFS.src.Application.Service
                     var wallet = await _walletRepository.GetWalletByUserId(payment.UserId);
                     //create payment
                     var result = await _paymentRepository.CreatePayment(payment);
+                    var listCredential = new List<Credential>();
                     if (result)
                     {
                         await _walletRepository.AddPoint(wallet.Id, (int)payment.Amount * 5 / 100);
                         foreach (var c in carts)
                         {
+                            //deactive cart
                             if (c.Status == CartStatusEnum.Active)
                             {
                                 c.Status = CartStatusEnum.Completed;
@@ -283,13 +286,23 @@ namespace KFS.src.Application.Service
                         }
                         foreach (var orderItem in order.OrderItems)
                         {
+                            //update inventory
                             var product = await _productRepository.GetProductById(orderItem.ProductId);
                             product.Inventory -= orderItem.Quantity;
                             await _productRepository.UpdateProduct(product);
+                            //get credential
+                            if (orderItem.IsBatch == false)
+                            {
+                                listCredential.AddRange(product.Credentials);
+                            }
                         }
                         order.Status = OrderStatusEnum.Paid;
                         response.StatusCode = 200;
                         response.Message = "Payment created successfully";
+                        response.Result = new ResultDto
+                        {
+                            Data = listCredential
+                        };
                         response.IsSuccess = true;
                     }
                     else

@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using KFS.src.Application.Dto.Pagination;
 using KFS.src.Application.Dto.ProductDtos;
 using KFS.src.Application.Dto.ResponseDtos;
 using KFS.src.Domain.Entities;
 using KFS.src.Domain.IRepository;
 using KFS.src.Domain.IService;
+using static KFS.src.Application.Dto.Pagination.Pagination;
 
 namespace KFS.src.Application.Service
 {
@@ -138,21 +140,27 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public async Task<ResponseDto> GetProducts()
+        public async Task<ResponseDto> GetProducts(ProductQuery productQuery)
         {
             var response = new ResponseDto();
             try
             {
-                var result = await _productRepository.GetProducts();
-                var mappedProduct = _mapper.Map<List<ProductDto>>(result);
-                if (result != null && result.Count() > 0)
+                var result = await _productRepository.GetProducts(productQuery);
+                var mappedProduct = _mapper.Map<List<ProductDto>>(result.List);
+                if (result != null && result.List.Count() > 0)
                 {
                     response.StatusCode = 200;
                     response.Message = "Products found";
                     response.IsSuccess = true;
                     response.Result = new ResultDto
                     {
-                        Data = mappedProduct
+                        Data = mappedProduct,
+                        PaginationResp = new PaginationResp
+                        {
+                            Page = productQuery.Page,
+                            PageSize = productQuery.PageSize,
+                            Total = result.Total,
+                        }
                     };
                     return response;
                 }

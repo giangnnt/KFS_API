@@ -22,11 +22,11 @@ namespace KFS.src.Application.Controller
             _productService = productService;
         }
         [HttpGet("all")]
-        public async Task<IActionResult> GetProducts()
+        public async Task<IActionResult> GetProducts(ProductQuery productQuery)
         {
             try
             {
-                var result = await _productService.GetProducts();
+                var result = await _productService.GetProducts(productQuery);
                 return Ok(result);
             }
             catch (Exception ex)
