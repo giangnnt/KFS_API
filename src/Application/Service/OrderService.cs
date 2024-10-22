@@ -72,6 +72,14 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
                     return response;
                 }
+                //check if cart is empty
+                if (cart.CartItems.Count() == 0)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Cart is empty";
+                    response.IsSuccess = false;
+                    return response;
+                }
 
                 //set cart to order
                 mappedOrder = _mapper.Map(cart, mappedOrder);

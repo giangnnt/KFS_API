@@ -24,6 +24,14 @@ namespace KFS.src.Application.Dto.CategoryDtos
         {
             CreateMap<Category, CategoryDto>()
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<CategoryCreate, Category>()
+            .ForMember(dest => dest.Products, opt => opt.Ignore())
+            .ForMember(dest => dest.Promotions, opt => opt.Ignore())
+            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<CategoryUpdate, Category>()
+            .ForMember(dest => dest.Products, opt => opt.Ignore())
+            .ForMember(dest => dest.Promotions, opt => opt.Ignore())
+            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
         }
     }
 }

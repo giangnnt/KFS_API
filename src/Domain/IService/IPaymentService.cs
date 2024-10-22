@@ -12,7 +12,6 @@ namespace KFS.src.Domain.IService
         Task<ResponseDto> GetPaymentById(Guid id);
         Task<ResponseDto> GetPayments();
         Task<ResponseDto> CreatePayment();
-        Task<ResponseDto> UpdatePayment();
         Task<ResponseDto> DeletePayment(Guid id);
         Task<ResponseDto> CreatePaymentByOrderIdCOD(Guid orderId);
         Task<ResponseDto> GetPaymentByUser(Guid userId);

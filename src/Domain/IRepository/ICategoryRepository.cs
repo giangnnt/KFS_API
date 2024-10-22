@@ -14,5 +14,6 @@ namespace KFS.src.Domain.IRepository
         Task<bool> UpdateCategory(Category category);
         Task<bool> DeleteCategory(Guid id);
         Task<Category> GetCategoryById(Guid id);
+        Task<bool> UpdateProductCategory(Category category, List<Product> products);
     }
 }

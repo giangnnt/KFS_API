@@ -180,8 +180,7 @@ namespace KFS.src.Application.Service
             {
                 var promotion = await _promotionRepository.GetPromotionById(promotionId);
                 var batchList = new List<Batch>();
-                try
-                {
+                
                     foreach (var id in batchId)
                     {
                         var batch = await _batchRepository.GetBatchById(id);
@@ -202,12 +201,6 @@ namespace KFS.src.Application.Service
                         response.IsSuccess = false;
                         return response;
                     }
-                }
-                catch
-                {
-                    throw;
-                }
-
             }
             catch (Exception ex)
             {

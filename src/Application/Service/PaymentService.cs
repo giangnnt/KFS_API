@@ -334,10 +334,5 @@ namespace KFS.src.Application.Service
                 return response;
             }
         }
-
-        public Task<ResponseDto> UpdatePayment()
-        {
-            throw new NotImplementedException();
-        }
     }
 }
