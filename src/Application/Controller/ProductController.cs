@@ -103,5 +103,19 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
+        [Protected]
+        [HttpGet("admin/all")]
+        public async Task<IActionResult> GetProductsAdmin(ProductAdminQuery productQuery)
+        {
+            try
+            {
+                var result = await _productService.GetProductsAdmin(productQuery);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

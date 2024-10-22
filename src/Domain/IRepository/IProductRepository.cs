@@ -11,7 +11,7 @@ namespace KFS.src.Domain.IRepository
     public interface IProductRepository
     {
         public Task<ObjectPaging<Product>> GetProducts(ProductQuery productQuery);
-        public Task<IEnumerable<Product>> GetProductsAdmin(ProductAdminQuery productQuery);
+        public Task<ObjectPaging<Product>> GetProductsAdmin(ProductAdminQuery productQuery);
         public Task<Product> GetProductById(Guid id);
         public Task<bool> CreateProduct(Product product);
         public Task<bool> UpdateProduct(Product product);

@@ -21,8 +21,9 @@ namespace KFS.src.Application.Dto.ProductDtos
         public decimal PriceStart { get; set; }
         public decimal PriceEnd { get; set; }
         public string? Origin { get; set; }
+        public string? Species { get; set; }
         public bool? IsForSell { get; set; }
-        public int? InventoryLower { get; set; }
+        public int? InventoryLowerThan { get; set; }
         public ProductStatusEnum? Status { get; set; }
     }
 }

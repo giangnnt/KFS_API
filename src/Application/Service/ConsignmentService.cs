@@ -13,6 +13,7 @@ using KFS.src.Application.Enum;
 using KFS.src.Domain.Entities;
 using KFS.src.Domain.IRepository;
 using KFS.src.Domain.IService;
+using static KFS.src.Application.Dto.Pagination.Pagination;
 
 namespace KFS.src.Application.Service
 {
@@ -386,21 +387,27 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public async Task<ResponseDto> GetConsignments()
+        public async Task<ResponseDto> GetConsignmentsAdmin(ConsignmentQuery consignmentQuery)
         {
             var response = new ResponseDto();
             try
             {
-                var consignments = await _consignmentRepository.GetConsignments();
+                var consignments = await _consignmentRepository.GetConsignmentsAdmin(consignmentQuery);
                 var mappedConsignment = _mapper.Map<List<ConsignmentDto>>(consignments);
-                if (consignments != null && consignments.Count() > 0)
+                if (consignments != null && consignments.List.Count() > 0)
                 {
                     response.StatusCode = 200;
                     response.Message = "Consignments found";
                     response.IsSuccess = true;
                     response.Result = new ResultDto
                     {
-                        Data = mappedConsignment
+                        Data = mappedConsignment,
+                        PaginationResp = new PaginationResp
+                        {
+                            Page = consignmentQuery.Page,
+                            PageSize = consignmentQuery.PageSize,
+                            Total = consignments.Total
+                        }
                     };
                     return response;
                 }
@@ -649,22 +656,27 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public async Task<ResponseDto> GetConsignmentByUserId(Guid userId)
+        public async Task<ResponseDto> GetConsignmentByUserId(ConsignmentQuery consignmentQuery, Guid userId)
         {
             var response = new ResponseDto();
             try
             {
-                var consignments = await _consignmentRepository.GetConsignments();
-                consignments = consignments.Where(x => x.UserId == userId).ToList();
+                var consignments = await _consignmentRepository.GetConsignmentsByUserId(consignmentQuery, userId);
                 var mappedConsignment = _mapper.Map<List<ConsignmentDto>>(consignments);
-                if (consignments != null && consignments.Count() > 0)
+                if (consignments != null && consignments.List.Count() > 0)
                 {
                     response.StatusCode = 200;
                     response.Message = "Consignments found";
                     response.IsSuccess = true;
                     response.Result = new ResultDto
                     {
-                        Data = mappedConsignment
+                        Data = mappedConsignment,
+                        PaginationResp = new PaginationResp
+                        {
+                            Page = consignmentQuery.Page,
+                            PageSize = consignmentQuery.PageSize,
+                            Total = consignments.Total
+                        }
                     };
                     return response;
                 }
@@ -685,7 +697,7 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public async Task<ResponseDto> GetOwnConsignment()
+        public async Task<ResponseDto> GetOwnConsignment(ConsignmentQuery consignmentQuery)
         {
             var response = new ResponseDto();
             try
@@ -706,9 +718,9 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
                     return response;
                 }
-                var consignments = await _consignmentRepository.GetConsignmentsByUserId(payload.UserId);
+                var consignments = await _consignmentRepository.GetConsignmentsByUserId(consignmentQuery, payload.UserId);
                 var mappedConsignment = _mapper.Map<List<ConsignmentDto>>(consignments);
-                if (consignments != null && consignments.Count() > 0)
+                if (consignments != null && consignments.List.Count() > 0)
                 {
                     response.StatusCode = 200;
                     response.Message = "Consignments found";

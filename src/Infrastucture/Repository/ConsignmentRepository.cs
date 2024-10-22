@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using KFS.src.Application.Dto.ConsignmentDtos;
 using KFS.src.Domain.Entities;
 using KFS.src.Domain.IRepository;
 using KFS.src.Infrastucture.Context;
 using Microsoft.EntityFrameworkCore;
+using static KFS.src.Application.Dto.Pagination.Pagination;
 
 namespace KFS.src.Infrastucture.Repository
 {
@@ -41,23 +43,52 @@ namespace KFS.src.Infrastucture.Repository
         }
 
 
-        public async Task<IEnumerable<Consignment>> GetConsignments()
+        public async Task<ObjectPaging<Consignment>> GetConsignmentsAdmin(ConsignmentQuery consignmentQuery)
         {
-            return await _context.Consignments
+            var query = _context.Consignments.AsQueryable();
+            // search syntax
+            query = query.Where(c => c.Status == consignmentQuery.Status || consignmentQuery.Status == null);
+            query = query.Where(c => c.IsForSell == consignmentQuery.IsForSell || consignmentQuery.IsForSell == null);
+            query = query.Where(c => c.ExpiryDate <= consignmentQuery.ExpiryDateBefore || consignmentQuery.ExpiryDateBefore == null);
+            // set total
+            var total = await query.CountAsync();
+            // return
+
+            var consignmentList = await query
             .Include(x => x.Product)
             .ThenInclude(x => x.Category)
             .Include(x => x.User)
+            .Skip((consignmentQuery.Page - 1) * consignmentQuery.PageSize)
+            .Take(consignmentQuery.PageSize)
             .ToListAsync();
+            return new ObjectPaging<Consignment>
+            {
+                List = consignmentList,
+                Total = total
+            };
         }
 
-        public async Task<IEnumerable<Consignment>> GetConsignmentsByUserId(Guid userId)
+        public async Task<ObjectPaging<Consignment>> GetConsignmentsByUserId(ConsignmentQuery consignmentQuery, Guid userId)
         {
-            return await _context.Consignments
+            var query = _context.Consignments.AsQueryable();
+            // search syntax
+            query = query.Where(c => c.Status == consignmentQuery.Status || consignmentQuery.Status == null);
+            query = query.Where(c => c.IsForSell == consignmentQuery.IsForSell || consignmentQuery.IsForSell == null);
+            query = query.Where(c => c.ExpiryDate <= consignmentQuery.ExpiryDateBefore || consignmentQuery.ExpiryDateBefore == null);
+            query = query.Where(c => c.UserId == userId);
+            // set total
+            var total = await query.CountAsync();
+            // return
+            var consignmentList = await query
             .Include(x => x.Product)
             .ThenInclude(x => x.Category)
             .Include(x => x.User)
-            .Where(x => x.UserId == userId)
             .ToListAsync();
+            return new ObjectPaging<Consignment>
+            {
+                List = consignmentList,
+                Total = total
+            };
         }
 
         public async Task<bool> UpdateConsignment(Consignment consignment)

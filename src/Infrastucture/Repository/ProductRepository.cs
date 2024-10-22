@@ -77,9 +77,33 @@ namespace KFS.src.Infrastucture.Repository
             return result > 0;
         }
 
-        public Task<IEnumerable<Product>> GetProductsAdmin(ProductAdminQuery productQuery)
+        public async Task<ObjectPaging<Product>> GetProductsAdmin(ProductAdminQuery productQuery)
         {
-            throw new NotImplementedException();
+            var query = _context.Products.AsQueryable();
+            // search syntax
+            query = query.Where(p => EF.Functions.Like(p.Name, $"%{productQuery.Name}%") || string.IsNullOrEmpty(productQuery.Name));
+            query = query.Where(p => EF.Functions.Like(p.Origin, $"%{productQuery.Origin}%") || string.IsNullOrEmpty(productQuery.Origin));
+            query = query.Where(p => EF.Functions.Like(p.Species, $"%{productQuery.Species}%") || string.IsNullOrEmpty(productQuery.Species));
+            query = query.Where(p => p.IsForSell == productQuery.IsForSell || productQuery.IsForSell == null);
+            query = query.Where(p => p.Inventory <= productQuery.InventoryLowerThan || productQuery.InventoryLowerThan == null);
+            query = query.Where(p => (p.Price >= productQuery.PriceStart && p.Price <= productQuery.PriceEnd) || (productQuery.PriceStart == 0 && productQuery.PriceEnd == 0));
+            //set total 
+            var total = await query.CountAsync();
+
+            // return
+            var productList = await query
+            .Include(x => x.Category)
+            .Include(x => x.Promotions)
+            .Include(x => x.Batches)
+            .Include(x => x.Medias)
+            .Skip((productQuery.Page - 1) * productQuery.PageSize)
+            .Take(productQuery.PageSize)
+            .ToListAsync();
+            return new ObjectPaging<Product>
+            {
+                List = productList,
+                Total = total
+            };
         }
     }
 }

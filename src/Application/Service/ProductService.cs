@@ -181,6 +181,47 @@ namespace KFS.src.Application.Service
             }
         }
 
+        public async Task<ResponseDto> GetProductsAdmin(ProductAdminQuery productQuery)
+        {
+            var response = new ResponseDto();
+            try
+            {
+                var result = await _productRepository.GetProductsAdmin(productQuery);
+                var mappedProduct = _mapper.Map<List<ProductDto>>(result.List);
+                if (result != null && result.List.Count() > 0)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Products found";
+                    response.IsSuccess = true;
+                    response.Result = new ResultDto
+                    {
+                        Data = mappedProduct,
+                        PaginationResp = new PaginationResp
+                        {
+                            Page = productQuery.Page,
+                            PageSize = productQuery.PageSize,
+                            Total = result.Total,
+                        }
+                    };
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Products not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
+            }
+        }
+
         public async Task<ResponseDto> UpdateIsForSell(bool isForSell, Guid id)
         {
             var response = new ResponseDto();

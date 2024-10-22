@@ -101,5 +101,19 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
+        [Protected]
+        [HttpPut("update-product-category/{categoryId}")]
+        public async Task<IActionResult> UpdateProductCategory(Guid categoryId, List<Guid> productId)
+        {
+            try
+            {
+                var result = await _categoryService.UpdateProductCategory(categoryId, productId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
