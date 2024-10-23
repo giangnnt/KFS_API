@@ -20,7 +20,7 @@ namespace KFS.src.Application.Controller
             _paymentService = paymentService;
         }
         [Protected]
-        [HttpGet]
+        [HttpPost("query")]
         public async Task<IActionResult> GetPayments(PaymentQuery paymentQuery)
         {
             try
