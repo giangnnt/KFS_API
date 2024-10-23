@@ -379,6 +379,15 @@ namespace KFS.src.Infrastucture.Context
                     v => v.ToString(),
                     v => v != null ? (MediaTypeEnum)Enum.Parse(typeof(MediaTypeEnum), v) : default);
             });
+            //config media
+            modelBuilder.Entity<Media>(entity =>
+            {
+                entity.Property(entity => entity.Id).ValueGeneratedOnAdd();
+                entity.Property(entity => entity.Type)
+                .HasConversion(
+                    v => v.ToString(),
+                    v => v != null ? (MediaTypeEnum)Enum.Parse(typeof(MediaTypeEnum), v) : default);
+            });
         }
     }
 }

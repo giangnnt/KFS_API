@@ -405,3 +405,6 @@ FodyWeavers.xsd
 
 # firebase
 /firebase.json
+
+# migrations
+/Migrations
