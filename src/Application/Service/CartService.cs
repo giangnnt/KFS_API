@@ -36,12 +36,12 @@ namespace KFS.src.Application.Service
             _cartItemRepository = cartItemRepository;
         }
 
-        public async Task<ResponseDto> AddBatchToCart(BatchAddRemoveDto req)
+        public async Task<ResponseDto> AddBatchToCart(Guid id, BatchAddRemoveDto req)
         {
             var response = new ResponseDto();
             try
             {
-                var cart = await _cartRepository.GetCartById(req.CartId);
+                var cart = await _cartRepository.GetCartById(id);
                 var batch = await _batchRepository.GetBatchById(req.BatchId);
                 var product = await _productRepository.GetProductById(batch.ProductId);
                 //check if batch is for sell
@@ -76,7 +76,7 @@ namespace KFS.src.Application.Service
                     //create new cart item
                     var cartItemToAdd = new CartItem
                     {
-                        CartId = req.CartId,
+                        CartId = id,
                         ProductId = batch.ProductId,
                         BatchId = batch.Id,
                         Quantity = req.Quantity,
@@ -130,12 +130,12 @@ namespace KFS.src.Application.Service
         }
 
 
-        public async Task<ResponseDto> AddProductToCart(CartAddRemoveDto req)
+        public async Task<ResponseDto> AddProductToCart(Guid id, CartAddRemoveDto req)
         {
             var response = new ResponseDto();
             try
             {
-                var cart = await _cartRepository.GetCartById(req.CartId);
+                var cart = await _cartRepository.GetCartById(id);
                 var product = await _productRepository.GetProductById(req.ProductId);
                 //check if product is for sell
                 if (product.IsForSell == false)
@@ -169,7 +169,7 @@ namespace KFS.src.Application.Service
                     //create new cart item
                     cartItem = new CartItem
                     {
-                        CartId = req.CartId,
+                        CartId = id,
                         ProductId = req.ProductId,
                         Quantity = req.Quantity,
                         Price = product.Price * req.Quantity,
@@ -447,12 +447,12 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public async Task<ResponseDto> RemoveBatchFromCart(BatchAddRemoveDto req)
+        public async Task<ResponseDto> RemoveBatchFromCart(Guid id, BatchAddRemoveDto req)
         {
             var response = new ResponseDto();
             try
             {
-                var cart = await _cartRepository.GetCartById(req.CartId);
+                var cart = await _cartRepository.GetCartById(id);
                 var batch = await _batchRepository.GetBatchById(req.BatchId);
                 //check if any cart item exists
                 var cartItem = cart.CartItems.FirstOrDefault(x => x.ProductId == batch.ProductId);
@@ -510,12 +510,12 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public async Task<ResponseDto> RemoveProductFromCart(CartAddRemoveDto req)
+        public async Task<ResponseDto> RemoveProductFromCart(Guid id, CartAddRemoveDto req)
         {
             var response = new ResponseDto();
             try
             {
-                var cart = await _cartRepository.GetCartById(req.CartId);
+                var cart = await _cartRepository.GetCartById(id);
                 var product = await _productRepository.GetProductById(req.ProductId);
                 //check if any cart item exists
                 var cartItem = cart.CartItems.FirstOrDefault(x => x.ProductId == req.ProductId);

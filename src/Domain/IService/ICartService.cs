@@ -16,10 +16,10 @@ namespace KFS.src.Domain.IService
         Task<ResponseDto> CreateCart(CartCreate req);
         Task<ResponseDto> UpdateCart(CartUpdate req, Guid id);
         Task<ResponseDto> DeleteCart(Guid id);
-        Task<ResponseDto> AddProductToCart(CartAddRemoveDto req);
-        Task<ResponseDto> RemoveProductFromCart(CartAddRemoveDto req);
-        Task<ResponseDto> AddBatchToCart(BatchAddRemoveDto req);
-        Task<ResponseDto> RemoveBatchFromCart(BatchAddRemoveDto req);
+        Task<ResponseDto> AddProductToCart(Guid id, CartAddRemoveDto req);
+        Task<ResponseDto> RemoveProductFromCart(Guid id, CartAddRemoveDto req);
+        Task<ResponseDto> AddBatchToCart(Guid id, BatchAddRemoveDto req);
+        Task<ResponseDto> RemoveBatchFromCart(Guid id, BatchAddRemoveDto req);
         Task<ResponseDto> GetCartByUserId(Guid userId);
         Task<ResponseDto> GetOwnCart();
     }

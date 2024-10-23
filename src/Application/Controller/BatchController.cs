@@ -19,7 +19,7 @@ namespace KFS.src.Application.Controller
         {
             _batchService = batchService;
         }
-        [HttpGet("all")]
+        [HttpGet]
         public async Task<IActionResult> GetBatches()
         {
             try
@@ -46,7 +46,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPost("create")]
+        [HttpPost]
         public async Task<IActionResult> CreateBatch(BatchCreate req, Guid productId)
         {
             try
@@ -60,7 +60,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPut("update/{id}")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> UpdateBatch(BatchUpdate req, Guid id)
         {
             try
@@ -74,7 +74,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpDelete("delete/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBatch(Guid id)
         {
             try

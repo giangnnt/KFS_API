@@ -338,6 +338,12 @@ namespace KFS.Migrations
                         principalTable: "Orders",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Payments_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -442,7 +448,9 @@ namespace KFS.Migrations
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Rating = table.Column<int>(type: "int", nullable: false),
                     ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -654,7 +662,7 @@ namespace KFS.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "Address", "Avatar", "CreatedAt", "Email", "FullName", "Password", "Phone", "RoleId", "UpdatedAt" },
-                values: new object[] { new Guid("00000000-0000-0000-0000-000000000001"), "HCM", null, new DateTime(2024, 10, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), "giangnnt260703@gmail.com", "Truong Giang", "$2a$11$U2BLelaBEJzrvFxO9Ca6Gej6lyzkesTTTsXVhRa.wZW2QpTmHgqAG", "0123456789", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
+                values: new object[] { new Guid("00000000-0000-0000-0000-000000000001"), "HCM", null, new DateTime(2024, 10, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), "giangnnt260703@gmail.com", "Truong Giang", "$2a$11$V28mxGiO8nM7x3FsggWHsehZ/qVQLbWfO3ycik6ElkG7o0NegAcTK", "0123456789", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) });
 
             migrationBuilder.InsertData(
                 table: "Batches",
@@ -682,7 +690,7 @@ namespace KFS.Migrations
             migrationBuilder.InsertData(
                 table: "Wallets",
                 columns: new[] { "Id", "Point", "UserId" },
-                values: new object[] { new Guid("5f81940e-d1f8-400c-8e7a-5da21a175eaa"), 20000, new Guid("00000000-0000-0000-0000-000000000001") });
+                values: new object[] { new Guid("ed0988a1-3639-4c56-ab3a-bf48407a792b"), 20000, new Guid("00000000-0000-0000-0000-000000000001") });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Batches_ProductId",
@@ -772,6 +780,11 @@ namespace KFS.Migrations
                 column: "OrderId",
                 unique: true,
                 filter: "[OrderId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Payments_UserId",
+                table: "Payments",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PermissionRole_RolesRoleId",

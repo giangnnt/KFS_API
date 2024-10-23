@@ -21,7 +21,7 @@ namespace KFS.src.Application.Controller
             _shipmentService = shipmentService;
         }
         [Protected]
-        [HttpPost("create")]
+        [HttpPost]
         public async Task<IActionResult> CreateShipment(Guid orderId)
         {
             try
@@ -35,7 +35,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPost("update/{id}")]
+        [HttpPost("{id}")]
         public async Task<IActionResult> UpdateShipment(UpdateDto updateDto, Guid id)
         {
             try
@@ -49,7 +49,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPost("delete")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteShipment(Guid id)
         {
             try
@@ -63,7 +63,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpGet("all")]
+        [HttpGet]
         public async Task<IActionResult> GetShipments()
         {
             try
@@ -91,7 +91,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPost("delivered/{id}")]
+        [HttpPut("{id}/delivered")]
         public async Task<IActionResult> ShipmentDelivered(Guid id)
         {
             try

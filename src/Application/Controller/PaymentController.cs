@@ -76,7 +76,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPost("create-by-order-id")]
+        [HttpPost("order/{id}")]
         public async Task<IActionResult> CreatePaymentByOrderId(Guid orderId)
         {
             try
@@ -90,7 +90,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpGet("by-user/{userId}")]
+        [HttpGet("user/{id}")]
         public async Task<IActionResult> GetPaymentByUser(Guid userId)
         {
             try
@@ -104,7 +104,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpGet("get-own-payment")]
+        [HttpGet("own")]
         public async Task<IActionResult> GetOwnPayment()
         {
             try

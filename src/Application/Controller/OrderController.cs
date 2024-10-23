@@ -23,7 +23,7 @@ namespace KFS.src.Application.Controller
             _orderService = orderService;
         }
         [Protected]
-        [HttpGet("all")]
+        [HttpGet]
         public async Task<IActionResult> GetOrders(OrderQuery req)
         {
             try
@@ -65,7 +65,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPut("update/{id}")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> UpdateOrder(Guid id, OrderUpdate req)
         {
             try
@@ -79,7 +79,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpDelete("delete/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteOrder(Guid id)
         {
             try
@@ -106,7 +106,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPut("update-status/{id}")]
+        [HttpPut("{id}/status")]
         public async Task<IActionResult> UpdateOrderStatus(OrderUpdateStatus req)
         {
             try
@@ -120,12 +120,12 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpGet("user/{userId}")]
-        public async Task<IActionResult> GetOrderByUserId(Guid userId)
+        [HttpGet("user/{id}")]
+        public async Task<IActionResult> GetOrderByUserId(Guid id)
         {
             try
             {
-                var result = await _orderService.GetOrderByUserId(userId);
+                var result = await _orderService.GetOrderByUserId(id);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -134,7 +134,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPost("create-offline")]
+        [HttpPost("offline")]
         public async Task<IActionResult> CreateOrderOffline(OrderCreateOffline req)
         {
             try
@@ -148,7 +148,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpGet("get-own-order")]
+        [HttpGet("own")]
         public async Task<IActionResult> GetOwnOrder()
         {
             try

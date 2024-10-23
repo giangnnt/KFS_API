@@ -366,6 +366,9 @@ namespace KFS.src.Infrastucture.Context
                 .WithOne(w => w.Owner)
                 .HasForeignKey<Wallet>(w => w.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+                entity.HasMany(u => u.Payments)
+                .WithOne(p => p.User)
+                .OnDelete(DeleteBehavior.Restrict);
             });
             //config media
             modelBuilder.Entity<Media>(entity =>

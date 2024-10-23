@@ -21,6 +21,7 @@ namespace KFS.src.Domain.Entities
         public List<Cart> Carts { get; set; } = new List<Cart>();
         public List<Order> Orders { get; set; } = new List<Order>();    
         public List<Consignment> Consignments { get; set; } = new List<Consignment>();  
+        public List<Payment> Payments { get; set; } = new List<Payment>();
         public List<Feedback> Feedbacks { get; set; } = new List<Feedback>();  
         public Wallet Wallet { get; set; } = null!;
     }

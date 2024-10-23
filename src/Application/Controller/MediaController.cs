@@ -35,7 +35,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpDelete("delete/{mediaId}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMedia(Guid mediaId)
         {
             try
@@ -49,7 +49,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpGet("get-media-product/{productId}")]
+        [HttpGet("product/{id}")]
         public async Task<IActionResult> GetMediaByProductId(Guid productId)
         {
             try
@@ -63,7 +63,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPut("update-media-product/{productId}")]
+        [HttpPut("product/{id}")]
         public async Task<IActionResult> UpdateMediaProduct(Guid productId, [FromBody] List<Guid> mediaIds)
         {
             try
@@ -77,7 +77,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPost("create")]
+        [HttpPost]
         public async Task<IActionResult> CreateMedia([FromBody] MediaCreate mediaCreate)
         {
             try

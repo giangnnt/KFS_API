@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KFS.Migrations
 {
     [DbContext(typeof(KFSContext))]
-    [Migration("20241021040559_01")]
+    [Migration("20241023062054_01")]
     partial class _01
     {
         /// <inheritdoc />
@@ -356,6 +356,9 @@ namespace KFS.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -364,6 +367,9 @@ namespace KFS.Migrations
 
                     b.Property<int>("Rating")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
@@ -545,6 +551,8 @@ namespace KFS.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Payments");
 
@@ -891,7 +899,7 @@ namespace KFS.Migrations
                             CreatedAt = new DateTime(2024, 10, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "giangnnt260703@gmail.com",
                             FullName = "Truong Giang",
-                            Password = "$2a$11$U2BLelaBEJzrvFxO9Ca6Gej6lyzkesTTTsXVhRa.wZW2QpTmHgqAG",
+                            Password = "$2a$11$V28mxGiO8nM7x3FsggWHsehZ/qVQLbWfO3ycik6ElkG7o0NegAcTK",
                             Phone = "0123456789",
                             RoleId = 1,
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -920,7 +928,7 @@ namespace KFS.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("5f81940e-d1f8-400c-8e7a-5da21a175eaa"),
+                            Id = new Guid("ed0988a1-3639-4c56-ab3a-bf48407a792b"),
                             Point = 20000,
                             UserId = new Guid("00000000-0000-0000-0000-000000000001")
                         });
@@ -1203,6 +1211,17 @@ namespace KFS.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("KFS.src.Domain.Entities.Payment", b =>
+                {
+                    b.HasOne("KFS.src.Domain.Entities.User", "User")
+                        .WithMany("Payments")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("KFS.src.Domain.Entities.Product", b =>
                 {
                     b.HasOne("KFS.src.Domain.Entities.Category", "Category")
@@ -1376,6 +1395,8 @@ namespace KFS.Migrations
                     b.Navigation("Feedbacks");
 
                     b.Navigation("Orders");
+
+                    b.Navigation("Payments");
 
                     b.Navigation("Wallet")
                         .IsRequired();
