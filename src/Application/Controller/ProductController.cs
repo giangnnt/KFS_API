@@ -21,12 +21,12 @@ namespace KFS.src.Application.Controller
         {
             _productService = productService;
         }
-        [HttpGet("all")]
-        public async Task<IActionResult> GetProducts()
+        [HttpGet]
+        public async Task<IActionResult> GetProducts(ProductQuery productQuery)
         {
             try
             {
-                var result = await _productService.GetProducts();
+                var result = await _productService.GetProducts(productQuery);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -48,7 +48,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPost("create")]
+        [HttpPost]
         public async Task<IActionResult> CreateProduct([FromBody] ProductCreate req)
         {
             try
@@ -62,7 +62,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPut("update/{id}")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProduct([FromBody] ProductUpdate req, Guid id)
         {
             try
@@ -76,7 +76,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpDelete("delete/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(Guid id)
         {
             try
@@ -90,12 +90,26 @@ namespace KFS.src.Application.Controller
             }
         }   
         [Protected]
-        [HttpPut("update-is-for-sell/{id}")]
+        [HttpPut("{id}/{is-for-sell}")]
         public async Task<IActionResult> UpdateIsForSell(bool isForSell, Guid id)
         {
             try
             {
                 var result = await _productService.UpdateIsForSell(isForSell, id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [Protected]
+        [HttpGet("admin")]
+        public async Task<IActionResult> GetProductsAdmin(ProductAdminQuery productQuery)
+        {
+            try
+            {
+                var result = await _productService.GetProductsAdmin(productQuery);
                 return Ok(result);
             }
             catch (Exception ex)

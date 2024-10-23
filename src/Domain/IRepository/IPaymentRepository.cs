@@ -2,14 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using KFS.src.Application.Dto.PaymentDtos;
 using KFS.src.Domain.Entities;
+using static KFS.src.Application.Dto.Pagination.Pagination;
 
 namespace KFS.src.Domain.IRepository
 {
     public interface IPaymentRepository
     {
         Task<bool> CreatePayment(Payment payment);
-        Task<IEnumerable<Payment>> GetPayments();
+        Task<ObjectPaging<Payment>> GetPayments(PaymentQuery query);
         Task<Payment> GetPaymentById(Guid id);
         Task<bool> UpdatePayment(Payment payment);
         Task<bool> DeletePayment(Payment payment);

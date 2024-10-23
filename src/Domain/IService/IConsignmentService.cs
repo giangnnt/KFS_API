@@ -13,12 +13,12 @@ namespace KFS.src.Domain.IService
         Task<ResponseDto> CreateConsignment(ConsignmentCreate req);
         Task<ResponseDto> UpdateConsignment(Guid id);
         Task<ResponseDto> DeleteConsignment(Guid id);
-        Task<ResponseDto> GetConsignments();
+        Task<ResponseDto> GetConsignmentsAdmin(ConsignmentQuery consignmentQuery);
         Task<ResponseDto> GetConsignmentById(Guid id);
         Task<ResponseDto> EvaluateConsignment(bool isApproved, Guid id);
         Task<ResponseDto> PayForConsignment(Guid id);
         Task<ResponseDto> GetResponsePaymentUrl();
-        Task<ResponseDto> GetConsignmentByUserId(Guid userId);
-        Task<ResponseDto> GetOwnConsignment();
+        Task<ResponseDto> GetConsignmentByUserId(ConsignmentQuery consignmentQuery, Guid userId);
+        Task<ResponseDto> GetOwnConsignment(ConsignmentQuery consignmentQuery);
     }
 }

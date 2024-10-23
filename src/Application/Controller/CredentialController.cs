@@ -21,7 +21,7 @@ namespace KFS.src.Application.Controller
             _credentialService = credentialService;
         }
         [Protected]
-        [HttpGet("all")]
+        [HttpGet]
         public async Task<IActionResult> GetCredentials()
         {
             try
@@ -49,7 +49,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPost("create")]
+        [HttpPost]
         public async Task<IActionResult> CreateCredential(CreadentialCreate req)
         {
             try
@@ -63,7 +63,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPut("update/{id}")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCredential(CredentialUpdate req, Guid id)
         {
             try
@@ -77,7 +77,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpDelete("delete/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCredential(Guid id)
         {
             try

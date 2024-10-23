@@ -10,6 +10,7 @@ using KFS.src.Application.Enum;
 using KFS.src.Domain.Entities;
 using KFS.src.Domain.IRepository;
 using KFS.src.Domain.IService;
+using static KFS.src.Application.Dto.Pagination.Pagination;
 
 namespace KFS.src.Application.Service
 {
@@ -269,10 +270,9 @@ namespace KFS.src.Application.Service
             var response = new ResponseDto();
             try
             {
-                var payments = await _paymentRepository.GetPayments();
-                payments = payments.Where(p => p.UserId == userId);
-                var mappedPayments = _mapper.Map<IEnumerable<PaymentDto>>(payments);
-                if (payments != null && payments.Count() > 0)
+                var payment = await _paymentRepository.GetPaymentsByUserId(userId);
+                var mappedPayments = _mapper.Map<IEnumerable<PaymentDto>>(payment);
+                if (payment != null && payment.Count() > 0)
                 {
                     response.StatusCode = 200;
                     response.Message = "Payments found";
@@ -300,21 +300,27 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public async Task<ResponseDto> GetPayments()
+        public async Task<ResponseDto> GetPayments(PaymentQuery paymentQuery)
         {
             var response = new ResponseDto();
             try
             {
-                var payments = await _paymentRepository.GetPayments();
+                var payments = await _paymentRepository.GetPayments(paymentQuery);
                 var mappedPayments = _mapper.Map<IEnumerable<PaymentDto>>(payments);
-                if (payments != null && payments.Count() > 0)
+                if (payments != null && payments.List.Count() > 0)
                 {
                     response.StatusCode = 200;
                     response.Message = "Payments found";
                     response.IsSuccess = true;
                     response.Result = new ResultDto
                     {
-                        Data = mappedPayments
+                        Data = mappedPayments,
+                        PaginationResp = new PaginationResp
+                        {
+                            Page = paymentQuery.Page,
+                            PageSize = paymentQuery.PageSize,
+                            Total = payments.Total
+                        }
                     };
                     return response;
                 }
@@ -333,11 +339,6 @@ namespace KFS.src.Application.Service
                 response.IsSuccess = false;
                 return response;
             }
-        }
-
-        public Task<ResponseDto> UpdatePayment()
-        {
-            throw new NotImplementedException();
         }
     }
 }

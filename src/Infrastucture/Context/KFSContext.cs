@@ -366,6 +366,18 @@ namespace KFS.src.Infrastucture.Context
                 .WithOne(w => w.Owner)
                 .HasForeignKey<Wallet>(w => w.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+                entity.HasMany(u => u.Payments)
+                .WithOne(p => p.User)
+                .OnDelete(DeleteBehavior.Restrict);
+            });
+            //config media
+            modelBuilder.Entity<Media>(entity =>
+            {
+                entity.Property(entity => entity.Id).ValueGeneratedOnAdd();
+                entity.Property(entity => entity.Type)
+                .HasConversion(
+                    v => v.ToString(),
+                    v => v != null ? (MediaTypeEnum)Enum.Parse(typeof(MediaTypeEnum), v) : default);
             });
             //config media
             modelBuilder.Entity<Media>(entity =>

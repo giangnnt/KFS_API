@@ -56,5 +56,28 @@ namespace KFS.src.Infrastucture.Repository
             .Include(x => x.Promotions)
             .FirstOrDefaultAsync(x => x.Id == id) ?? throw new Exception("Category not found");
         }
+
+        public async Task<bool> UpdateProductCategory(Category category, List<Product> products)
+        {
+            // get and remove product
+            for (int i = 0; i < products.Count; i++)
+            {
+                if (!products.Contains(category.Products[i]))
+                {
+                    category.Products.RemoveAt(i);
+                }
+            }
+            // add new product
+            foreach (var item in products)
+            {
+                if (!category.Products.Contains(item))
+                {
+                    category.Products.Add(item);
+                }
+            }
+            _context.Categories.Update(category);
+            var result = await _context.SaveChangesAsync();
+            return result > 0;
+        }
     }
 }

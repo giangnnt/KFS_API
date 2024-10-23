@@ -20,38 +20,38 @@ namespace KFS.src.Application.Controller
             _consignmentService = consignmentService;
         }
         [Protected]
-        [HttpPost("create-consignment-online")]
+        [HttpPost("online")]
         public async Task<IActionResult> CreateConsignmentOnline([FromBody] ConsignmentCreateByOrderItem req)
         {
             var response = await _consignmentService.CreateConsignmentOnline(req);
             return Ok(response);
         }
         [Protected]
-        [HttpPost("create")]
+        [HttpPost("offline")]
         public async Task<IActionResult> CreateConsignment([FromBody] ConsignmentCreate req)
         {
             var response = await _consignmentService.CreateConsignment(req);
             return Ok(response);
         }
         [Protected]
-        [HttpPut("update/{id}")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> UpdateConsignment(Guid id)
         {
             var response = await _consignmentService.UpdateConsignment(id);
             return Ok(response);
         }
         [Protected]
-        [HttpDelete("delete/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteConsignment(Guid id)
         {
             var response = await _consignmentService.DeleteConsignment(id);
             return Ok(response);
         }
         [Protected]
-        [HttpGet("all")]
-        public async Task<IActionResult> GetConsignments()
+        [HttpGet("admin")]
+        public async Task<IActionResult> GetConsignmentsAdmin(ConsignmentQuery consignmentQuery)
         {
-            var response = await _consignmentService.GetConsignments();
+            var response = await _consignmentService.GetConsignmentsAdmin(consignmentQuery);
             return Ok(response);
         }
         [Protected]
@@ -62,31 +62,38 @@ namespace KFS.src.Application.Controller
             return Ok(response);
         }
         [Protected]
-        [HttpPut("evaluate-consignment/{id}")]
+        [HttpPut("{id}/evaluate")]
         public async Task<IActionResult> EvaluateConsignment(bool isApproved, Guid id)
         {
             var response = await _consignmentService.EvaluateConsignment(isApproved, id);
             return Ok(response);
         }
         [Protected]
-        [HttpPut("pay-for-consignment/{id}")]
+        [HttpPut("{id}/pay")]
         public async Task<IActionResult> PayForConsignment(Guid id)
         {
             var response = await _consignmentService.PayForConsignment(id);
             return Ok(response);
         }
         [Protected]
-        [HttpGet("get-response-payment-url")]
+        [HttpGet("response-payment-url")]
         public async Task<IActionResult> GetResponsePaymentUrl()
         {
             var response = await _consignmentService.GetResponsePaymentUrl();
             return Ok(response);
         }
         [Protected]
-        [HttpGet("get-consignment-by-user-id/{userId}")]
-        public async Task<IActionResult> GetConsignmentByUserId(Guid userId)
+        [HttpGet("user/{id}")]
+        public async Task<IActionResult> GetConsignmentByUserId(ConsignmentQuery consignmentQuery,Guid userId)
         {
-            var response = await _consignmentService.GetConsignmentByUserId(userId);
+            var response = await _consignmentService.GetConsignmentByUserId(consignmentQuery, userId);
+            return Ok(response);
+        }
+        [Protected]
+        [HttpGet("own")]
+        public async Task<IActionResult> GetOwnConsignment(ConsignmentQuery consignmentQuery)
+        {
+            var response = await _consignmentService.GetOwnConsignment(consignmentQuery);
             return Ok(response);
         }
     }

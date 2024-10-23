@@ -13,8 +13,10 @@ using KFS.src.Application.Enum;
 using KFS.src.Domain.Entities;
 using KFS.src.Domain.IRepository;
 using KFS.src.Domain.IService;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.VisualBasic;
+using static KFS.src.Application.Dto.Pagination.Pagination;
 
 namespace KFS.src.Application.Service
 {
@@ -69,6 +71,14 @@ namespace KFS.src.Application.Service
                 {
                     response.StatusCode = 400;
                     response.Message = "Cart is not active";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                //check if cart is empty
+                if (cart.CartItems.Count() == 0)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Cart is empty";
                     response.IsSuccess = false;
                     return response;
                 }
@@ -262,11 +272,13 @@ namespace KFS.src.Application.Service
                     var wallet = await _walletRepository.GetWalletByUserId(payment.UserId);
                     //create payment
                     var result = await _paymentRepository.CreatePayment(payment);
+                    var listCredential = new List<Credential>();
                     if (result)
                     {
                         await _walletRepository.AddPoint(wallet.Id, (int)payment.Amount * 5 / 100);
                         foreach (var c in carts)
                         {
+                            //deactive cart
                             if (c.Status == CartStatusEnum.Active)
                             {
                                 c.Status = CartStatusEnum.Completed;
@@ -275,13 +287,23 @@ namespace KFS.src.Application.Service
                         }
                         foreach (var orderItem in order.OrderItems)
                         {
+                            //update inventory
                             var product = await _productRepository.GetProductById(orderItem.ProductId);
                             product.Inventory -= orderItem.Quantity;
                             await _productRepository.UpdateProduct(product);
+                            //get credential
+                            if (orderItem.IsBatch == false)
+                            {
+                                listCredential.AddRange(product.Credentials);
+                            }
                         }
                         order.Status = OrderStatusEnum.Paid;
                         response.StatusCode = 200;
                         response.Message = "Payment created successfully";
+                        response.Result = new ResultDto
+                        {
+                            Data = listCredential
+                        };
                         response.IsSuccess = true;
                     }
                     else
@@ -465,23 +487,29 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public async Task<ResponseDto> GetOrders()
+        public async Task<ResponseDto> GetOrders(OrderQuery req)
         {
             var response = new ResponseDto();
             try
             {
-                var orders = await _orderRepository.GetOrders();
+                var orders = await _orderRepository.GetOrders(req);
                 var mappedOrders = _mapper.Map<List<OrderDto>>(orders);
                 //map by format
                 await GetOrdersFormat(mappedOrders);
 
-                if (orders != null && orders.Count() > 0)
+                if (orders != null && orders.List.Count() > 0)
                 {
                     response.StatusCode = 200;
                     response.Message = "Orders found";
                     response.Result = new ResultDto
                     {
-                        Data = mappedOrders
+                        Data = mappedOrders,
+                        PaginationResp = new PaginationResp
+                        {
+                            Page = req.Page,
+                            PageSize = req.PageSize,
+                            Total = orders.Total
+                        }
                     };
                     response.IsSuccess = true;
                     return response;

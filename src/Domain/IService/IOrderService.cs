@@ -10,7 +10,7 @@ namespace KFS.src.Domain.IService
 {
     public interface IOrderService
     {
-        Task<ResponseDto> GetOrders();
+        Task<ResponseDto> GetOrders(OrderQuery req);
         Task<ResponseDto> GetOrderById(Guid id);
         Task<ResponseDto> CreateOrderFromCart(OrderCreateFromCart req);
         Task<ResponseDto> UpdateOrder(OrderUpdate req, Guid id);

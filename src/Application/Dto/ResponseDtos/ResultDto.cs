@@ -9,11 +9,6 @@ namespace KFS.src.Application.Dto.ResponseDtos
     public class ResultDto
     {
         public required object Data { get; set; }
-        public PageInfo? PageInfo { get; set; }
-    }
-
-    public class PageInfo : PaginationResp
-    {
-        public bool? HasNextPage { get; set; }
+        public PaginationResp? PaginationResp { get; set; }
     }
 }

@@ -12,6 +12,8 @@ namespace KFS.src.Domain.Entities
         public int Rating { get; set; }
         public Guid ProductId { get; set; }
         public Guid UserId { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
         public Product Product { get; set; } = null!;
         public User User { get; set; } = null!;
     }

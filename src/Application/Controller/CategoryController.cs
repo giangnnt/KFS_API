@@ -20,7 +20,7 @@ namespace KFS.src.Application.Controller
         {
             _categoryService = categoryService;
         }
-        [HttpGet("all")]
+        [HttpGet]
         public async Task<IActionResult> GetCategories()
         {
             try
@@ -34,7 +34,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPost("create")]
+        [HttpPost]
         public async Task<IActionResult> CreateCategory(CategoryCreate req)
         {
             try
@@ -61,7 +61,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpDelete("delete/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteById(Guid id)
         {
             try
@@ -75,7 +75,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPut("update/id")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProduct(CategoryUpdate req, Guid id)
         {
             try
@@ -88,12 +88,26 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
-        [HttpGet("product/{id}")]
+        [HttpGet("{id}/products")]
         public async Task<IActionResult> GetProductByCategory(Guid id)
         {
             try
             {
                 var result = await _categoryService.GetProductByCategory(id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [Protected]
+        [HttpPut("{id}/products")]
+        public async Task<IActionResult> UpdateProductCategory(Guid categoryId, List<Guid> productId)
+        {
+            try
+            {
+                var result = await _categoryService.UpdateProductCategory(categoryId, productId);
                 return Ok(result);
             }
             catch (Exception ex)

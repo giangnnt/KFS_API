@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using KFS.src.Application.Dto.PaymentDtos;
 using KFS.src.Application.Middleware;
 using KFS.src.Domain.IService;
 using Microsoft.AspNetCore.Mvc;
@@ -20,11 +21,11 @@ namespace KFS.src.Application.Controller
         }
         [Protected]
         [HttpGet]
-        public async Task<IActionResult> GetPayments()
+        public async Task<IActionResult> GetPayments(PaymentQuery paymentQuery)
         {
             try
             {
-                var result = await _paymentService.GetPayments();
+                var result = await _paymentService.GetPayments(paymentQuery);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -61,20 +62,6 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPut]
-        public async Task<IActionResult> UpdatePayment()
-        {
-            try
-            {
-                var result = await _paymentService.UpdatePayment();
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-        [Protected]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePayment(Guid id)
         {
@@ -89,7 +76,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPost("create-by-order-id")]
+        [HttpPost("order/{id}")]
         public async Task<IActionResult> CreatePaymentByOrderId(Guid orderId)
         {
             try
@@ -103,7 +90,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpGet("by-user/{userId}")]
+        [HttpGet("user/{id}")]
         public async Task<IActionResult> GetPaymentByUser(Guid userId)
         {
             try
@@ -117,7 +104,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpGet("get-own-payment")]
+        [HttpGet("own")]
         public async Task<IActionResult> GetOwnPayment()
         {
             try

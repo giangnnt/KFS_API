@@ -22,7 +22,7 @@ namespace KFS.src.Application.Controller
         }
 
         [Protected]
-        [HttpGet("all")]
+        [HttpGet]
         public async Task<IActionResult> GetCarts()
         {
             try
@@ -50,7 +50,7 @@ namespace KFS.src.Application.Controller
         }
 
         [Protected]
-        [HttpPost("create")]
+        [HttpPost]
         public async Task<IActionResult> CreateCart(CartCreate req)
         {
             try
@@ -65,7 +65,7 @@ namespace KFS.src.Application.Controller
         }
 
         [Protected]
-        [HttpPut("update/{id}")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCart(CartUpdate req, Guid id)
         {
             try
@@ -80,7 +80,7 @@ namespace KFS.src.Application.Controller
         }
 
         [Protected]
-        [HttpDelete("delete/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCart(Guid id)
         {
             try
@@ -95,12 +95,12 @@ namespace KFS.src.Application.Controller
         }
 
         [Protected]
-        [HttpPost("add-product")]
-        public async Task<IActionResult> AddProductToCart(CartAddRemoveDto req)
+        [HttpPost("{id}/product/add")]
+        public async Task<IActionResult> AddProductToCart(Guid id, CartAddRemoveDto req)
         {
             try
             {
-                var result = await _cartService.AddProductToCart(req);
+                var result = await _cartService.AddProductToCart(id, req);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -110,12 +110,12 @@ namespace KFS.src.Application.Controller
         }
 
         [Protected]
-        [HttpPost("remove-product")]
-        public async Task<IActionResult> RemoveProductFromCart(CartAddRemoveDto req)
+        [HttpPost("{id}/product/remove")]
+        public async Task<IActionResult> RemoveProductFromCart(Guid id, CartAddRemoveDto req)
         {
             try
             {
-                var result = await _cartService.RemoveProductFromCart(req);
+                var result = await _cartService.RemoveProductFromCart(id, req);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -124,12 +124,12 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPost("add-batch")]
-        public async Task<IActionResult> AddBatchToCart(BatchAddRemoveDto req)
+        [HttpPost("{id}/batch/add")]
+        public async Task<IActionResult> AddBatchToCart(Guid id, BatchAddRemoveDto req)
         {
             try
             {
-                var result = await _cartService.AddBatchToCart(req);
+                var result = await _cartService.AddBatchToCart(id, req);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -138,12 +138,12 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPost("remove-batch")]
-        public async Task<IActionResult> RemoveBatchFromCart(BatchAddRemoveDto req)
+        [HttpPost("{id}/batch/remove")]
+        public async Task<IActionResult> RemoveBatchFromCart(Guid id, BatchAddRemoveDto req)
         {
             try
             {
-                var result = await _cartService.RemoveBatchFromCart(req);
+                var result = await _cartService.RemoveBatchFromCart(id, req);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -152,12 +152,12 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpGet("by-user/{userId}")]
-        public async Task<IActionResult> GetCartByUserId(Guid userId)
+        [HttpGet("user/{id}")]
+        public async Task<IActionResult> GetCartByUserId(Guid id)
         {
             try
             {
-                var result = await _cartService.GetCartByUserId(userId);
+                var result = await _cartService.GetCartByUserId(id);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -166,7 +166,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpGet("get-own-cart")]
+        [HttpGet("own")]
         public async Task<IActionResult> GetOwnCart()
         {
             try

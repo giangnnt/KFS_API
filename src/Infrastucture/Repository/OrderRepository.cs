@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using KFS.src.Application.Dto.OrderDtos;
 using KFS.src.Domain.Entities;
 using KFS.src.Domain.IRepository;
 using KFS.src.Infrastucture.Context;
 using Microsoft.EntityFrameworkCore;
+using static KFS.src.Application.Dto.Pagination.Pagination;
 
 namespace KFS.src.Infrastucture.Repository
 {
@@ -50,13 +52,26 @@ namespace KFS.src.Infrastucture.Repository
             .ToListAsync();
         }
 
-        public async Task<IEnumerable<Order>> GetOrders()
+        public async Task<ObjectPaging<Order>> GetOrders(OrderQuery orderQuery)
         {
-            return await _context.Orders
+            var query = _context.Orders.AsQueryable();
+            // search syntax
+            query = query.Where(p => p.PaymentMethod == orderQuery.PaymentMethod || orderQuery.PaymentMethod == null);
+            query = query.Where(p => p.Status == orderQuery.Status || orderQuery.Status == null);
+            //set total
+            var total = await query.CountAsync();
+
+            // return
+            var orderList = await query
             .Include(x => x.OrderItems)
             .Include(x => x.Payment)
             .Include(x => x.Shipment)
             .ToListAsync();
+            return new ObjectPaging<Order>
+            {
+                List = orderList,
+                Total = total
+            };
         }
 
         public async Task<bool> UpdateOrder(Order order)

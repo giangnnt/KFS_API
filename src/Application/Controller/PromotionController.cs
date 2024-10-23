@@ -20,7 +20,7 @@ namespace KFS.src.Application.Controller
             _promotionService = promotionService;
         }
         [Protected]
-        [HttpGet("all")]
+        [HttpGet]
         public async Task<IActionResult> GetPromotions()
         {
             try
@@ -48,7 +48,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPost("create")]
+        [HttpPost]
         public async Task<IActionResult> CreatePromotion(PromotionCreate req)
         {
             try
@@ -62,7 +62,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPut("update/{id}")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> UpdatePromotion(PromotionUpdate req, Guid id)
         {
             try
@@ -76,7 +76,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpDelete("delete/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePromotion(Guid id)
         {
             try
@@ -90,7 +90,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPut("start/{id}")]
+        [HttpPut("{id}/start")]
         public async Task<IActionResult> SetPromotionState(Guid id)
         {
             try
@@ -104,7 +104,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPut("update-product-promotion/{promotionId}")]
+        [HttpPut("{id}/products")]
         public async Task<IActionResult> ListProductToPromotion(Guid promotionId, PromotionAddRemoveItemDto productId)
         {
             try
@@ -118,7 +118,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPut("update-batch-promotion/{promotionId}")]
+        [HttpPut("{id}/batches")]
         public async Task<IActionResult> ListBatchToPromotion(Guid promotionId, PromotionAddRemoveItemDto batchId)
         {
             try
@@ -132,7 +132,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPut("update-category-promotion/{promotionId}")]
+        [HttpPut("{id}/categories")]
         public async Task<IActionResult> ListCategoryToPromotion(Guid promotionId, PromotionAddRemoveItemDto categoryId)
         {
             try
@@ -146,7 +146,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPut("end/{promotionId}")]
+        [HttpPut("{id}/end")]
         public async Task<IActionResult> EndPromotion(Guid promotionId)
         {
             try

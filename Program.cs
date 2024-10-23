@@ -1,6 +1,5 @@
 using Hangfire;
 using KFS.src.Application.Core;
-using KFS.src.Application.Core;
 using KFS.src.Application.Core.Crypto;
 using KFS.src.Application.Core.Jwt;
 using KFS.src.Application.Service;
@@ -9,8 +8,6 @@ using KFS.src.Domain.IService;
 using KFS.src.Infrastucture.Cache;
 using KFS.src.Infrastucture.Context;
 using KFS.src.Infrastucture.Repository;
-using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
@@ -57,6 +54,7 @@ builder.Services.AddScoped<ICategoryRepository,CategoryRepository>();
 builder.Services.AddScoped<IWalletRepository, WalletRepository>();
 builder.Services.AddScoped<ICredentialRepositoty, CredentialRepository>();
 builder.Services.AddScoped<IMediaRepository, MediaRepository>();
+builder.Services.AddScoped<IFeedbackRepository, FeedbackRepository>();
 // Add Service 
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICartService, CartService>();
@@ -77,6 +75,7 @@ builder.Services.AddScoped<ICredentialService, CredentialService>();
 builder.Services.AddScoped<IGCService, GCService>();
 builder.Services.AddScoped<ICredentialService, CredentialService>();
 builder.Services.AddScoped<IMediaService, MediaService>();
+builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 // Add Mapper
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddEndpointsApiExplorer();
@@ -91,7 +90,8 @@ builder.Services.AddDbContext<KFSContext>(options => options.UseSqlServer(connec
 
 // redis configuration
 Console.WriteLine($"Redis connection string: {builder.Configuration.GetConnectionString("RedisConnection")}");
-builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("RedisConnection")));
+var redisConnectionString = builder.Configuration.GetConnectionString("RedisConnection") ?? throw new InvalidOperationException("Redis connection string is not configured.");
+builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnectionString));
 
 // hangfire configuration
 Console.WriteLine($"Hangfire connection string: {builder.Configuration.GetConnectionString("DatabaseConnection")}");
