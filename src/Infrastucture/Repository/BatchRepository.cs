@@ -47,7 +47,8 @@ namespace KFS.src.Infrastucture.Repository
 
         public async Task<bool> UpdateBatch(Batch batch)
         {
-            batch.UpdatedAt = DateTime.Now;
+            DateTime nowVietnam = TimeZoneInfo.ConvertTime(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
+            batch.UpdatedAt = nowVietnam;
             _context.Batches.Update(batch);
             var result = await _context.SaveChangesAsync();
             return result > 0;

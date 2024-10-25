@@ -49,7 +49,8 @@ namespace KFS.src.Infrastucture.Repository
 
         public async Task<bool> UpdateShipment(Shipment shipment)
         {
-            shipment.UpdatedAt = DateTime.Now;
+            DateTime nowVietnam = TimeZoneInfo.ConvertTime(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
+            shipment.UpdatedAt = nowVietnam;
             _context.Shipments.Update(shipment);
             var result = await _context.SaveChangesAsync();
             return result > 0;

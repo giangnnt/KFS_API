@@ -73,7 +73,8 @@ namespace KFS.src.Infrastucture.Repository
 
         public async Task<bool> UpdateFeedback(Feedback feedback)
         {
-            feedback.UpdatedAt = DateTime.Now;
+            DateTime nowVietnam = TimeZoneInfo.ConvertTime(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
+            feedback.UpdatedAt = nowVietnam;
             _context.Feedbacks.Update(feedback);
             return await _context.SaveChangesAsync() > 0;
         }

@@ -97,9 +97,9 @@ namespace KFS.src.Application.Service
                 }
                 if (order.PaymentMethod == PaymentMethodEnum.COD)
                 {
-                    if (order.Status != OrderStatusEnum.Processing)
+                    if (order.Status != OrderStatusEnum.Accepted)
                     {
-                        response.Message = "Order is not processing";
+                        response.Message = "Order is not accepted";
                         response.IsSuccess = false;
                         return response;
                     }

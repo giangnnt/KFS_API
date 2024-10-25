@@ -51,7 +51,8 @@ namespace KFS.src.Infrastucture.Repository
 
         public async Task<bool> UpdateBatchPromotion(Promotion promotion, List<Batch> batch)
         {
-            promotion.UpdatedAt = DateTime.Now;
+            DateTime nowVietnam = TimeZoneInfo.ConvertTime(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
+            promotion.UpdatedAt = nowVietnam;
             // get and remove batch
             foreach (var item in promotion.Batches)
             {
@@ -75,7 +76,8 @@ namespace KFS.src.Infrastucture.Repository
 
         public async Task<bool> UpdateCategoryPromotion(Promotion promotion, List<Category> category)
         {
-            promotion.UpdatedAt = DateTime.Now;
+            DateTime nowVietnam = TimeZoneInfo.ConvertTime(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
+            promotion.UpdatedAt = nowVietnam;
             // get and remove category
             foreach (var item in promotion.Categories)
             {
@@ -99,7 +101,8 @@ namespace KFS.src.Infrastucture.Repository
 
         public async Task<bool> UpdateProductPromotion(Promotion promotion, List<Product> product)
         {
-            promotion.UpdatedAt = DateTime.Now;
+            DateTime nowVietnam = TimeZoneInfo.ConvertTime(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
+            promotion.UpdatedAt = nowVietnam;
             // get and remove product
             for (int i = 0; i < promotion.Products.Count; i++)
             {
@@ -123,7 +126,8 @@ namespace KFS.src.Infrastucture.Repository
 
         public async Task<bool> UpdatePromotion(Promotion promotion)
         {
-            promotion.UpdatedAt = DateTime.Now;
+            DateTime nowVietnam = TimeZoneInfo.ConvertTime(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
+            promotion.UpdatedAt = nowVietnam;
             _context.Promotions.Update(promotion);
             var result = await _context.SaveChangesAsync();
             return result > 0;

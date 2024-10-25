@@ -88,10 +88,10 @@ namespace KFS.src.Application.Controller
             {
                 return BadRequest(ex.Message);
             }
-        }   
+        }
         [Protected]
-        [HttpPut("{id}/{is-for-sell}")]
-        public async Task<IActionResult> UpdateIsForSell(bool isForSell, Guid id)
+        [HttpPut("{id}/is-for-sell")]
+        public async Task<IActionResult> UpdateIsForSell(Guid id, [FromQuery] bool isForSell)
         {
             try
             {

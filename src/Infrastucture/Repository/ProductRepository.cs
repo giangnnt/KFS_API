@@ -63,7 +63,8 @@ namespace KFS.src.Infrastucture.Repository
         }
         public async Task<bool> UpdateProduct(Product product)
         {
-            product.UpdatedAt = DateTime.Now;
+            DateTime nowVietnam = TimeZoneInfo.ConvertTime(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
+            product.UpdatedAt = nowVietnam;
             _context.Products.Update(product);
             int result = await _context.SaveChangesAsync();
             return result > 0;

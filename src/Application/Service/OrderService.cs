@@ -34,7 +34,6 @@ namespace KFS.src.Application.Service
         private readonly IBatchRepository _batchRepository;
         private readonly HttpContext _httpContext;
         private readonly IOwnerService _ownerService;
-
         private readonly IMapper _mapper;
         public OrderService(IOrderRepository orderRepository, IMapper mapper, IUserRepository userRepository, ICartRepository cartRepository, IVNPayService vNPayService, IHttpContextAccessor httpContextAccessor, IProductRepository productRepository, IPaymentRepository paymentRepository, IWalletRepository walletRepository, IPromotionRepository promotionRepository, IBatchRepository batchRepository, IOwnerService ownerService)
         {
@@ -48,13 +47,14 @@ namespace KFS.src.Application.Service
             _walletRepository = walletRepository;
             _promotionRepository = promotionRepository;
             _batchRepository = batchRepository;
+            _ownerService = ownerService;
 
             // http context
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             _httpContext = httpContextAccessor.HttpContext ?? throw new InvalidOperationException("Http context is required.");
         }
 
-        public async Task<ResponseDto> CreateOrderFromCart(OrderCreateFromCart req)
+        public async Task<ResponseDto> CreateOrderFromCart(Guid id, OrderCreateFromCart req)
         {
             var response = new ResponseDto();
             try
@@ -63,7 +63,7 @@ namespace KFS.src.Application.Service
                 var mappedOrder = _mapper.Map<Order>(req);
 
                 //check if cart exist
-                var cart = await _cartRepository.GetCartById(req.CartId);
+                var cart = await _cartRepository.GetCartById(id);
                 //check if cart is authorized
                 var isOwner = _ownerService.CheckEntityOwner(_httpContext, cart.UserId);
                 if (!isOwner)
@@ -512,7 +512,7 @@ namespace KFS.src.Application.Service
                 else
                 {
                     var product = await _productRepository.GetProductById(orderItem.ProductId);
-                    orderItem.Product = _mapper.Map<ProductDto>(product);
+                    orderItem.Product = _mapper.Map<ProductDtoNoBatch>(product);
                 }
             }
         }
@@ -530,7 +530,7 @@ namespace KFS.src.Application.Service
                     else
                     {
                         var product = await _productRepository.GetProductById(orderItem.ProductId);
-                        orderItem.Product = _mapper.Map<ProductDto>(product);
+                        orderItem.Product = _mapper.Map<ProductDtoNoBatch>(product);
                     }
                 }
             }
@@ -542,7 +542,7 @@ namespace KFS.src.Application.Service
             try
             {
                 var orders = await _orderRepository.GetOrders(req);
-                var mappedOrders = _mapper.Map<List<OrderDto>>(orders);
+                var mappedOrders = _mapper.Map<List<OrderDto>>(orders.List);
                 //map by format
                 await GetOrdersFormat(mappedOrders);
 
@@ -643,13 +643,13 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public async Task<ResponseDto> UpdateOrderStatus(OrderUpdateStatus req)
+        public async Task<ResponseDto> AcceptOrder(Guid id, bool isAccept)
         {
             var response = new ResponseDto();
             try
             {
                 //get order
-                var order = _orderRepository.GetOrderById(req.Id).Result;
+                var order = await _orderRepository.GetOrderById(id);
                 if (order == null)
                 {
                     response.StatusCode = 404;
@@ -659,7 +659,7 @@ namespace KFS.src.Application.Service
                 }
 
                 //set order status
-                order.Status = req.Status;
+                order.Status = isAccept ? OrderStatusEnum.Accepted : OrderStatusEnum.Canceled;
 
                 //update order
                 var result = await _orderRepository.UpdateOrder(order);

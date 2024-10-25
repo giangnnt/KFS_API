@@ -342,7 +342,6 @@ namespace KFS.src.Application.Service
             var response = new ResponseDto();
             try
             {
-                var result = await _cartRepository.DeleteCart(id);
                 var cart = await _cartRepository.GetCartById(id);
                 //check if cart is authorized
                 var isOwner = _ownerService.CheckEntityOwner(_httpContext, cart.UserId);
@@ -353,6 +352,7 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
                     return response;
                 }
+                var result = await _cartRepository.DeleteCart(id);
                 if (result)
                 {
                     response.StatusCode = 200;
@@ -383,15 +383,6 @@ namespace KFS.src.Application.Service
             try
             {
                 var cart = await _cartRepository.GetCartById(id);
-                //check if cart is authorized
-                var isOwner = _ownerService.CheckEntityOwner(_httpContext, cart.UserId);
-                if (!isOwner)
-                {
-                    response.StatusCode = 401;
-                    response.Message = "Unauthorized";
-                    response.IsSuccess = false;
-                    return response;
-                }
                 var mappedCart = _mapper.Map<CartDto>(cart);
                 //map by format
                 await GetCartFormat(mappedCart);
@@ -435,7 +426,7 @@ namespace KFS.src.Application.Service
                 else
                 {
                     var product = await _productRepository.GetProductById(cartItem.ProductId);
-                    cartItem.Product = _mapper.Map<ProductDto>(product);
+                    cartItem.Product = _mapper.Map<ProductDtoNoBatch>(product);
                 }
             }
         }
@@ -453,7 +444,7 @@ namespace KFS.src.Application.Service
                     else
                     {
                         var product = await _productRepository.GetProductById(cartItem.ProductId);
-                        cartItem.Product = _mapper.Map<ProductDto>(product);
+                        cartItem.Product = _mapper.Map<ProductDtoNoBatch>(product);
                     }
                 }
             }
@@ -715,10 +706,10 @@ namespace KFS.src.Application.Service
             var response = new ResponseDto();
             try
             {
-                var cart = _cartRepository.GetCartByUserId(userId);
-                var mappedCart = _mapper.Map<CartDto>(cart);
+                var cart = await _cartRepository.GetCartByUserId(userId);
+                var mappedCart = _mapper.Map<List<CartDto>>(cart);
                 //map by format
-                await GetCartFormat(mappedCart);
+                await GetCartsFormat(mappedCart);
                 if (mappedCart != null)
                 {
                     response.StatusCode = 200;

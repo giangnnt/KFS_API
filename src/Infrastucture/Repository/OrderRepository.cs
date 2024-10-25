@@ -48,6 +48,8 @@ namespace KFS.src.Infrastucture.Repository
         {
             return await _context.Orders
             .Include(x => x.OrderItems)
+            .Include(x => x.Payment)
+            .Include(x => x.Shipment)
             .Where(x => x.UserId == userId)
             .ToListAsync();
         }
@@ -76,7 +78,8 @@ namespace KFS.src.Infrastucture.Repository
 
         public async Task<bool> UpdateOrder(Order order)
         {
-            order.UpdatedAt = DateTime.Now;
+            DateTime nowVietnam = TimeZoneInfo.ConvertTime(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
+            order.UpdatedAt = nowVietnam;
             _context.Orders.Update(order);
 
             foreach (var item in order.OrderItems)

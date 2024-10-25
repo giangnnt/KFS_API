@@ -11,6 +11,6 @@ namespace KFS.src.Application.Dto.OrderDtos
     {
         public Guid Id { get; set; }
         [JsonConverter(typeof(JsonStringEnumConverter))]
-        public OrderStatusEnum Status { get; set; }
+        public bool IsAccept { get; set; }
     }
 }

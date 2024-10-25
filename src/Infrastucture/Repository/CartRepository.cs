@@ -19,7 +19,8 @@ namespace KFS.src.Infrastucture.Repository
 
         public async Task<bool> AddRemoveCartItem(Cart cart)
         {
-            cart.UpdatedAt = DateTime.Now;
+            DateTime nowVietnam = TimeZoneInfo.ConvertTime(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
+            cart.UpdatedAt = nowVietnam;
             _context.Carts.Update(cart);
 
             foreach (var item in cart.CartItems)
@@ -83,7 +84,6 @@ namespace KFS.src.Infrastucture.Repository
             return await _context.Carts
                 .Include(c => c.CartItems)
                 .ThenInclude(ci => ci.Product)
-                .ThenInclude(p => p.Category)
                 .Include(c => c.CartItems)
                 .ThenInclude(ci => ci.Product)
                 .ThenInclude(p => p.Batches)
@@ -93,7 +93,8 @@ namespace KFS.src.Infrastucture.Repository
 
         public async Task<bool> UpdateCart(Cart cart)
         {
-            cart.UpdatedAt = DateTime.Now;
+            DateTime nowVietnam = TimeZoneInfo.ConvertTime(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
+            cart.UpdatedAt = nowVietnam;;
             _context.Carts.Update(cart);
             int result = await _context.SaveChangesAsync();
             return result > 0;
