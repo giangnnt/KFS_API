@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using KFS.src.Application.Dto.BatchDtos;
 using KFS.src.Application.Dto.CategoryDtos;
+using KFS.src.Application.Dto.FeedbackDtos;
 using KFS.src.Application.Dto.MediaDtos;
 using KFS.src.Application.Dto.PromotionDtos;
 using KFS.src.Application.Enum;
@@ -31,11 +32,15 @@ namespace KFS.src.Application.Dto.ProductDtos
         public int Inventory { get; set; }
         public bool IsForSell { get; set; }
         public Guid CategoryId { get; set; }
+        public Guid? ConsignmentId { get; set; }
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public ProductStatusEnum Status { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public List<BatchDto>? Batches { get; set; }
         public List<PromotionDto>? Promotions { get; set; }
         public List<MediaDto>? Medias { get; set; }
+        public List<FeedbackDto>? Feedbacks { get; set; }
     }
     public class ProductProfile : Profile
     {
@@ -45,6 +50,7 @@ namespace KFS.src.Application.Dto.ProductDtos
             .ForMember(dest => dest.Batches, opt => opt.MapFrom(src => src.Batches))
             .ForMember(dest => dest.Promotions, opt => opt.MapFrom(src => src.Promotions))
             .ForMember(dest => dest.Medias, opt => opt.MapFrom(src => src.Medias))
+            .ForMember(dest => dest.Feedbacks, opt => opt.MapFrom(src => src.Feedbacks))
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<ProductCreate, Product>()
             .ForMember(dest => dest.Category, opt => opt.Ignore())

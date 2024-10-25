@@ -80,6 +80,7 @@ namespace KFS.src.Infrastucture.Repository
 
         public async Task<bool> UpdatePayment(Payment payment)
         {
+            payment.UpdatedAt = DateTime.Now;
             _context.Update(payment);
             var result = await _context.SaveChangesAsync();
             return result > 0;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using KFS.src.Application.Constant;
 using KFS.src.Application.Core.Jwt;
 using KFS.src.Application.Dto.ResponseDtos;
 using KFS.src.Domain.IRepository;
@@ -46,7 +47,7 @@ namespace KFS.src.Application.Middleware
                     });
                     return;
                 }
-                if(roleBaseRepository == null || cacheService == null)
+                if (roleBaseRepository == null || cacheService == null)
                 {
                     context.Result = new JsonResult(new ResponseDto
                     {

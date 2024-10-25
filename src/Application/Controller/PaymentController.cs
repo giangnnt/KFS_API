@@ -48,12 +48,12 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPost]
-        public async Task<IActionResult> CreatePayment()
+        [HttpPost("offline-order/{id}")]
+        public async Task<IActionResult> CreatePaymentOffline(Guid id)
         {
             try
             {
-                var result = await _paymentService.CreatePayment();
+                var result = await _paymentService.CreatePaymentOffline(id);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -76,7 +76,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPost("order/{id}")]
+        [HttpPost("COD-order/{id}")]
         public async Task<IActionResult> CreatePaymentByOrderId(Guid orderId)
         {
             try

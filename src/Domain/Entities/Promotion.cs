@@ -15,6 +15,8 @@ namespace KFS.src.Domain.Entities
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public bool IsActive { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
         public List<Product> Products { get; set; } = new List<Product>();
         public List<Batch> Batches { get; set; } = new List<Batch>();
         public List<Category> Categories { get; set; } = new List<Category>();

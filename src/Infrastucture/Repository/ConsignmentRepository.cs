@@ -103,6 +103,7 @@ namespace KFS.src.Infrastucture.Repository
 
         public async Task<bool> UpdateConsignment(Consignment consignment)
         {
+            consignment.UpdatedAt = DateTime.Now;
             _context.Consignments.Update(consignment);
             var result = await _context.SaveChangesAsync();
             return result > 0;

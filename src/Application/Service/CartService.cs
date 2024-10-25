@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using KFS.src.Application.Constant;
 using KFS.src.Application.Core.Jwt;
 using KFS.src.Application.Dto.BatchDtos;
 using KFS.src.Application.Dto.CartDtos;
@@ -25,15 +26,21 @@ namespace KFS.src.Application.Service
         private readonly ICartItemRepository _cartItemRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IBatchRepository _batchRepository;
-        public CartService(ICartRepository cartRepository, IProductRepository productRepository, IUserRepository userRepository, IMapper mapper, IHttpContextAccessor httpContextAccessor, IBatchRepository batchRepository, ICartItemRepository cartItemRepository)
+        private readonly HttpContext _httpContext;
+        private readonly IOwnerService _ownerService;
+        public CartService(ICartRepository cartRepository, IProductRepository productRepository, IUserRepository userRepository, IMapper mapper, IHttpContextAccessor httpContextAccessor, IBatchRepository batchRepository, ICartItemRepository cartItemRepository, IOwnerService ownerService)
         {
             _cartRepository = cartRepository;
             _productRepository = productRepository;
             _userRepository = userRepository;
             _mapper = mapper;
-            _httpContextAccessor = httpContextAccessor;
             _batchRepository = batchRepository;
             _cartItemRepository = cartItemRepository;
+            _ownerService = ownerService;
+            // http context
+            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
+            _httpContext = httpContextAccessor.HttpContext ?? throw new InvalidOperationException("Http context is required.");
+
         }
 
         public async Task<ResponseDto> AddBatchToCart(Guid id, BatchAddRemoveDto req)
@@ -44,6 +51,17 @@ namespace KFS.src.Application.Service
                 var cart = await _cartRepository.GetCartById(id);
                 var batch = await _batchRepository.GetBatchById(req.BatchId);
                 var product = await _productRepository.GetProductById(batch.ProductId);
+
+                //check if cart is authorized
+                var isOwner = _ownerService.CheckEntityOwner(_httpContext, cart.UserId);
+                if (!isOwner)
+                {
+                    response.StatusCode = 401;
+                    response.Message = "Unauthorized";
+                    response.IsSuccess = false;
+                    return response;
+                }
+
                 //check if batch is for sell
                 if (batch.IsForSell == false)
                 {
@@ -53,7 +71,7 @@ namespace KFS.src.Application.Service
                     return response;
                 }
                 //check if any cart item exists rules: same product, is a batch, same quantity
-                var cartItem = cart.CartItems.Where(x => x.ProductId == batch.ProductId && x.IsBatch == true && x.Quantity == batch.Quantity).FirstOrDefault();
+                var cartItem = cart.CartItems.Where(x => req.BatchId == x.BatchId).FirstOrDefault();
                 if (cartItem == null)
                 {
                     // check if any cart item is a same product but not a batch
@@ -137,6 +155,19 @@ namespace KFS.src.Application.Service
             {
                 var cart = await _cartRepository.GetCartById(id);
                 var product = await _productRepository.GetProductById(req.ProductId);
+
+                //check if cart is authorized
+                var isOwner = _ownerService.CheckEntityOwner(_httpContext, cart.UserId);
+                if (!isOwner)
+                {
+                    response.StatusCode = 401;
+                    response.Message = "Unauthorized";
+                    response.IsSuccess = false;
+                    return response;
+                }
+
+                //check if cart is authorized
+
                 //check if product is for sell
                 if (product.IsForSell == false)
                 {
@@ -312,6 +343,16 @@ namespace KFS.src.Application.Service
             try
             {
                 var result = await _cartRepository.DeleteCart(id);
+                var cart = await _cartRepository.GetCartById(id);
+                //check if cart is authorized
+                var isOwner = _ownerService.CheckEntityOwner(_httpContext, cart.UserId);
+                if (!isOwner)
+                {
+                    response.StatusCode = 401;
+                    response.Message = "Unauthorized";
+                    response.IsSuccess = false;
+                    return response;
+                }
                 if (result)
                 {
                     response.StatusCode = 200;
@@ -342,6 +383,15 @@ namespace KFS.src.Application.Service
             try
             {
                 var cart = await _cartRepository.GetCartById(id);
+                //check if cart is authorized
+                var isOwner = _ownerService.CheckEntityOwner(_httpContext, cart.UserId);
+                if (!isOwner)
+                {
+                    response.StatusCode = 401;
+                    response.Message = "Unauthorized";
+                    response.IsSuccess = false;
+                    return response;
+                }
                 var mappedCart = _mapper.Map<CartDto>(cart);
                 //map by format
                 await GetCartFormat(mappedCart);
@@ -454,6 +504,15 @@ namespace KFS.src.Application.Service
             {
                 var cart = await _cartRepository.GetCartById(id);
                 var batch = await _batchRepository.GetBatchById(req.BatchId);
+                //check if cart is authorized
+                var isOwner = _ownerService.CheckEntityOwner(_httpContext, cart.UserId);
+                if (!isOwner)
+                {
+                    response.StatusCode = 401;
+                    response.Message = "Unauthorized";
+                    response.IsSuccess = false;
+                    return response;
+                }
                 //check if any cart item exists
                 var cartItem = cart.CartItems.FirstOrDefault(x => x.ProductId == batch.ProductId);
                 if (cartItem == null)
@@ -517,6 +576,15 @@ namespace KFS.src.Application.Service
             {
                 var cart = await _cartRepository.GetCartById(id);
                 var product = await _productRepository.GetProductById(req.ProductId);
+                //check if cart is authorized
+                var isOwner = _ownerService.CheckEntityOwner(_httpContext, cart.UserId);
+                if (!isOwner)
+                {
+                    response.StatusCode = 401;
+                    response.Message = "Unauthorized";
+                    response.IsSuccess = false;
+                    return response;
+                }
                 //check if any cart item exists
                 var cartItem = cart.CartItems.FirstOrDefault(x => x.ProductId == req.ProductId);
                 if (cartItem == null)
@@ -580,6 +648,15 @@ namespace KFS.src.Application.Service
             try
             {
                 var cart = await _cartRepository.GetCartById(id);
+                //check if cart is authorized
+                var isOwner = _ownerService.CheckEntityOwner(_httpContext, cart.UserId);
+                if (!isOwner)
+                {
+                    response.StatusCode = 401;
+                    response.Message = "Unauthorized";
+                    response.IsSuccess = false;
+                    return response;
+                }
                 if (cart == null)
                 {
                     response.StatusCode = 404;

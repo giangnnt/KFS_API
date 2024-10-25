@@ -135,6 +135,7 @@ namespace KFS.src.Infrastucture.Context
                 entity.Property(entity => entity.Id).ValueGeneratedOnAdd();
                 entity.Property(entity => entity.Gender).HasConversion(v => v.ToString(), v => v != null ? (GenderEnum)Enum.Parse(typeof(GenderEnum), v) : default)
                 .HasColumnType("nvarchar(20)");
+                entity.Property(entity => entity.Status).HasConversion(v => v.ToString(), v => v != null ? (ProductStatusEnum)Enum.Parse(typeof(ProductStatusEnum), v) : default);
                 entity.HasMany(p => p.Batches)
                 .WithOne(b => b.Product)
                 .OnDelete(DeleteBehavior.Restrict);
@@ -231,6 +232,7 @@ namespace KFS.src.Infrastucture.Context
             //config cart
             modelBuilder.Entity<Cart>(entity =>
             {
+                entity.Property(entity => entity.Id).ValueGeneratedOnAdd();
                 entity.Property(entity => entity.Status)
                 .HasConversion(
                     v => v.ToString(),
@@ -343,11 +345,16 @@ namespace KFS.src.Infrastucture.Context
             modelBuilder.Entity<Promotion>()
             .HasIndex(p => p.DiscountCode)
             .IsUnique();
+            modelBuilder.Entity<Promotion>(entity => 
+            {
+                entity.Property(entity => entity.Id).ValueGeneratedOnAdd();
+            });
             //config batch
             modelBuilder.Entity<Batch>(entity =>
             {
                 entity.Property(entity => entity.Id).ValueGeneratedOnAdd();
                 entity.Property(entity => entity.IsForSell).HasDefaultValue(false);
+                entity.Property(entity => entity.Status).HasConversion(v => v.ToString(), v => v != null ? (ProductStatusEnum)Enum.Parse(typeof(ProductStatusEnum), v) : default);
                 entity.HasOne(b => b.Product)
                 .WithMany(p => p.Batches)
                 .HasForeignKey(b => b.ProductId)

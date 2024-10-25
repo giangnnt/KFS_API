@@ -13,6 +13,7 @@ using KFS.src.Application.Enum;
 using KFS.src.Domain.Entities;
 using KFS.src.Domain.IRepository;
 using KFS.src.Domain.IService;
+using StackExchange.Redis;
 using static KFS.src.Application.Dto.Pagination.Pagination;
 
 namespace KFS.src.Application.Service
@@ -24,21 +25,29 @@ namespace KFS.src.Application.Service
         private readonly IConsignmentRepository _consignmentRepository;
         private readonly IProductRepository _productRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly HttpContext _httpContext;
         private readonly IMapper _mapper;
         private readonly IBackgroundJobClient _backgroundJobClient;
         private readonly IVNPayService _vNPayService;
         private readonly IPaymentRepository _paymentRepository;
-        public ConsignmentService(IOrderRepository orderRepository, IConsignmentRepository consignmentRepository, IProductRepository productRepository, IHttpContextAccessor httpContextAccessor, IOrderItemRepository orderItemRepository, IMapper mapper, IBackgroundJobClient backgroundJobClient, IVNPayService vNPayService, IPaymentRepository paymentRepository)
+        private readonly IBatchRepository _batchRepository;
+        private readonly IOwnerService _ownerService;
+        public ConsignmentService(IOrderRepository orderRepository, IConsignmentRepository consignmentRepository, IProductRepository productRepository, IHttpContextAccessor httpContextAccessor, IOrderItemRepository orderItemRepository, IMapper mapper, IBackgroundJobClient backgroundJobClient, IVNPayService vNPayService, IPaymentRepository paymentRepository, IBatchRepository batchRepository, IOwnerService ownerService)
         {
             _consignmentRepository = consignmentRepository;
             _orderRepository = orderRepository;
-            _httpContextAccessor = httpContextAccessor;
             _productRepository = productRepository;
             _orderItemRepository = orderItemRepository;
             _mapper = mapper;
             _backgroundJobClient = backgroundJobClient;
             _vNPayService = vNPayService;
             _paymentRepository = paymentRepository;
+            _batchRepository = batchRepository;
+            _ownerService = ownerService;
+
+            // http context
+            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
+            _httpContext = httpContextAccessor.HttpContext ?? throw new InvalidOperationException("Http context is required.");
         }
         public async Task<ResponseDto> CreateConsignment(ConsignmentCreate req)
         {
@@ -167,6 +176,7 @@ namespace KFS.src.Application.Service
                 var consignment = new Consignment();
                 if (orderItem.IsBatch)
                 {
+                    var batch = await _batchRepository.GetBatchById(orderItem.BatchId);
                     consignment.UserId = order.UserId;
                     consignment.Method = ConsignmentMethodEnum.Online;
                     consignment.CommissionPercentage = req.CommissionPercentage;
@@ -195,19 +205,16 @@ namespace KFS.src.Application.Service
                         Inventory = 0,
                         Status = ProductStatusEnum.Consignment,
                     };
-                    foreach (var batch in product.Batches)
+                    consignment.Product.Batches.Add(new Batch
                     {
-                        consignment.Product.Batches.Add(new Batch
-                        {
-                            Name = batch.Name,
-                            Description = batch.Description,
-                            Price = req.DealingAmount,
-                            Quantity = batch.Quantity,
-                            Inventory = batch.Inventory,
-                            Status = ProductStatusEnum.Consignment,
-                            IsForSell = false,
-                        });
-                    }
+                        Name = batch.Name,
+                        Description = batch.Description,
+                        Quantity = batch.Quantity,
+                        Inventory = orderItem.Quantity,
+                        Price = req.DealingAmount,
+                        Status = ProductStatusEnum.Consignment,
+                        IsForSell = false
+                    });
                 }
                 else
                 {
@@ -273,6 +280,15 @@ namespace KFS.src.Application.Service
             try
             {
                 var consignment = await _consignmentRepository.GetConsignmentById(id);
+                //check if consignment is authorized
+                var isOwner = _ownerService.CheckEntityOwner(_httpContext, consignment.UserId);
+                if (!isOwner)
+                {
+                    response.StatusCode = 401;
+                    response.Message = "Unauthorized";
+                    response.IsSuccess = false;
+                    return response;
+                }
                 if (consignment == null)
                 {
                     response.StatusCode = 404;
@@ -434,6 +450,15 @@ namespace KFS.src.Application.Service
             try
             {
                 var consignment = await _consignmentRepository.GetConsignmentById(consignmentId);
+                //check if consignment is authorized
+                var isOwner = _ownerService.CheckEntityOwner(_httpContext, consignment.UserId);
+                if (!isOwner)
+                {
+                    response.StatusCode = 401;
+                    response.Message = "Unauthorized";
+                    response.IsSuccess = false;
+                    return response;
+                }
                 if (consignment == null)
                 {
                     response.StatusCode = 404;
@@ -565,7 +590,7 @@ namespace KFS.src.Application.Service
                     //update consignment status active
                     await SetStatusConsignment(ConsignmentStatusEnum.Active, Guid.Parse(vnPayResponseModel.OrderId));
                     //job for expire consignment
-                    _backgroundJobClient.Enqueue(() => JobExpireConsignment(Guid.Parse(vnPayResponseModel.OrderId)));
+                    _backgroundJobClient.Schedule(() => JobExpireConsignment(Guid.Parse(vnPayResponseModel.OrderId)), consignment.ExpiryDate);
                     var result = await _paymentRepository.CreatePayment(payment);
                     if (result)
                     {
@@ -643,7 +668,7 @@ namespace KFS.src.Application.Service
                 return;
             }
         }
-        protected async Task JobExpireConsignment(Guid consignmentId)
+        public async Task JobExpireConsignment(Guid consignmentId)
         {
             try
             {
@@ -719,7 +744,7 @@ namespace KFS.src.Application.Service
                     return response;
                 }
                 var consignments = await _consignmentRepository.GetConsignmentsByUserId(consignmentQuery, payload.UserId);
-                var mappedConsignment = _mapper.Map<List<ConsignmentDto>>(consignments);
+                var mappedConsignment = _mapper.Map<List<ConsignmentDto>>(consignments.List);
                 if (consignments != null && consignments.List.Count() > 0)
                 {
                     response.StatusCode = 200;
@@ -727,7 +752,13 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = true;
                     response.Result = new ResultDto
                     {
-                        Data = mappedConsignment
+                        Data = mappedConsignment,
+                        PaginationResp = new PaginationResp
+                        {
+                            Page = consignmentQuery.Page,
+                            PageSize = consignmentQuery.PageSize,
+                            Total = consignments.Total
+                        }
                     };
                     return response;
                 }

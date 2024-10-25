@@ -71,9 +71,11 @@ namespace KFS.src.Infrastucture.Repository
 
         }
 
-        public Task<bool> UpdateFeedback(Feedback feedback)
+        public async Task<bool> UpdateFeedback(Feedback feedback)
         {
-            throw new NotImplementedException();
+            feedback.UpdatedAt = DateTime.Now;
+            _context.Feedbacks.Update(feedback);
+            return await _context.SaveChangesAsync() > 0;
         }
     }
 }

@@ -17,6 +17,8 @@ namespace KFS.src.Application.Dto.BatchDtos
         public decimal Price { get; set; }
         public Guid ProductId { get; set; }
         public bool IsForSell { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
     }
     public class BatchProfile : Profile
     {

@@ -18,6 +18,7 @@ namespace KFS.src.Infrastucture.Repository
         }
         public async Task<bool> CreateShipment(Shipment shipment)
         {
+            shipment.CreatedAt = DateTime.Now;
             _context.Shipments.Add(shipment);
             int result = await _context.SaveChangesAsync();
             return result > 0;
@@ -48,6 +49,7 @@ namespace KFS.src.Infrastucture.Repository
 
         public async Task<bool> UpdateShipment(Shipment shipment)
         {
+            shipment.UpdatedAt = DateTime.Now;
             _context.Shipments.Update(shipment);
             var result = await _context.SaveChangesAsync();
             return result > 0;

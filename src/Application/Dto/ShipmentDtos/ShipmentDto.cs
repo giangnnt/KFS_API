@@ -15,6 +15,8 @@ namespace KFS.src.Application.Dto.ShipmentDtos
         public Guid OrderId { get; set; }
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public ShipmentStatusEnum Status { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
     }
     public class ShipmentProfile : Profile
     {

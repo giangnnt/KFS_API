@@ -33,7 +33,7 @@ namespace KFS.src.Application.Service
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
         }
-        public Task<ResponseDto> CreatePayment()
+        public Task<ResponseDto> CreatePaymentOffline(Guid id)
         {
             throw new NotImplementedException();
         }

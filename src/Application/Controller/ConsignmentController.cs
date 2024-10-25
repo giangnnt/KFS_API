@@ -75,8 +75,7 @@ namespace KFS.src.Application.Controller
             var response = await _consignmentService.PayForConsignment(id);
             return Ok(response);
         }
-        [Protected]
-        [HttpGet("response-payment-url")]
+        [HttpGet("vnpayment-return")]
         public async Task<IActionResult> GetResponsePaymentUrl()
         {
             var response = await _consignmentService.GetResponsePaymentUrl();
