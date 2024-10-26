@@ -17,6 +17,8 @@ namespace KFS.src.Domain.Entities
         public Guid ProductId { get; set; }
         public ProductStatusEnum Status { get; set; }
         public bool IsForSell { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
         public List<Promotion> Promotions { get; set; } = new List<Promotion>();
         public Product Product { get; set; } = null!;
     }

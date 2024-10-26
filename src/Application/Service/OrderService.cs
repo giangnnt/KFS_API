@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using AutoMapper;
 using KFS.src.Application.Core.Jwt;
@@ -32,24 +33,31 @@ namespace KFS.src.Application.Service
         private readonly IWalletRepository _walletRepository;
         private readonly IPromotionRepository _promotionRepository;
         private readonly IBatchRepository _batchRepository;
-
+        private readonly HttpContext _httpContext;
+        private readonly IOwnerService _ownerService;
+        private readonly IShipmentRepository _shipmentRepository;
         private readonly IMapper _mapper;
-        public OrderService(IOrderRepository orderRepository, IMapper mapper, IUserRepository userRepository, ICartRepository cartRepository, IVNPayService vNPayService, IHttpContextAccessor httpContextAccessor, IProductRepository productRepository, IPaymentRepository paymentRepository, IWalletRepository walletRepository, IPromotionRepository promotionRepository, IBatchRepository batchRepository)
+        public OrderService(IOrderRepository orderRepository, IMapper mapper, IUserRepository userRepository, ICartRepository cartRepository, IVNPayService vNPayService, IHttpContextAccessor httpContextAccessor, IProductRepository productRepository, IPaymentRepository paymentRepository, IWalletRepository walletRepository, IPromotionRepository promotionRepository, IBatchRepository batchRepository, IOwnerService ownerService, IShipmentRepository shipmentRepository)
         {
             _orderRepository = orderRepository;
             _mapper = mapper;
             _userRepository = userRepository;
             _cartRepository = cartRepository;
             _vNPayService = vNPayService;
-            _httpContextAccessor = httpContextAccessor;
             _paymentRepository = paymentRepository;
             _productRepository = productRepository;
             _walletRepository = walletRepository;
             _promotionRepository = promotionRepository;
             _batchRepository = batchRepository;
+            _ownerService = ownerService;
+            _shipmentRepository = shipmentRepository;
+
+            // http context
+            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
+            _httpContext = httpContextAccessor.HttpContext ?? throw new InvalidOperationException("Http context is required.");
         }
 
-        public async Task<ResponseDto> CreateOrderFromCart(OrderCreateFromCart req)
+        public async Task<ResponseDto> CreateOrderFromCart(Guid id, OrderCreateFromCart req)
         {
             var response = new ResponseDto();
             try
@@ -58,7 +66,16 @@ namespace KFS.src.Application.Service
                 var mappedOrder = _mapper.Map<Order>(req);
 
                 //check if cart exist
-                var cart = await _cartRepository.GetCartById(req.CartId);
+                var cart = await _cartRepository.GetCartById(id);
+                //check if cart is authorized
+                var isOwner = _ownerService.CheckEntityOwner(_httpContext, cart.UserId);
+                if (!isOwner)
+                {
+                    response.StatusCode = 401;
+                    response.Message = "Unauthorized";
+                    response.IsSuccess = false;
+                    return response;
+                }
                 if (cart == null)
                 {
                     response.StatusCode = 404;
@@ -86,6 +103,33 @@ namespace KFS.src.Application.Service
                 //set cart to order
                 mappedOrder = _mapper.Map(cart, mappedOrder);
 
+                // check shipping address
+                if (mappedOrder.ShippingAddress == null)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Shipping address is required";
+                    response.IsSuccess = false;
+                    return response;
+                }
+
+                // check contact number
+                if (mappedOrder.ContactNumber == null)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Contact number is required";
+                    response.IsSuccess = false;
+                    return response;
+                }
+
+                // check contact name
+                if (mappedOrder.ContactName == null)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Contact name is required";
+                    response.IsSuccess = false;
+                    return response;
+                }
+
                 //set estimated delivery date
                 mappedOrder.EstimatedDeliveryDate = "3 days";
 
@@ -105,7 +149,6 @@ namespace KFS.src.Application.Service
                     {
                         mappedOrder.Discount = targetPromotion.DiscountPercentage;
                     }
-
                 }
                 //set shipping fee
                 mappedOrder.ShippingFee = 30000;
@@ -191,7 +234,7 @@ namespace KFS.src.Application.Service
                     Amount = (double)order.TotalPrice,
                     CreateDate = DateTime.Now,
                     Description = "Payment for order " + order.Id.ToString(),
-                    FullName = order.ContactName,
+                    FullName = order.ContactName!,
                     OrderId = order.Id
                 }, "order");
             }
@@ -287,14 +330,31 @@ namespace KFS.src.Application.Service
                         }
                         foreach (var orderItem in order.OrderItems)
                         {
-                            //update inventory
-                            var product = await _productRepository.GetProductById(orderItem.ProductId);
-                            product.Inventory -= orderItem.Quantity;
-                            await _productRepository.UpdateProduct(product);
-                            //get credential
-                            if (orderItem.IsBatch == false)
+                            // order item product
+                            if (!orderItem.IsBatch)
                             {
+                                //update inventory
+                                var product = await _productRepository.GetProductById(orderItem.ProductId);
+                                product.Inventory -= orderItem.Quantity;
+                                if (product.Inventory == 0)
+                                {
+                                    product.Status = ProductStatusEnum.SoldOut;
+                                }
+                                await _productRepository.UpdateProduct(product);
+                                //get credential
                                 listCredential.AddRange(product.Credentials);
+                            }
+                            // order item batch
+                            if (orderItem.IsBatch)
+                            {
+                                // update inventory
+                                var batch = await _batchRepository.GetBatchById(orderItem.BatchId);
+                                batch.Inventory -= orderItem.Quantity;
+                                if (batch.Inventory == 0)
+                                {
+                                    batch.Status = ProductStatusEnum.SoldOut;
+                                }
+                                await _batchRepository.UpdateBatch(batch);
                             }
                         }
                         order.Status = OrderStatusEnum.Paid;
@@ -342,6 +402,15 @@ namespace KFS.src.Application.Service
             {
                 //get order
                 var order = await _orderRepository.GetOrderById(id);
+                //check if order is authorized
+                var isOwner = _ownerService.CheckEntityOwner(_httpContext, order.UserId);
+                if (!isOwner)
+                {
+                    response.StatusCode = 401;
+                    response.Message = "Unauthorized";
+                    response.IsSuccess = false;
+                    return response;
+                }
                 if (order == null)
                 {
                     response.StatusCode = 404;
@@ -463,7 +532,7 @@ namespace KFS.src.Application.Service
                 else
                 {
                     var product = await _productRepository.GetProductById(orderItem.ProductId);
-                    orderItem.Product = _mapper.Map<ProductDto>(product);
+                    orderItem.Product = _mapper.Map<ProductDtoNoBatch>(product);
                 }
             }
         }
@@ -481,7 +550,7 @@ namespace KFS.src.Application.Service
                     else
                     {
                         var product = await _productRepository.GetProductById(orderItem.ProductId);
-                        orderItem.Product = _mapper.Map<ProductDto>(product);
+                        orderItem.Product = _mapper.Map<ProductDtoNoBatch>(product);
                     }
                 }
             }
@@ -493,7 +562,7 @@ namespace KFS.src.Application.Service
             try
             {
                 var orders = await _orderRepository.GetOrders(req);
-                var mappedOrders = _mapper.Map<List<OrderDto>>(orders);
+                var mappedOrders = _mapper.Map<List<OrderDto>>(orders.List);
                 //map by format
                 await GetOrdersFormat(mappedOrders);
 
@@ -538,6 +607,15 @@ namespace KFS.src.Application.Service
             {
                 //get order
                 var order = await _orderRepository.GetOrderById(id);
+                //check if order is authorized
+                var isOwner = _ownerService.CheckEntityOwner(_httpContext, order.UserId);
+                if (!isOwner)
+                {
+                    response.StatusCode = 401;
+                    response.Message = "Unauthorized";
+                    response.IsSuccess = false;
+                    return response;
+                }
                 if (order == null)
                 {
                     response.StatusCode = 404;
@@ -585,13 +663,13 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public async Task<ResponseDto> UpdateOrderStatus(OrderUpdateStatus req)
+        public async Task<ResponseDto> AcceptOrder(Guid id, bool isAccept)
         {
             var response = new ResponseDto();
             try
             {
                 //get order
-                var order = _orderRepository.GetOrderById(req.Id).Result;
+                var order = await _orderRepository.GetOrderById(id);
                 if (order == null)
                 {
                     response.StatusCode = 404;
@@ -599,9 +677,29 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
                     return response;
                 }
-
+                if (order.PaymentMethod == PaymentMethodEnum.VNPAY && order.Status != OrderStatusEnum.Paid)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Order status is not Paid";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                if (order.PaymentMethod == PaymentMethodEnum.COD && order.Status != OrderStatusEnum.Processing)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Order status is not Processing";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                if (order.Status == OrderStatusEnum.Delivering || order.Status == OrderStatusEnum.Delivered || order.Status == OrderStatusEnum.Completed || order.Status == OrderStatusEnum.Canceled || order.Status == OrderStatusEnum.Failed)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Can not update order";
+                    response.IsSuccess = false;
+                    return response;
+                }
                 //set order status
-                order.Status = req.Status;
+                order.Status = isAccept ? OrderStatusEnum.Accepted : OrderStatusEnum.Canceled;
 
                 //update order
                 var result = await _orderRepository.UpdateOrder(order);
@@ -631,9 +729,164 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public Task<ResponseDto> CreateOrderOffline(OrderCreateOffline req)
+        public async Task<ResponseDto> CreateOrderOffline(OrderCreateOffline req)
         {
-            throw new NotImplementedException();
+            var response = new ResponseDto();
+            try
+            {
+                var orderItems = new List<OrderItem>();
+                var products = new List<Product>();
+                var batches = new List<Batch>();
+                // get http context
+                var HttpContext = _httpContextAccessor.HttpContext;
+                if (HttpContext == null)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "HttpContext is null";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                // get payload
+                var payload = HttpContext.Items["payload"] as Payload;
+                if (payload == null)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Payload is null";
+                    response.IsSuccess = false;
+                    return response;
+                }
+
+                // check product and batch empty
+                if ((req.ProductsReq == null || req.ProductsReq.Count() == 0) && (req.BatchesReq == null || req.BatchesReq.Count() == 0))
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Product or Batch is required";
+                    response.IsSuccess = false;
+                    return response;
+                }
+
+                // create order items product
+                if (req.ProductsReq != null && req.ProductsReq.Count() > 0)
+                {
+                    foreach (var productReq in req.ProductsReq)
+                    {
+                        if (productReq.Quantity == 0)
+                        {
+                            response.StatusCode = 400;
+                            response.Message = "Quantity must be greater than 0";
+                            response.IsSuccess = false;
+                            return response;
+                        }
+                        var product = await _productRepository.GetProductById(productReq.ProductId);
+                        var orderItem = new OrderItem
+                        {
+                            Id = Guid.NewGuid(),
+                            ProductId = product.Id,
+                            Quantity = productReq.Quantity,
+                            Price = product.Price,
+                            IsBatch = false,
+                            IsConsignment = false
+                        };
+                        products.Add(product);
+                        orderItems.Add(orderItem);
+                    }
+                }
+
+                // create order items batch
+                if (req.BatchesReq != null && req.BatchesReq.Count() > 0)
+                {
+                    foreach (var batchReq in req.BatchesReq)
+                    {
+                        if (batchReq.Quantity == 0)
+                        {
+                            response.StatusCode = 400;
+                            response.Message = "Quantity must be greater than 0";
+                            response.IsSuccess = false;
+                            return response;
+                        }
+                        var batch = await _batchRepository.GetBatchById(batchReq.BatchId);
+                        var orderItem = new OrderItem
+                        {
+                            Id = Guid.NewGuid(),
+                            BatchId = batch.Id,
+                            ProductId = batch.ProductId,
+                            Quantity = batchReq.Quantity,
+                            Price = batch.Price,
+                            IsBatch = true,
+                            IsConsignment = false
+                        };
+                        batches.Add(batch);
+                        orderItems.Add(orderItem);
+                    }
+                }
+                // check product and batch duplicate
+                if (req.ProductsReq != null && req.BatchesReq != null)
+                {
+                    foreach (var batch in batches)
+                    {
+                        if (products.Any(x => x.Id == batch.ProductId))
+                        {
+                            response.StatusCode = 400;
+                            response.Message = "You can only choose one out of two: product or cart";
+                            response.IsSuccess = false;
+                            return response;
+                        }
+                    }
+                }
+                // create order
+                var order = new Order
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = payload.UserId,
+                    TotalPrice = orderItems.Sum(x => x.Price * x.Quantity),
+                    TotalItem = orderItems.Sum(x => x.Quantity),
+                    OrderItems = orderItems,
+                    Status = OrderStatusEnum.Processing,
+                    Currency = req.Currency,
+                    ShippingFee = 0,
+                    PaymentMethod = PaymentMethodEnum.OFFLINE,
+                };
+                // Discount code
+                if (req.DiscountCode != null)
+                {
+                    var promotions = await _promotionRepository.GetAllPromotions();
+                    var targetPromotion = promotions.FirstOrDefault(x => x.DiscountCode == req.DiscountCode && x.IsActive);
+                    if (targetPromotion == null)
+                    {
+                        response.StatusCode = 404;
+                        response.Message = "Promotion not found";
+                        response.IsSuccess = false;
+                        return response;
+                    }
+                    else
+                    {
+                        order.Discount = targetPromotion.DiscountPercentage;
+                    }
+                }
+                var result = await _orderRepository.CreateOrder(order);
+                if (result)
+                {
+                    response.StatusCode = 201;
+                    response.Message = "Order created successfully";
+                    response.IsSuccess = true;
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Order creation failed";
+                    response.IsSuccess = false;
+                    return response;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
+            }
         }
 
         public async Task<ResponseDto> GetOwnOrder()
@@ -678,6 +931,122 @@ namespace KFS.src.Application.Service
                 {
                     response.StatusCode = 404;
                     response.Message = "Orders not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
+            }
+        }
+
+        public Task<ResponseDto> CancelOrder(Guid id)
+        {
+            var response = new ResponseDto();
+            try
+            {
+                //get order
+                var order = _orderRepository.GetOrderById(id).Result;
+                if (order == null)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Order not found";
+                    response.IsSuccess = false;
+                    return Task.FromResult(response);
+                }
+                if (order.Status == OrderStatusEnum.Accepted || order.Status == OrderStatusEnum.Delivering || order.Status == OrderStatusEnum.Delivered || order.Status == OrderStatusEnum.Completed || order.Status == OrderStatusEnum.Canceled || order.Status == OrderStatusEnum.Failed)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Can not cancel order";
+                    response.IsSuccess = false;
+                    return Task.FromResult(response);
+                }
+                //set order status
+                order.Status = OrderStatusEnum.Canceled;
+
+                //update order
+                var result = _orderRepository.UpdateOrder(order).Result;
+
+                //check result
+                if (result)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Order status updated successfully";
+                    response.IsSuccess = true;
+                    return Task.FromResult(response);
+                }
+                else
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Order status update failed";
+                    response.IsSuccess = false;
+                    return Task.FromResult(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return Task.FromResult(response);
+            }
+        }
+
+        public async Task<ResponseDto> OrderReturn(Guid orderId)
+        {
+            var response = new ResponseDto();
+            try
+            {
+                //get order
+                var order = await _orderRepository.GetOrderById(orderId);
+                if (order == null)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Order not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                if (order.Shipment == null)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Shipment not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+
+                if (order.Status != OrderStatusEnum.Delivered || order.Shipment.Status != ShipmentStatusEnum.Delivered)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Can not return order";
+                    response.IsSuccess = false;
+                    return response;
+                }
+
+                //set order status
+                order.Status = OrderStatusEnum.Canceled;
+                //set shipment status
+                order.Shipment.Status = ShipmentStatusEnum.Cancelled;
+
+                //update order
+                var result = _orderRepository.UpdateOrder(order).Result;
+
+                //check result
+                if (result)
+                {
+                    await _shipmentRepository.UpdateShipment(order.Shipment);
+                    response.StatusCode = 200;
+                    response.Message = "Order status updated successfully";
+                    response.IsSuccess = true;
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Order status update failed";
                     response.IsSuccess = false;
                     return response;
                 }

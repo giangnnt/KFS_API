@@ -22,6 +22,9 @@ namespace KFS.src.Infrastucture.Repository
         {
             return await _context.Categories
             .Include(x => x.Products)
+            .ThenInclude(x => x.Medias)
+            .Include(x => x.Products)
+            .ThenInclude(x => x.Feedbacks)
             .Include(x => x.Promotions)
             .ToListAsync();
         }
@@ -53,6 +56,9 @@ namespace KFS.src.Infrastucture.Repository
         {
             return await _context.Categories
             .Include(x => x.Products)
+            .ThenInclude(x => x.Medias)
+            .Include(x => x.Products)
+            .ThenInclude(x => x.Feedbacks)
             .Include(x => x.Promotions)
             .FirstOrDefaultAsync(x => x.Id == id) ?? throw new Exception("Category not found");
         }

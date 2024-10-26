@@ -80,6 +80,8 @@ namespace KFS.src.Infrastucture.Repository
 
         public async Task<bool> UpdatePayment(Payment payment)
         {
+            DateTime nowVietnam = TimeZoneInfo.ConvertTime(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
+            payment.UpdatedAt = nowVietnam;
             _context.Update(payment);
             var result = await _context.SaveChangesAsync();
             return result > 0;

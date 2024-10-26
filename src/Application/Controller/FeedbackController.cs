@@ -20,7 +20,7 @@ namespace KFS.src.Application.Controller
             _feedbackService = feedbackService;
         }
         
-        [HttpGet]
+        [HttpPost("query")]
         public async Task<IActionResult> GetFeedbacks(FeedbackQuery feedbackQuery)
         {
             try

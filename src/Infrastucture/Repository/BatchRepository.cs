@@ -18,6 +18,7 @@ namespace KFS.src.Infrastucture.Repository
         }
         public async Task<bool> CreateBatch(Batch batch)
         {
+            batch.CreatedAt = DateTime.Now;
             _context.Batches.Add(batch);
             var result = await _context.SaveChangesAsync();
             return result > 0;
@@ -46,6 +47,8 @@ namespace KFS.src.Infrastucture.Repository
 
         public async Task<bool> UpdateBatch(Batch batch)
         {
+            DateTime nowVietnam = TimeZoneInfo.ConvertTime(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
+            batch.UpdatedAt = nowVietnam;
             _context.Batches.Update(batch);
             var result = await _context.SaveChangesAsync();
             return result > 0;

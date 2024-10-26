@@ -13,7 +13,7 @@ namespace KFS.src.Domain.IService
     {
         Task<ResponseDto> GetPaymentById(Guid id);
         Task<ResponseDto> GetPayments(PaymentQuery paymentQuery);
-        Task<ResponseDto> CreatePayment();
+        Task<ResponseDto> CreatePaymentOffline(Guid id);
         Task<ResponseDto> DeletePayment(Guid id);
         Task<ResponseDto> CreatePaymentByOrderIdCOD(Guid orderId);
         Task<ResponseDto> GetPaymentByUser(Guid userId);

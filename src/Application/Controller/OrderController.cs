@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using KFS.src.Application.Constant;
 using KFS.src.Application.Dto.OrderDtos;
@@ -23,7 +24,7 @@ namespace KFS.src.Application.Controller
             _orderService = orderService;
         }
         [Protected]
-        [HttpGet]
+        [HttpPost("query")]
         public async Task<IActionResult> GetOrders(OrderQuery req)
         {
             try
@@ -50,12 +51,13 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPost("create-from-cart")]
-        public async Task<IActionResult> CreateOrderFromCart(OrderCreateFromCart req)
+        [Protected]
+        [HttpPost("cart/{id}")]
+        public async Task<IActionResult> CreateOrderFromCart(Guid id, OrderCreateFromCart req)
         {
             try
             {
-                var result = await _orderService.CreateOrderFromCart(req);
+                var result = await _orderService.CreateOrderFromCart(id, req);
                 return Ok(result);
 
             }
@@ -64,20 +66,20 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
-        [Protected]
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateOrder(Guid id, OrderUpdate req)
-        {
-            try
-            {
-                var result = await _orderService.UpdateOrder(req, id);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
+        // [Protected]
+        // [HttpPut("{id}")]
+        // public async Task<IActionResult> UpdateOrder(Guid id, OrderUpdate req)
+        // {
+        //     try
+        //     {
+        //         var result = await _orderService.UpdateOrder(req, id);
+        //         return Ok(result);
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         return BadRequest(ex.Message);
+        //     }
+        // }
         [Protected]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteOrder(Guid id)
@@ -106,12 +108,12 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPut("{id}/status")]
-        public async Task<IActionResult> UpdateOrderStatus(OrderUpdateStatus req)
+        [HttpPut("{id}/is-accept")]
+        public async Task<IActionResult> AcceptOrder(Guid id, [FromQuery] bool isAccept)
         {
             try
             {
-                var result = await _orderService.UpdateOrderStatus(req);
+                var result = await _orderService.AcceptOrder(id, isAccept);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -154,6 +156,34 @@ namespace KFS.src.Application.Controller
             try
             {
                 var result = await _orderService.GetOwnOrder();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [Protected]
+        [HttpPut("{id}/cancel")]
+        public async Task<IActionResult> CancelOrder(Guid id)
+        {
+            try
+            {
+                var result = await _orderService.CancelOrder(id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [Protected]
+        [HttpPut("{id}/return")]
+        public async Task<IActionResult> OrderReturn(Guid id)
+        {
+            try
+            {
+                var result = await _orderService.OrderReturn(id);
                 return Ok(result);
             }
             catch (Exception ex)

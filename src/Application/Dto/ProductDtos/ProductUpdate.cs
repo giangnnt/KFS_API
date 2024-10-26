@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using KFS.src.Application.Enum;
 
@@ -18,6 +19,7 @@ namespace KFS.src.Application.Dto.ProductDtos
         public string? Color { get; set; }
         public string? FeedingVolumn { get; set; }
         public float? FilterRate { get; set; }
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public GenderEnum? Gender { get; set; }
         public int? Inventory { get; set; }
         public Guid? CategoryId { get; set; }

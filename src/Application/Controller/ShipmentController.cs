@@ -63,12 +63,12 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpGet]
-        public async Task<IActionResult> GetShipments()
+        [HttpPost("query")]
+        public async Task<IActionResult> GetShipments(ShipmentQuery shipmentQuery)
         {
             try
             {
-                var result = await _shipmentService.GetShipments();
+                var result = await _shipmentService.GetShipments(shipmentQuery);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -91,12 +91,26 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPut("{id}/delivered")]
-        public async Task<IActionResult> ShipmentDelivered(Guid id)
+        [HttpPut("{id}/delivered/is-success")]
+        public async Task<IActionResult> ShipmentDelivered(Guid id, [FromQuery] bool IsSuccess)
         {
             try
             {
-                var result = await _shipmentService.ShipmentDelivered(id);
+                var result = await _shipmentService.ShipmentDelivered(id, IsSuccess);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [Protected]
+        [HttpPut("{id}/completed/is-success")]
+        public async Task<IActionResult> ShipmentCompleted(Guid id, [FromQuery] bool IsSuccess)
+        {
+            try
+            {
+                var result = await _shipmentService.ShipmentCompleted(id, IsSuccess);
                 return Ok(result);
             }
             catch (Exception ex)

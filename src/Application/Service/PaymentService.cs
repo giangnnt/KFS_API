@@ -23,7 +23,8 @@ namespace KFS.src.Application.Service
         private readonly IShipmentRepository _shipmentRepository;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public PaymentService(IPaymentRepository paymentRepository, IOrderRepository orderRepository, ICartRepository cartRepository, IProductRepository productRepository, IShipmentRepository shipmentRepository, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+        private readonly IBatchRepository _batchRepository;
+        public PaymentService(IPaymentRepository paymentRepository, IOrderRepository orderRepository, ICartRepository cartRepository, IProductRepository productRepository, IShipmentRepository shipmentRepository, IMapper mapper, IHttpContextAccessor httpContextAccessor, IBatchRepository batchRepository)
         {
             _paymentRepository = paymentRepository;
             _orderRepository = orderRepository;
@@ -32,10 +33,110 @@ namespace KFS.src.Application.Service
             _shipmentRepository = shipmentRepository;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
+            _batchRepository = batchRepository;
         }
-        public Task<ResponseDto> CreatePayment()
+        public async Task<ResponseDto> CreatePaymentOffline(Guid id)
         {
-            throw new NotImplementedException();
+            var response = new ResponseDto();
+            try
+            {
+                var listCredential = new List<Credential>();
+                var httpContext = _httpContextAccessor.HttpContext;
+                // check httpContext
+                if (httpContext == null)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Http context is required";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                // get payload
+                var payload = httpContext.Items["payload"] as Payload;
+                // check payload
+                if (payload == null)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Payload is required";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                // check order offline
+                var order = await _orderRepository.GetOrderById(id);
+                if (order.PaymentMethod != PaymentMethodEnum.OFFLINE)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Payment method is not Offline";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                var payment = new PaymentOrder
+                {
+                    OrderId = id,
+                    PaymentType = "Order",
+                    UserId = order.UserId,
+                    PaymentMethod = order.PaymentMethod,
+                    Amount = order.TotalPrice,
+                    Status = PaymentStatusEnum.Completed,
+                    CreatedAt = DateTime.Now
+                };
+                var result = await _paymentRepository.CreatePayment(payment);
+                foreach (var orderItem in order.OrderItems)
+                {
+                    // order item product
+                    if (!orderItem.IsBatch)
+                    {
+                        //update inventory
+                        var product = await _productRepository.GetProductById(orderItem.ProductId);
+                        product.Inventory -= orderItem.Quantity;
+                        if (product.Inventory == 0)
+                        {
+                            product.Status = ProductStatusEnum.SoldOut;
+                        }
+                        await _productRepository.UpdateProduct(product);
+                        //get credential
+                        listCredential.AddRange(product.Credentials);
+                    }
+                    // order item batch
+                    if (orderItem.IsBatch)
+                    {
+                        // update inventory
+                        var batch = await _batchRepository.GetBatchById(orderItem.BatchId);
+                        batch.Inventory -= orderItem.Quantity;
+                        if (batch.Inventory == 0)
+                        {
+                            batch.Status = ProductStatusEnum.SoldOut;
+                        }
+                        await _batchRepository.UpdateBatch(batch);
+                    }
+                }
+                order.Status = OrderStatusEnum.Completed;
+                if (result)
+                {
+                    await _orderRepository.UpdateOrder(order);
+                    response.StatusCode = 201;
+                    response.Message = "Payment created successfully";
+                    response.IsSuccess = true;
+                    response.Result = new ResultDto
+                    {
+                        Data = listCredential
+                    };
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Payment creation failed";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
+            }
         }
 
         public async Task<ResponseDto> CreatePaymentByOrderIdCOD(Guid orderId)
@@ -44,13 +145,6 @@ namespace KFS.src.Application.Service
             try
             {
                 var order = await _orderRepository.GetOrderById(orderId);
-                if (order == null)
-                {
-                    response.StatusCode = 404;
-                    response.Message = "Order not found";
-                    response.IsSuccess = false;
-                    return response;
-                }
                 if (order.Status != OrderStatusEnum.Delivered)
                 {
                     response.StatusCode = 400;
@@ -65,6 +159,7 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
                     return response;
                 }
+                // create payment
                 var payment = new PaymentOrder
                 {
                     OrderId = orderId,
@@ -79,6 +174,7 @@ namespace KFS.src.Application.Service
                 var carts = await _cartRepository.GetCartByUserId(payment.UserId);
                 var cart = new Cart();
                 var result = await _paymentRepository.CreatePayment(payment);
+                var listCredential = new List<Credential>();
                 if (result)
                 {
                     foreach (var c in carts)
@@ -91,14 +187,40 @@ namespace KFS.src.Application.Service
                     }
                     foreach (var orderItem in order.OrderItems)
                     {
-                        // update product inventory
-                        var product = await _productRepository.GetProductById(orderItem.ProductId);
-                        product.Inventory -= orderItem.Quantity;
-                        await _productRepository.UpdateProduct(product);
+                        // order item product
+                        if (!orderItem.IsBatch)
+                        {
+                            //update inventory
+                            var product = await _productRepository.GetProductById(orderItem.ProductId);
+                            product.Inventory -= orderItem.Quantity;
+                            if (product.Inventory == 0)
+                            {
+                                product.Status = ProductStatusEnum.SoldOut;
+                            }
+                            await _productRepository.UpdateProduct(product);
+                            //get credential
+                            listCredential.AddRange(product.Credentials);
+                        }
+                        // order item batch
+                        if (orderItem.IsBatch)
+                        {
+                            // update inventory
+                            var batch = await _batchRepository.GetBatchById(orderItem.BatchId);
+                            batch.Inventory -= orderItem.Quantity;
+                            if (batch.Inventory == 0)
+                            {
+                                batch.Status = ProductStatusEnum.SoldOut;
+                            }
+                            await _batchRepository.UpdateBatch(batch);
+                        }
                     }
                     order.Status = OrderStatusEnum.Completed;
                     response.StatusCode = 201;
                     response.Message = "Payment created successfully";
+                    response.Result = new ResultDto
+                    {
+                        Data = listCredential
+                    };
                     response.IsSuccess = true;
                 }
                 else
@@ -306,7 +428,7 @@ namespace KFS.src.Application.Service
             try
             {
                 var payments = await _paymentRepository.GetPayments(paymentQuery);
-                var mappedPayments = _mapper.Map<IEnumerable<PaymentDto>>(payments);
+                var mappedPayments = _mapper.Map<IEnumerable<PaymentDto>>(payments.List);
                 if (payments != null && payments.List.Count() > 0)
                 {
                     response.StatusCode = 200;

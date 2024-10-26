@@ -12,9 +12,9 @@ namespace KFS.src.Domain.Entities
         public Guid UserId { get; set; }
         public decimal TotalPrice { get; set; }
         public int TotalItem { get; set; }
-        public string ShippingAddress { get; set; } = null!;
-        public string ContactNumber { get; set; } = null!;
-        public string ContactName { get; set; } = null!;
+        public string? ShippingAddress { get; set; }
+        public string? ContactNumber { get; set; }
+        public string? ContactName { get; set; }
         public int ShippingFee { get; set; }
         public int Discount { get; set; }
         public PaymentMethodEnum PaymentMethod { get; set; }
@@ -27,6 +27,6 @@ namespace KFS.src.Domain.Entities
         public User User { get; set; } = null!;
         public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
         public PaymentOrder? Payment { get; set; }
-        public Shipment Shipment { get; set; } = null!;
+        public Shipment? Shipment { get; set; }
     }
 }

@@ -48,7 +48,7 @@ namespace KFS.src.Application.Controller
             return Ok(response);
         }
         [Protected]
-        [HttpGet("admin")]
+        [HttpPost("admin/query")]
         public async Task<IActionResult> GetConsignmentsAdmin(ConsignmentQuery consignmentQuery)
         {
             var response = await _consignmentService.GetConsignmentsAdmin(consignmentQuery);
@@ -75,22 +75,21 @@ namespace KFS.src.Application.Controller
             var response = await _consignmentService.PayForConsignment(id);
             return Ok(response);
         }
-        [Protected]
-        [HttpGet("response-payment-url")]
+        [HttpGet("vnpayment-return")]
         public async Task<IActionResult> GetResponsePaymentUrl()
         {
             var response = await _consignmentService.GetResponsePaymentUrl();
             return Ok(response);
         }
         [Protected]
-        [HttpGet("user/{id}")]
-        public async Task<IActionResult> GetConsignmentByUserId(ConsignmentQuery consignmentQuery,Guid userId)
+        [HttpPost("user/{id}/query")]
+        public async Task<IActionResult> GetConsignmentByUserId(ConsignmentQuery consignmentQuery,Guid id)
         {
-            var response = await _consignmentService.GetConsignmentByUserId(consignmentQuery, userId);
+            var response = await _consignmentService.GetConsignmentByUserId(consignmentQuery, id);
             return Ok(response);
         }
         [Protected]
-        [HttpGet("own")]
+        [HttpPost("own/query")]
         public async Task<IActionResult> GetOwnConsignment(ConsignmentQuery consignmentQuery)
         {
             var response = await _consignmentService.GetOwnConsignment(consignmentQuery);

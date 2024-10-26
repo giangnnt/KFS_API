@@ -103,6 +103,8 @@ namespace KFS.src.Infrastucture.Repository
 
         public async Task<bool> UpdateConsignment(Consignment consignment)
         {
+            DateTime nowVietnam = TimeZoneInfo.ConvertTime(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
+            consignment.UpdatedAt = nowVietnam;
             _context.Consignments.Update(consignment);
             var result = await _context.SaveChangesAsync();
             return result > 0;

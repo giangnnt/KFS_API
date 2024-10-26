@@ -21,13 +21,19 @@ namespace KFS.src.Application.Service
         private readonly IProductRepository _productRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IPaymentRepository _paymentRepository;
-        public FeedbackService(IFeedbackRepository feedbackRepository, IMapper mapper, IProductRepository productRepository, IHttpContextAccessor httpContextAccessor, IPaymentRepository paymentRepository)
+        private readonly HttpContext _httpContext;
+        private readonly IOwnerService _ownerService;
+        public FeedbackService(IFeedbackRepository feedbackRepository, IMapper mapper, IProductRepository productRepository, IHttpContextAccessor httpContextAccessor, IPaymentRepository paymentRepository, IOwnerService ownerService)
         {
             _feedbackRepository = feedbackRepository;
             _mapper = mapper;
             _productRepository = productRepository;
-            _httpContextAccessor = httpContextAccessor;
             _paymentRepository = paymentRepository;
+            _ownerService = ownerService;
+
+            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
+            _httpContext = _httpContextAccessor.HttpContext ?? throw new InvalidOperationException("Http context is required.");
+
         }
         public async Task<ResponseDto> CreateFeedback(Guid id, FeedbackCreate req)
         {

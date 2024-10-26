@@ -21,7 +21,7 @@ namespace KFS.src.Application.Controller
         {
             _productService = productService;
         }
-        [HttpGet]
+        [HttpPost("query")]
         public async Task<IActionResult> GetProducts(ProductQuery productQuery)
         {
             try
@@ -88,10 +88,10 @@ namespace KFS.src.Application.Controller
             {
                 return BadRequest(ex.Message);
             }
-        }   
+        }
         [Protected]
-        [HttpPut("{id}/{is-for-sell}")]
-        public async Task<IActionResult> UpdateIsForSell(bool isForSell, Guid id)
+        [HttpPut("{id}/is-for-sell")]
+        public async Task<IActionResult> UpdateIsForSell(Guid id, [FromQuery] bool isForSell)
         {
             try
             {
@@ -104,7 +104,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpGet("admin")]
+        [HttpPost("admin")]
         public async Task<IActionResult> GetProductsAdmin(ProductAdminQuery productQuery)
         {
             try

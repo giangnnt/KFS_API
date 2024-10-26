@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using KFS.src.Application.Dto.Pagination;
 using KFS.src.Application.Dto.ResponseDtos;
 using KFS.src.Application.Dto.ShipmentDtos;
 using KFS.src.Application.Enum;
@@ -10,6 +11,7 @@ using KFS.src.Domain.Entities;
 using KFS.src.Domain.IRepository;
 using KFS.src.Domain.IService;
 using KFS.src.Infrastucture.Context;
+using static KFS.src.Application.Dto.Pagination.Pagination;
 
 namespace KFS.src.Application.Service
 {
@@ -25,7 +27,7 @@ namespace KFS.src.Application.Service
             _mapper = mapper;
         }
 
-        public async Task<ResponseDto> ShipmentDelivered(Guid id)
+        public async Task<ResponseDto> ShipmentDelivered(Guid id, bool IsSuccess)
         {
             var response = new ResponseDto();
             try
@@ -38,17 +40,35 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
                     return response;
                 }
-                // Check order payment method
-                if (order.PaymentMethod == PaymentMethodEnum.VNPAY)
+                // Check shipment is success or not
+                if (!IsSuccess)
                 {
-                    order.Status = OrderStatusEnum.Completed;
-                    shipment.Status = ShipmentStatusEnum.Completed;
+                    shipment.Status = ShipmentStatusEnum.Failed;
+                    order.Status = OrderStatusEnum.Failed;
+                    var result1 = await _shipmentRepository.UpdateShipment(shipment);
+                    if (result1)
+                    {
+                        await _orderRepository.UpdateOrder(order);
+                        response.Message = "Shipment failed";
+                        response.IsSuccess = true;
+                        return response;
+                    }
+                    else
+                    {
+                        response.Message = "Shipment failed failed";
+                        response.IsSuccess = false;
+                        return response;
+                    }
                 }
-                else
+                // Check order status
+                if (order.Status != OrderStatusEnum.Delivering)
                 {
-                    order.Status = OrderStatusEnum.Delivered;
-                    shipment.Status = ShipmentStatusEnum.Delivered;
+                    response.Message = "Order is not Delivering";
+                    response.IsSuccess = false;
+                    return response;
                 }
+                shipment.Status = ShipmentStatusEnum.Delivered;
+                order.Status = OrderStatusEnum.Delivered;
                 var result = await _shipmentRepository.UpdateShipment(shipment);
                 if (result)
                 {
@@ -63,7 +83,7 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
                     return response;
                 }
-        }
+            }
             catch (Exception ex)
             {
                 response.StatusCode = 500;
@@ -85,25 +105,22 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
                     return response;
                 }
+
+                if (order.PaymentMethod != PaymentMethodEnum.COD && order.PaymentMethod != PaymentMethodEnum.VNPAY)
+                {
+                    response.Message = "Invalid payment method";
+                    response.IsSuccess = false;
+                    return response;
+                }
+
                 // Check order payment method
-                if (order.PaymentMethod == PaymentMethodEnum.VNPAY)
+                if (order.Status != OrderStatusEnum.Accepted)
                 {
-                    if (order.Status != OrderStatusEnum.Paid)
-                    {
-                        response.Message = "Order is not paid";
-                        response.IsSuccess = false;
-                        return response;
-                    }
+                    response.Message = "Order is not Accepted";
+                    response.IsSuccess = false;
+                    return response;
                 }
-                if (order.PaymentMethod == PaymentMethodEnum.COD)
-                {
-                    if (order.Status != OrderStatusEnum.Processing)
-                    {
-                        response.Message = "Order is not processing";
-                        response.IsSuccess = false;
-                        return response;
-                    }
-                }
+
                 order.Status = OrderStatusEnum.Delivering;
                 await _orderRepository.UpdateOrder(order);
 
@@ -199,21 +216,28 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public async Task<ResponseDto> GetShipments()
+        public async Task<ResponseDto> GetShipments(ShipmentQuery shipmentQuery)
         {
             var response = new ResponseDto();
             try
             {
-                var shipments = await _shipmentRepository.GetShipments();
-                var mappedShipments = _mapper.Map<IEnumerable<ShipmentDto>>(shipments);
+                var shipments = await _shipmentRepository.GetShipments(shipmentQuery);
+                var mappedShipments = _mapper.Map<IEnumerable<ShipmentDto>>(shipments.List);
 
-                if (shipments != null && shipments.Any())
+                if (shipments != null && shipments.List.Any())
                 {
                     response.StatusCode = 200;
                     response.IsSuccess = true;
                     response.Result = new ResultDto
                     {
-                        Data = mappedShipments
+                        Data = mappedShipments,
+                        PaginationResp = new PaginationResp
+                        {
+                            Page = shipmentQuery.Page,
+                            PageSize = shipmentQuery.PageSize,
+                            Total = shipments.Total
+                        }
+
                     };
                     return response;
                 }
@@ -261,6 +285,66 @@ namespace KFS.src.Application.Service
                 response.Message = "Shipment update failed";
                 response.IsSuccess = false;
                 return response;
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
+            }
+        }
+
+        public async Task<ResponseDto> ShipmentCompleted(Guid id, bool IsSuccess)
+        {
+            var response = new ResponseDto();
+            try
+            {
+                var shipment = await _shipmentRepository.GetShipmentById(id);
+                var order = await _orderRepository.GetOrderById(shipment.OrderId);
+                // check is success
+                if (!IsSuccess)
+                {
+                    shipment.Status = ShipmentStatusEnum.Failed;
+                    order.Status = OrderStatusEnum.Failed;
+                    var result1 = await _shipmentRepository.UpdateShipment(shipment);
+                    if (result1)
+                    {
+                        await _orderRepository.UpdateOrder(order);
+                        response.Message = "Shipment failed";
+                        response.IsSuccess = true;
+                        return response;
+                    }
+                    else
+                    {
+                        response.Message = "Shipment failed failed";
+                        response.IsSuccess = false;
+                        return response;
+                    }
+                }
+                // complete for vn pay
+                if (order.PaymentMethod != PaymentMethodEnum.VNPAY || shipment.Status != ShipmentStatusEnum.Delivered)
+                {
+                    response.Message = "Cannot complete shipment";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                shipment.Status = ShipmentStatusEnum.Completed;
+                order.Status = OrderStatusEnum.Completed;
+                var result = await _shipmentRepository.UpdateShipment(shipment);
+                if (result)
+                {
+                    await _orderRepository.UpdateOrder(order);
+                    response.Message = "Shipment completed successfully";
+                    response.IsSuccess = true;
+                    return response;
+                }
+                else
+                {
+                    response.Message = "Shipment completion failed";
+                    response.IsSuccess = false;
+                    return response;
+                }
             }
             catch (Exception ex)
             {

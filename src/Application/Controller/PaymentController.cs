@@ -20,7 +20,7 @@ namespace KFS.src.Application.Controller
             _paymentService = paymentService;
         }
         [Protected]
-        [HttpGet]
+        [HttpPost("query")]
         public async Task<IActionResult> GetPayments(PaymentQuery paymentQuery)
         {
             try
@@ -48,12 +48,12 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPost]
-        public async Task<IActionResult> CreatePayment()
+        [HttpPost("offline-order/{id}")]
+        public async Task<IActionResult> CreatePaymentOffline(Guid id)
         {
             try
             {
-                var result = await _paymentService.CreatePayment();
+                var result = await _paymentService.CreatePaymentOffline(id);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -76,12 +76,12 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPost("order/{id}")]
-        public async Task<IActionResult> CreatePaymentByOrderId(Guid orderId)
+        [HttpPost("COD-order/{id}")]
+        public async Task<IActionResult> CreatePaymentByOrderId(Guid id)
         {
             try
             {
-                var result = await _paymentService.CreatePaymentByOrderIdCOD(orderId);
+                var result = await _paymentService.CreatePaymentByOrderIdCOD(id);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -91,11 +91,11 @@ namespace KFS.src.Application.Controller
         }
         [Protected]
         [HttpGet("user/{id}")]
-        public async Task<IActionResult> GetPaymentByUser(Guid userId)
+        public async Task<IActionResult> GetPaymentByUser(Guid id)
         {
             try
             {
-                var result = await _paymentService.GetPaymentByUser(userId);
+                var result = await _paymentService.GetPaymentByUser(id);
                 return Ok(result);
             }
             catch (Exception ex)

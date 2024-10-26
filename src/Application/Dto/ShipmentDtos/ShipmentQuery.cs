@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using KFS.src.Application.Enum;
+using static KFS.src.Application.Dto.Pagination.Pagination;
 
-namespace KFS.src.Application.Dto.OrderDtos
+namespace KFS.src.Application.Dto.ShipmentDtos
 {
-    public class OrderUpdateStatus
+    public class ShipmentQuery : PaginationReq
     {
-        public Guid Id { get; set; }
         [JsonConverter(typeof(JsonStringEnumConverter))]
-        public bool IsAccept { get; set; }
+        public ShipmentStatusEnum? Status { get; set; }
     }
 }
