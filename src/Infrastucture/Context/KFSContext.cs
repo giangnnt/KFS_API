@@ -135,7 +135,7 @@ namespace KFS.src.Infrastucture.Context
                 entity.Property(entity => entity.Id).ValueGeneratedOnAdd();
                 entity.Property(entity => entity.Gender).HasConversion(v => v.ToString(), v => v != null ? (GenderEnum)Enum.Parse(typeof(GenderEnum), v) : default)
                 .HasColumnType("nvarchar(20)");
-                entity.Property(entity => entity.CreatedAt).HasDefaultValueSql("(SYSDATETIMEOFFSET() AT TIME ZONE 'Asia/Ho_Chi_Minh')");
+                entity.Property(entity => entity.CreatedAt).HasDefaultValueSql("(SYSDATETIMEOFFSET() AT TIME ZONE 'SE Asia Standard Time')");
                 entity.Property(entity => entity.Status).HasConversion(v => v.ToString(), v => v != null ? (ProductStatusEnum)Enum.Parse(typeof(ProductStatusEnum), v) : default);
                 entity.HasMany(p => p.Batches)
                 .WithOne(b => b.Product)
@@ -179,14 +179,14 @@ namespace KFS.src.Infrastucture.Context
                 entity.Property(entity => entity.Id).ValueGeneratedOnAdd();
                 entity.Property(entity => entity.Status).HasConversion(v => v.ToString(), v => v != null ? (PaymentStatusEnum)Enum.Parse(typeof(PaymentStatusEnum), v) : default)
                 .HasColumnType("nvarchar(20)");
-                entity.Property(entity => entity.CreatedAt).HasDefaultValueSql("(SYSDATETIMEOFFSET() AT TIME ZONE 'Asia/Ho_Chi_Minh')");
+                entity.Property(entity => entity.CreatedAt).HasDefaultValueSql("(SYSDATETIMEOFFSET() AT TIME ZONE 'SE Asia Standard Time')");
                 entity.Property(entity => entity.PaymentMethod).HasConversion(v => v.ToString(), v => v != null ? (PaymentMethodEnum)Enum.Parse(typeof(PaymentMethodEnum), v) : default)
                 .HasColumnType("nvarchar(20)");
             });
             //config shipment
             modelBuilder.Entity<Shipment>(entity =>
             {
-                entity.Property(entity => entity.CreatedAt).HasDefaultValueSql("(SYSDATETIMEOFFSET() AT TIME ZONE 'Asia/Ho_Chi_Minh')");
+                entity.Property(entity => entity.CreatedAt).HasDefaultValueSql("(SYSDATETIMEOFFSET() AT TIME ZONE 'SE Asia Standard Time')");
                 entity.HasOne(entity => entity.Order)
                 .WithOne(entity => entity.Shipment);
                 entity.Property(entity => entity.Id).ValueGeneratedOnAdd();
@@ -235,7 +235,7 @@ namespace KFS.src.Infrastucture.Context
             //config cart
             modelBuilder.Entity<Cart>(entity =>
             {
-                entity.Property(entity => entity.CreatedAt).HasDefaultValueSql("(SYSDATETIMEOFFSET() AT TIME ZONE 'Asia/Ho_Chi_Minh')");
+                entity.Property(entity => entity.CreatedAt).HasDefaultValueSql("(SYSDATETIMEOFFSET() AT TIME ZONE 'SE Asia Standard Time')");
                 entity.Property(entity => entity.Id).ValueGeneratedOnAdd();
                 entity.Property(entity => entity.Status)
                 .HasConversion(
@@ -286,7 +286,7 @@ namespace KFS.src.Infrastucture.Context
             //config order
             modelBuilder.Entity<Order>(entity =>
             {
-                entity.Property(entity => entity.CreatedAt).HasDefaultValueSql("(SYSDATETIMEOFFSET() AT TIME ZONE 'Asia/Ho_Chi_Minh')");
+                entity.Property(entity => entity.CreatedAt).HasDefaultValueSql("(SYSDATETIMEOFFSET() AT TIME ZONE 'SE Asia Standard Time')");
                 entity.HasOne(entity => entity.Shipment)
                 .WithOne(entity => entity.Order);
                 entity.Property(entity => entity.Status)
@@ -321,7 +321,7 @@ namespace KFS.src.Infrastucture.Context
             //config consignment
             modelBuilder.Entity<Consignment>(entity =>
             {
-                entity.Property(entity => entity.CreatedAt).HasDefaultValueSql("(SYSDATETIMEOFFSET() AT TIME ZONE 'Asia/Ho_Chi_Minh')");
+                entity.Property(entity => entity.CreatedAt).HasDefaultValueSql("(SYSDATETIMEOFFSET() AT TIME ZONE 'SE Asia Standard Time')");
                 entity.Property(entity => entity.Id).ValueGeneratedOnAdd();
                 entity.Property(entity => entity.Method)
                 .HasConversion(
@@ -354,10 +354,12 @@ namespace KFS.src.Infrastucture.Context
             modelBuilder.Entity<Promotion>(entity =>
             {
                 entity.Property(entity => entity.Id).ValueGeneratedOnAdd();
+                entity.Property(entity => entity.CreatedAt).HasDefaultValueSql("(SYSDATETIMEOFFSET() AT TIME ZONE 'SE Asia Standard Time')");
             });
             //config batch
             modelBuilder.Entity<Batch>(entity =>
             {
+                entity.Property(entity => entity.CreatedAt).HasDefaultValueSql("(SYSDATETIMEOFFSET() AT TIME ZONE 'SE Asia Standard Time')");
                 entity.Property(entity => entity.Id).ValueGeneratedOnAdd();
                 entity.Property(entity => entity.IsForSell).HasDefaultValue(false);
                 entity.Property(entity => entity.Status).HasConversion(v => v.ToString(), v => v != null ? (ProductStatusEnum)Enum.Parse(typeof(ProductStatusEnum), v) : default);
@@ -369,6 +371,7 @@ namespace KFS.src.Infrastucture.Context
             //config user
             modelBuilder.Entity<User>(entity =>
             {
+                entity.Property(entity => entity.CreatedAt).HasDefaultValueSql("(SYSDATETIMEOFFSET() AT TIME ZONE 'SE Asia Standard Time')");
                 entity.Property(entity => entity.Id).ValueGeneratedOnAdd();
                 entity.Property(entity => entity.RoleId).HasDefaultValue(RoleConst.CUSTOMER_ID);
                 entity.HasOne(u => u.Role)
@@ -386,6 +389,7 @@ namespace KFS.src.Infrastucture.Context
             //config media
             modelBuilder.Entity<Media>(entity =>
             {
+                entity.Property(entity => entity.CreatedAt).HasDefaultValueSql("(SYSDATETIMEOFFSET() AT TIME ZONE 'SE Asia Standard Time')");
                 entity.Property(entity => entity.Id).ValueGeneratedOnAdd();
                 entity.Property(entity => entity.Type)
                 .HasConversion(
@@ -400,6 +404,20 @@ namespace KFS.src.Infrastucture.Context
                 .HasConversion(
                     v => v.ToString(),
                     v => v != null ? (MediaTypeEnum)Enum.Parse(typeof(MediaTypeEnum), v) : default);
+            });
+            //config feedback
+            modelBuilder.Entity<Feedback>(entity =>
+            {
+                entity.Property(entity => entity.CreatedAt).HasDefaultValueSql("(SYSDATETIMEOFFSET() AT TIME ZONE 'SE Asia Standard Time')");
+                entity.Property(entity => entity.Id).ValueGeneratedOnAdd();
+                entity.HasOne(f => f.User)
+                .WithMany(u => u.Feedbacks)
+                .HasForeignKey(f => f.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(f => f.Product)
+                .WithMany(p => p.Feedbacks)
+                .HasForeignKey(f => f.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
             });
         }
 

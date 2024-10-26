@@ -163,5 +163,33 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
+        [Protected]
+        [HttpPut("{id}/cancel")]
+        public async Task<IActionResult> CancelOrder(Guid id)
+        {
+            try
+            {
+                var result = await _orderService.CancelOrder(id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [Protected]
+        [HttpPut("{id}/return")]
+        public async Task<IActionResult> OrderReturn(Guid orderId)
+        {
+            try
+            {
+                var result = await _orderService.OrderReturn(orderId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

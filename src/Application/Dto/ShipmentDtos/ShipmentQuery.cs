@@ -6,13 +6,11 @@ using System.Threading.Tasks;
 using KFS.src.Application.Enum;
 using static KFS.src.Application.Dto.Pagination.Pagination;
 
-namespace KFS.src.Application.Dto.OrderDtos
+namespace KFS.src.Application.Dto.ShipmentDtos
 {
-    public class OrderQuery : PaginationReq
+    public class ShipmentQuery : PaginationReq
     {
         [JsonConverter(typeof(JsonStringEnumConverter))]
-        public PaymentMethodEnum? PaymentMethod { get; set; }
-        [JsonConverter(typeof(JsonStringEnumConverter))]
-        public OrderStatusEnum? Status { get; set; }
+        public ShipmentStatusEnum? Status { get; set; }
     }
 }

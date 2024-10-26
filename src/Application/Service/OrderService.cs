@@ -34,8 +34,9 @@ namespace KFS.src.Application.Service
         private readonly IBatchRepository _batchRepository;
         private readonly HttpContext _httpContext;
         private readonly IOwnerService _ownerService;
+        private readonly IShipmentRepository _shipmentRepository;
         private readonly IMapper _mapper;
-        public OrderService(IOrderRepository orderRepository, IMapper mapper, IUserRepository userRepository, ICartRepository cartRepository, IVNPayService vNPayService, IHttpContextAccessor httpContextAccessor, IProductRepository productRepository, IPaymentRepository paymentRepository, IWalletRepository walletRepository, IPromotionRepository promotionRepository, IBatchRepository batchRepository, IOwnerService ownerService)
+        public OrderService(IOrderRepository orderRepository, IMapper mapper, IUserRepository userRepository, ICartRepository cartRepository, IVNPayService vNPayService, IHttpContextAccessor httpContextAccessor, IProductRepository productRepository, IPaymentRepository paymentRepository, IWalletRepository walletRepository, IPromotionRepository promotionRepository, IBatchRepository batchRepository, IOwnerService ownerService, IShipmentRepository shipmentRepository)
         {
             _orderRepository = orderRepository;
             _mapper = mapper;
@@ -48,6 +49,7 @@ namespace KFS.src.Application.Service
             _promotionRepository = promotionRepository;
             _batchRepository = batchRepository;
             _ownerService = ownerService;
+            _shipmentRepository = shipmentRepository;
 
             // http context
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
@@ -657,7 +659,27 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
                     return response;
                 }
-
+                if (order.PaymentMethod == PaymentMethodEnum.VNPAY && order.Status != OrderStatusEnum.Paid)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Order status is not Paid";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                if (order.PaymentMethod == PaymentMethodEnum.COD && order.Status != OrderStatusEnum.Processing)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Order status is not Processing";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                if (order.Status == OrderStatusEnum.Delivering || order.Status == OrderStatusEnum.Delivered || order.Status == OrderStatusEnum.Completed || order.Status == OrderStatusEnum.Canceled || order.Status == OrderStatusEnum.Failed)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Can not update order";
+                    response.IsSuccess = false;
+                    return response;
+                }
                 //set order status
                 order.Status = isAccept ? OrderStatusEnum.Accepted : OrderStatusEnum.Canceled;
 
@@ -891,6 +913,113 @@ namespace KFS.src.Application.Service
                 {
                     response.StatusCode = 404;
                     response.Message = "Orders not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
+            }
+        }
+
+        public Task<ResponseDto> CancelOrder(Guid id)
+        {
+            var response = new ResponseDto();
+            try
+            {
+                //get order
+                var order = _orderRepository.GetOrderById(id).Result;
+                if (order == null)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Order not found";
+                    response.IsSuccess = false;
+                    return Task.FromResult(response);
+                }
+                if (order.Status == OrderStatusEnum.Delivering || order.Status == OrderStatusEnum.Delivered || order.Status == OrderStatusEnum.Completed || order.Status == OrderStatusEnum.Canceled || order.Status == OrderStatusEnum.Failed)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Can not cancel order";
+                    response.IsSuccess = false;
+                    return Task.FromResult(response);
+                }
+                //set order status
+                order.Status = OrderStatusEnum.Canceled;
+
+                //update order
+                var result = _orderRepository.UpdateOrder(order).Result;
+
+                //check result
+                if (result)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Order status updated successfully";
+                    response.IsSuccess = true;
+                    return Task.FromResult(response);
+                }
+                else
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Order status update failed";
+                    response.IsSuccess = false;
+                    return Task.FromResult(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return Task.FromResult(response);
+            }
+        }
+
+        public async Task<ResponseDto> OrderReturn(Guid orderId)
+        {
+            var response = new ResponseDto();
+            try
+            {
+                //get order
+                var order = _orderRepository.GetOrderById(orderId).Result;
+                if (order == null)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Order not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                if (order.Status == OrderStatusEnum.Delivered)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Can not return order";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                //set order status
+                order.Status = OrderStatusEnum.Canceled;
+                //set shipment status
+                order.Shipment!.Status = ShipmentStatusEnum.Cancelled;
+
+                //update order
+                var result = _orderRepository.UpdateOrder(order).Result;
+
+                //check result
+                if (result)
+                {
+                    await _shipmentRepository.UpdateShipment(order.Shipment);
+                    response.StatusCode = 200;
+                    response.Message = "Order status updated successfully";
+                    response.IsSuccess = true;
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Order status update failed";
                     response.IsSuccess = false;
                     return response;
                 }

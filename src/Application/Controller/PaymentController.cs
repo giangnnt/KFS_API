@@ -77,11 +77,11 @@ namespace KFS.src.Application.Controller
         }
         [Protected]
         [HttpPost("COD-order/{id}")]
-        public async Task<IActionResult> CreatePaymentByOrderId(Guid orderId)
+        public async Task<IActionResult> CreatePaymentByOrderId(Guid id)
         {
             try
             {
-                var result = await _paymentService.CreatePaymentByOrderIdCOD(orderId);
+                var result = await _paymentService.CreatePaymentByOrderIdCOD(id);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -91,11 +91,11 @@ namespace KFS.src.Application.Controller
         }
         [Protected]
         [HttpGet("user/{id}")]
-        public async Task<IActionResult> GetPaymentByUser(Guid userId)
+        public async Task<IActionResult> GetPaymentByUser(Guid id)
         {
             try
             {
-                var result = await _paymentService.GetPaymentByUser(userId);
+                var result = await _paymentService.GetPaymentByUser(id);
                 return Ok(result);
             }
             catch (Exception ex)

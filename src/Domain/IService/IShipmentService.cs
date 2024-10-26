@@ -13,8 +13,9 @@ namespace KFS.src.Domain.IService
         Task<ResponseDto> CreateShipment(Guid orderId);
         Task<ResponseDto> UpdateShipment(UpdateDto updateDto, Guid id);
         Task<ResponseDto> DeleteShipment(Guid id);
-        Task<ResponseDto> GetShipments();
+        Task<ResponseDto> GetShipments(ShipmentQuery shipmentQuery);
         Task<ResponseDto> GetShipmentById(Guid id);
-        Task<ResponseDto> ShipmentDelivered(Guid id);
+        Task<ResponseDto> ShipmentDelivered(Guid id, bool IsSuccess);
+        Task<ResponseDto> ShipmentCompleted(Guid id, bool IsSuccess);
     }
 }

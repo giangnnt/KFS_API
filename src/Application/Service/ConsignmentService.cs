@@ -243,6 +243,8 @@ namespace KFS.src.Application.Service
                         Color = product.Color,
                         FeedingVolumn = product.FeedingVolumn,
                         FilterRate = product.FilterRate,
+                        Gender = product.Gender,
+                        Inventory = orderItem.Quantity,
                         Status = ProductStatusEnum.Consignment,
                     };
                 };
@@ -409,7 +411,7 @@ namespace KFS.src.Application.Service
             try
             {
                 var consignments = await _consignmentRepository.GetConsignmentsAdmin(consignmentQuery);
-                var mappedConsignment = _mapper.Map<List<ConsignmentDto>>(consignments);
+                var mappedConsignment = _mapper.Map<List<ConsignmentDto>>(consignments.List);
                 if (consignments != null && consignments.List.Count() > 0)
                 {
                     response.StatusCode = 200;

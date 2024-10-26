@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using AutoMapper;
+using KFS.src.Application.Dto.PromotionDtos;
+using KFS.src.Application.Enum;
 using KFS.src.Domain.Entities;
 
 namespace KFS.src.Application.Dto.BatchDtos
@@ -16,15 +19,19 @@ namespace KFS.src.Application.Dto.BatchDtos
         public int Inventory { get; set; }
         public decimal Price { get; set; }
         public Guid ProductId { get; set; }
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public ProductStatusEnum Status { get; set; }
         public bool IsForSell { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+        public List<PromotionDto>? Promotions { get; set; }
     }
     public class BatchProfile : Profile
     {
         public BatchProfile()
         {
             CreateMap<Batch, BatchDto>()
+            .ForMember(dest => dest.Promotions, opt => opt.MapFrom(src => src.Promotions))
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<BatchUpdate, Batch>()
             .ForMember(dest => dest.ProductId, opt => opt.Ignore())

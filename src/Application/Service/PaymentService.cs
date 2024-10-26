@@ -33,9 +33,74 @@ namespace KFS.src.Application.Service
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
         }
-        public Task<ResponseDto> CreatePaymentOffline(Guid id)
+        public async Task<ResponseDto> CreatePaymentOffline(Guid id)
         {
-            throw new NotImplementedException();
+            var response = new ResponseDto();
+            try
+            {
+                var httpContext = _httpContextAccessor.HttpContext;
+                // check httpContext
+                if (httpContext == null)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Http context is required";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                // get payload
+                var payload = httpContext.Items["payload"] as Payload;
+                // check payload
+                if (payload == null)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Payload is required";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                // check order offline
+                var order = await _orderRepository.GetOrderById(id);
+                if (order.PaymentMethod != PaymentMethodEnum.OFFLINE)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Payment method is not Offline";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                var payment = new PaymentOrder
+                {
+                    OrderId = id,
+                    PaymentType = "Order",
+                    UserId = order.UserId,
+                    PaymentMethod = order.PaymentMethod,
+                    Amount = order.TotalPrice,
+                    Status = PaymentStatusEnum.Completed,
+                    CreatedAt = DateTime.Now
+                };
+                var result = await _paymentRepository.CreatePayment(payment);
+                order.Status = OrderStatusEnum.Completed;
+                if (result)
+                {
+                    await _orderRepository.UpdateOrder(order);
+                    response.StatusCode = 201;
+                    response.Message = "Payment created successfully";
+                    response.IsSuccess = true;
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Payment creation failed";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
+            }
         }
 
         public async Task<ResponseDto> CreatePaymentByOrderIdCOD(Guid orderId)
@@ -44,13 +109,6 @@ namespace KFS.src.Application.Service
             try
             {
                 var order = await _orderRepository.GetOrderById(orderId);
-                if (order == null)
-                {
-                    response.StatusCode = 404;
-                    response.Message = "Order not found";
-                    response.IsSuccess = false;
-                    return response;
-                }
                 if (order.Status != OrderStatusEnum.Delivered)
                 {
                     response.StatusCode = 400;
@@ -65,6 +123,7 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
                     return response;
                 }
+                // create payment
                 var payment = new PaymentOrder
                 {
                     OrderId = orderId,
@@ -306,7 +365,7 @@ namespace KFS.src.Application.Service
             try
             {
                 var payments = await _paymentRepository.GetPayments(paymentQuery);
-                var mappedPayments = _mapper.Map<IEnumerable<PaymentDto>>(payments);
+                var mappedPayments = _mapper.Map<IEnumerable<PaymentDto>>(payments.List);
                 if (payments != null && payments.List.Count() > 0)
                 {
                     response.StatusCode = 200;
