@@ -25,7 +25,6 @@ namespace KFS.src.Application.Service
         private readonly IConsignmentRepository _consignmentRepository;
         private readonly IProductRepository _productRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly HttpContext _httpContext;
         private readonly IMapper _mapper;
         private readonly IBackgroundJobClient _backgroundJobClient;
         private readonly IVNPayService _vNPayService;
@@ -46,8 +45,7 @@ namespace KFS.src.Application.Service
             _ownerService = ownerService;
 
             // http context
-            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
-            _httpContext = httpContextAccessor.HttpContext ?? throw new InvalidOperationException("Http context is required.");
+            _httpContextAccessor = httpContextAccessor;
         }
         public async Task<ResponseDto> CreateConsignment(ConsignmentCreate req)
         {
@@ -281,6 +279,14 @@ namespace KFS.src.Application.Service
             var response = new ResponseDto();
             try
             {
+                var _httpContext = _httpContextAccessor.HttpContext;
+                if (_httpContext == null)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Unauthorized";
+                    response.IsSuccess = false;
+                    return response;
+                }
                 var consignment = await _consignmentRepository.GetConsignmentById(id);
                 //check if consignment is authorized
                 var isOwner = _ownerService.CheckEntityOwner(_httpContext, consignment.UserId);
@@ -451,6 +457,14 @@ namespace KFS.src.Application.Service
             var response = new ResponseDto();
             try
             {
+                var _httpContext = _httpContextAccessor.HttpContext;
+                if (_httpContext == null)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Unauthorized";
+                    response.IsSuccess = false;
+                    return response;
+                }
                 var consignment = await _consignmentRepository.GetConsignmentById(consignmentId);
                 //check if consignment is authorized
                 var isOwner = _ownerService.CheckEntityOwner(_httpContext, consignment.UserId);
