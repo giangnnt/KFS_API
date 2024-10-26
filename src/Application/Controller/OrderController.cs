@@ -179,11 +179,11 @@ namespace KFS.src.Application.Controller
         }
         [Protected]
         [HttpPut("{id}/return")]
-        public async Task<IActionResult> OrderReturn(Guid orderId)
+        public async Task<IActionResult> OrderReturn(Guid id)
         {
             try
             {
-                var result = await _orderService.OrderReturn(orderId);
+                var result = await _orderService.OrderReturn(id);
                 return Ok(result);
             }
             catch (Exception ex)

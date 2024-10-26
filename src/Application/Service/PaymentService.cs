@@ -23,7 +23,8 @@ namespace KFS.src.Application.Service
         private readonly IShipmentRepository _shipmentRepository;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public PaymentService(IPaymentRepository paymentRepository, IOrderRepository orderRepository, ICartRepository cartRepository, IProductRepository productRepository, IShipmentRepository shipmentRepository, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+        private readonly IBatchRepository _batchRepository;
+        public PaymentService(IPaymentRepository paymentRepository, IOrderRepository orderRepository, ICartRepository cartRepository, IProductRepository productRepository, IShipmentRepository shipmentRepository, IMapper mapper, IHttpContextAccessor httpContextAccessor, IBatchRepository batchRepository)
         {
             _paymentRepository = paymentRepository;
             _orderRepository = orderRepository;
@@ -32,12 +33,14 @@ namespace KFS.src.Application.Service
             _shipmentRepository = shipmentRepository;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
+            _batchRepository = batchRepository;
         }
         public async Task<ResponseDto> CreatePaymentOffline(Guid id)
         {
             var response = new ResponseDto();
             try
             {
+                var listCredential = new List<Credential>();
                 var httpContext = _httpContextAccessor.HttpContext;
                 // check httpContext
                 if (httpContext == null)
@@ -77,6 +80,35 @@ namespace KFS.src.Application.Service
                     CreatedAt = DateTime.Now
                 };
                 var result = await _paymentRepository.CreatePayment(payment);
+                foreach (var orderItem in order.OrderItems)
+                {
+                    // order item product
+                    if (!orderItem.IsBatch)
+                    {
+                        //update inventory
+                        var product = await _productRepository.GetProductById(orderItem.ProductId);
+                        product.Inventory -= orderItem.Quantity;
+                        if (product.Inventory == 0)
+                        {
+                            product.Status = ProductStatusEnum.SoldOut;
+                        }
+                        await _productRepository.UpdateProduct(product);
+                        //get credential
+                        listCredential.AddRange(product.Credentials);
+                    }
+                    // order item batch
+                    if (orderItem.IsBatch)
+                    {
+                        // update inventory
+                        var batch = await _batchRepository.GetBatchById(orderItem.BatchId);
+                        batch.Inventory -= orderItem.Quantity;
+                        if (batch.Inventory == 0)
+                        {
+                            batch.Status = ProductStatusEnum.SoldOut;
+                        }
+                        await _batchRepository.UpdateBatch(batch);
+                    }
+                }
                 order.Status = OrderStatusEnum.Completed;
                 if (result)
                 {
@@ -84,6 +116,10 @@ namespace KFS.src.Application.Service
                     response.StatusCode = 201;
                     response.Message = "Payment created successfully";
                     response.IsSuccess = true;
+                    response.Result = new ResultDto
+                    {
+                        Data = listCredential
+                    };
                     return response;
                 }
                 else
@@ -138,6 +174,7 @@ namespace KFS.src.Application.Service
                 var carts = await _cartRepository.GetCartByUserId(payment.UserId);
                 var cart = new Cart();
                 var result = await _paymentRepository.CreatePayment(payment);
+                var listCredential = new List<Credential>();
                 if (result)
                 {
                     foreach (var c in carts)
@@ -150,14 +187,40 @@ namespace KFS.src.Application.Service
                     }
                     foreach (var orderItem in order.OrderItems)
                     {
-                        // update product inventory
-                        var product = await _productRepository.GetProductById(orderItem.ProductId);
-                        product.Inventory -= orderItem.Quantity;
-                        await _productRepository.UpdateProduct(product);
+                        // order item product
+                        if (!orderItem.IsBatch)
+                        {
+                            //update inventory
+                            var product = await _productRepository.GetProductById(orderItem.ProductId);
+                            product.Inventory -= orderItem.Quantity;
+                            if (product.Inventory == 0)
+                            {
+                                product.Status = ProductStatusEnum.SoldOut;
+                            }
+                            await _productRepository.UpdateProduct(product);
+                            //get credential
+                            listCredential.AddRange(product.Credentials);
+                        }
+                        // order item batch
+                        if (orderItem.IsBatch)
+                        {
+                            // update inventory
+                            var batch = await _batchRepository.GetBatchById(orderItem.BatchId);
+                            batch.Inventory -= orderItem.Quantity;
+                            if (batch.Inventory == 0)
+                            {
+                                batch.Status = ProductStatusEnum.SoldOut;
+                            }
+                            await _batchRepository.UpdateBatch(batch);
+                        }
                     }
                     order.Status = OrderStatusEnum.Completed;
                     response.StatusCode = 201;
                     response.Message = "Payment created successfully";
+                    response.Result = new ResultDto
+                    {
+                        Data = listCredential
+                    };
                     response.IsSuccess = true;
                 }
                 else

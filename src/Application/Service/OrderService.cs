@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using AutoMapper;
 using KFS.src.Application.Core.Jwt;
@@ -329,14 +330,31 @@ namespace KFS.src.Application.Service
                         }
                         foreach (var orderItem in order.OrderItems)
                         {
-                            //update inventory
-                            var product = await _productRepository.GetProductById(orderItem.ProductId);
-                            product.Inventory -= orderItem.Quantity;
-                            await _productRepository.UpdateProduct(product);
-                            //get credential
-                            if (orderItem.IsBatch == false)
+                            // order item product
+                            if (!orderItem.IsBatch)
                             {
+                                //update inventory
+                                var product = await _productRepository.GetProductById(orderItem.ProductId);
+                                product.Inventory -= orderItem.Quantity;
+                                if (product.Inventory == 0)
+                                {
+                                    product.Status = ProductStatusEnum.SoldOut;
+                                }
+                                await _productRepository.UpdateProduct(product);
+                                //get credential
                                 listCredential.AddRange(product.Credentials);
+                            }
+                            // order item batch
+                            if (orderItem.IsBatch)
+                            {
+                                // update inventory
+                                var batch = await _batchRepository.GetBatchById(orderItem.BatchId);
+                                batch.Inventory -= orderItem.Quantity;
+                                if (batch.Inventory == 0)
+                                {
+                                    batch.Status = ProductStatusEnum.SoldOut;
+                                }
+                                await _batchRepository.UpdateBatch(batch);
                             }
                         }
                         order.Status = OrderStatusEnum.Paid;
@@ -940,7 +958,7 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
                     return Task.FromResult(response);
                 }
-                if (order.Status == OrderStatusEnum.Delivering || order.Status == OrderStatusEnum.Delivered || order.Status == OrderStatusEnum.Completed || order.Status == OrderStatusEnum.Canceled || order.Status == OrderStatusEnum.Failed)
+                if (order.Status == OrderStatusEnum.Accepted || order.Status == OrderStatusEnum.Delivering || order.Status == OrderStatusEnum.Delivered || order.Status == OrderStatusEnum.Completed || order.Status == OrderStatusEnum.Canceled || order.Status == OrderStatusEnum.Failed)
                 {
                     response.StatusCode = 400;
                     response.Message = "Can not cancel order";
@@ -984,7 +1002,7 @@ namespace KFS.src.Application.Service
             try
             {
                 //get order
-                var order = _orderRepository.GetOrderById(orderId).Result;
+                var order = await _orderRepository.GetOrderById(orderId);
                 if (order == null)
                 {
                     response.StatusCode = 404;
@@ -992,17 +1010,26 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
                     return response;
                 }
-                if (order.Status == OrderStatusEnum.Delivered)
+                if (order.Shipment == null)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Shipment not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+
+                if (order.Status != OrderStatusEnum.Delivered || order.Shipment.Status != ShipmentStatusEnum.Delivered)
                 {
                     response.StatusCode = 400;
                     response.Message = "Can not return order";
                     response.IsSuccess = false;
                     return response;
                 }
+
                 //set order status
                 order.Status = OrderStatusEnum.Canceled;
                 //set shipment status
-                order.Shipment!.Status = ShipmentStatusEnum.Cancelled;
+                order.Shipment.Status = ShipmentStatusEnum.Cancelled;
 
                 //update order
                 var result = _orderRepository.UpdateOrder(order).Result;
