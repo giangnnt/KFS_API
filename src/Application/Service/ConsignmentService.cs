@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.IO.Pipelines;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Hangfire;
 using Hangfire.Common;
 using KFS.src.Application.Core.Jwt;
+using KFS.src.Application.Dto.BatchDtos;
 using KFS.src.Application.Dto.ConsignmentDtos;
 using KFS.src.Application.Dto.ResponseDtos;
 using KFS.src.Application.Dto.VNPay;
@@ -382,7 +384,7 @@ namespace KFS.src.Application.Service
             try
             {
                 var consignment = await _consignmentRepository.GetConsignmentById(id);
-                var mappedConsignment = _mapper.Map<ConsignmentDto>(consignment);
+                var mappedConsignment = GetConsignmentFormat(consignment);
                 if (mappedConsignment != null)
                 {
                     response.StatusCode = 200;
@@ -417,7 +419,7 @@ namespace KFS.src.Application.Service
             try
             {
                 var consignments = await _consignmentRepository.GetConsignmentsAdmin(consignmentQuery);
-                var mappedConsignment = _mapper.Map<List<ConsignmentDto>>(consignments.List);
+                var mappedConsignment = GetConsignmentsFormat(consignments.List);
                 if (consignments != null && consignments.List.Count() > 0)
                 {
                     response.StatusCode = 200;
@@ -644,17 +646,20 @@ namespace KFS.src.Application.Service
                 if (status == ConsignmentStatusEnum.Active)
                 {
                     product.IsForSell = true;
+                    product.Status = ProductStatusEnum.Consignment;
                     if (consignment.IsBatch)
                     {
                         foreach (var batch in product.Batches)
                         {
                             batch.IsForSell = true;
+                            batch.Status = ProductStatusEnum.Consignment;
                         }
                     }
                 }
                 else
                 {
                     product.IsForSell = false;
+                    product.Status = ProductStatusEnum.Deactive;
                     product.Status = ProductStatusEnum.Deactive;
                     if (consignment.IsBatch)
                     {
@@ -703,7 +708,7 @@ namespace KFS.src.Application.Service
             try
             {
                 var consignments = await _consignmentRepository.GetConsignmentsByUserId(consignmentQuery, userId);
-                var mappedConsignment = _mapper.Map<List<ConsignmentDto>>(consignments);
+                var mappedConsignment = GetConsignmentsFormat(consignments.List);
                 if (consignments != null && consignments.List.Count() > 0)
                 {
                     response.StatusCode = 200;
@@ -760,7 +765,7 @@ namespace KFS.src.Application.Service
                     return response;
                 }
                 var consignments = await _consignmentRepository.GetConsignmentsByUserId(consignmentQuery, payload.UserId);
-                var mappedConsignment = _mapper.Map<List<ConsignmentDto>>(consignments.List);
+                var mappedConsignment = GetConsignmentsFormat(consignments.List);
                 if (consignments != null && consignments.List.Count() > 0)
                 {
                     response.StatusCode = 200;
@@ -793,6 +798,43 @@ namespace KFS.src.Application.Service
                 response.IsSuccess = false;
                 return response;
             }
+        }
+        public ConsignmentDto GetConsignmentFormat(Consignment consignment)
+        {
+            var mappedConsignment = _mapper.Map<ConsignmentDto>(consignment);
+            if (consignment.IsBatch)
+            {
+                mappedConsignment.Product = null;
+                foreach (var item in consignment.Product.Batches)
+                {
+                    mappedConsignment.Batch = _mapper.Map<BatchDto>(item);
+                }
+            }
+            else
+            {
+                mappedConsignment.Batch = null;
+            }
+            return mappedConsignment;
+        }
+        public List<ConsignmentDto> GetConsignmentsFormat(List<Consignment> consignments)
+        {
+            var mappedConsignmentList = _mapper.Map<List<ConsignmentDto>>(consignments);
+            for (int i = 0; i < consignments.Count; i++)
+            {
+                if (consignments[i].IsBatch)
+                {
+                    mappedConsignmentList[i].Product = null;
+                    foreach (var item in consignments[i].Product.Batches)
+                    {
+                        mappedConsignmentList[i].Batch = _mapper.Map<BatchDto>(item);
+                    }
+                }
+                else
+                {
+                    mappedConsignmentList[i].Batch = null;
+                }
+            }
+            return mappedConsignmentList;
         }
     }
 }

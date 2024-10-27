@@ -37,7 +37,7 @@ namespace KFS.src.Infrastucture.Repository
         {
             return await _context.Consignments
             .Include(x => x.Product)
-            .ThenInclude(x => x.Category)
+            .ThenInclude(x => x.Batches)
             .Include(x => x.User)
             .FirstOrDefaultAsync(x => x.Id == id) ?? throw new Exception("Consignment not found");
         }
@@ -56,7 +56,7 @@ namespace KFS.src.Infrastucture.Repository
 
             var consignmentList = await query
             .Include(x => x.Product)
-            .ThenInclude(x => x.Category)
+            .ThenInclude(x => x.Batches)
             .Include(x => x.User)
             .Skip((consignmentQuery.Page - 1) * consignmentQuery.PageSize)
             .Take(consignmentQuery.PageSize)
@@ -81,7 +81,7 @@ namespace KFS.src.Infrastucture.Repository
             // return
             var consignmentList = await query
             .Include(x => x.Product)
-            .ThenInclude(x => x.Category)
+            .ThenInclude(x => x.Batches)
             .Include(x => x.User)
             .ToListAsync();
             return new ObjectPaging<Consignment>
@@ -95,7 +95,7 @@ namespace KFS.src.Infrastucture.Repository
         {
             return await _context.Consignments
             .Include(x => x.Product)
-            .ThenInclude(x => x.Category)
+            .ThenInclude(x => x.Batches)
             .Include(x => x.User)
             .Where(x => x.UserId == userId)
             .ToListAsync();
