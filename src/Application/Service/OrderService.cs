@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using KFS.src.Application.Core.Jwt;
 using KFS.src.Application.Dto.BatchDtos;
+using KFS.src.Application.Dto.GHN;
 using KFS.src.Application.Dto.OrderDtos;
 using KFS.src.Application.Dto.ProductDtos;
 using KFS.src.Application.Dto.ResponseDtos;
@@ -36,8 +37,10 @@ namespace KFS.src.Application.Service
         private readonly HttpContext _httpContext;
         private readonly IOwnerService _ownerService;
         private readonly IShipmentRepository _shipmentRepository;
+        private readonly IAddressRepository _addressRepository;
+        private readonly IGHNService _ghnService;
         private readonly IMapper _mapper;
-        public OrderService(IOrderRepository orderRepository, IMapper mapper, IUserRepository userRepository, ICartRepository cartRepository, IVNPayService vNPayService, IHttpContextAccessor httpContextAccessor, IProductRepository productRepository, IPaymentRepository paymentRepository, IWalletRepository walletRepository, IPromotionRepository promotionRepository, IBatchRepository batchRepository, IOwnerService ownerService, IShipmentRepository shipmentRepository)
+        public OrderService(IOrderRepository orderRepository, IMapper mapper, IUserRepository userRepository, ICartRepository cartRepository, IVNPayService vNPayService, IHttpContextAccessor httpContextAccessor, IProductRepository productRepository, IPaymentRepository paymentRepository, IWalletRepository walletRepository, IPromotionRepository promotionRepository, IBatchRepository batchRepository, IOwnerService ownerService, IShipmentRepository shipmentRepository, IAddressRepository addressRepository, IGHNService ghnService)
         {
             _orderRepository = orderRepository;
             _mapper = mapper;
@@ -51,6 +54,8 @@ namespace KFS.src.Application.Service
             _batchRepository = batchRepository;
             _ownerService = ownerService;
             _shipmentRepository = shipmentRepository;
+            _addressRepository = addressRepository;
+            _ghnService = ghnService;
 
             // http context
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
@@ -104,13 +109,15 @@ namespace KFS.src.Application.Service
                 mappedOrder = _mapper.Map(cart, mappedOrder);
 
                 // check shipping address
-                if (mappedOrder.ShippingAddress == null)
+                var address = await _addressRepository.GetAddressById(mappedOrder.AddressId);
+                if (address == null)
                 {
                     response.StatusCode = 400;
-                    response.Message = "Shipping address is required";
+                    response.Message = "Address not found";
                     response.IsSuccess = false;
                     return response;
                 }
+                mappedOrder.Address = address;
 
                 // check contact number
                 if (mappedOrder.ContactNumber == null)
@@ -151,7 +158,25 @@ namespace KFS.src.Application.Service
                     }
                 }
                 //set shipping fee
-                mappedOrder.ShippingFee = 30000;
+                var GHNResponse = await _ghnService.CalculateShippingFee(new GHNRequest
+                {
+                    ToWardCode = address.WardCode,
+                    ToDistrictId = address.DistrictId,
+                    Weight = mappedOrder.TotalWeight,
+                    ServiceId = mappedOrder.ServiceId,
+                    ServiceTypeId = mappedOrder.ServiceTypeId
+                });
+                if (GHNResponse != null)
+                {
+                    mappedOrder.ShippingFee = GHNResponse.Data.Total;
+                }
+                else
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Can not calculate shipping fee";
+                    response.IsSuccess = false;
+                    return response;
+                }
 
                 // Use point from wallet
                 if (req.UsePoint == true)
@@ -197,7 +222,11 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = true;
                     response.Result = new ResultDto
                     {
-                        Data = data
+                        Data = new
+                        {
+                            mappedOrder.ShippingFee,
+                            paymentUrl = data
+                        }
                     };
                 }
                 else
@@ -840,6 +869,7 @@ namespace KFS.src.Application.Service
                     UserId = payload.UserId,
                     TotalPrice = orderItems.Sum(x => x.Price * x.Quantity),
                     TotalItem = orderItems.Sum(x => x.Quantity),
+                    TotalWeight = 0,
                     OrderItems = orderItems,
                     Status = OrderStatusEnum.Processing,
                     Currency = req.Currency,

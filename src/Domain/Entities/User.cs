@@ -14,7 +14,6 @@ namespace KFS.src.Domain.Entities
         public int RoleId { get; set; }
         public string? Avatar { get; set; }
         public string Phone { get; set; } = null!;
-        public string? Address { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public Role Role { get; set; } = null!;
@@ -24,5 +23,6 @@ namespace KFS.src.Domain.Entities
         public List<Payment> Payments { get; set; } = new List<Payment>();
         public List<Feedback> Feedbacks { get; set; } = new List<Feedback>();  
         public Wallet Wallet { get; set; } = null!;
+        public List<Address> Address { get; set; } = new List<Address>();
     }
 }

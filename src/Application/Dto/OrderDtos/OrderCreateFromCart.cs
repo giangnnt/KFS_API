@@ -9,7 +9,10 @@ namespace KFS.src.Application.Dto.OrderDtos
 {
     public class OrderCreateFromCart
     {
-        public string ShippingAddress { get; set; } = null!;
+        public Guid AddressId { get; set; }
+        public int ServiceId { get; set; }
+        public int ServiceTypeId { get; set; }
+        public int TotalWeight { get; set; }
         public string ContactNumber { get; set; } = null!;
         public string ContactName { get; set; } = null!;
         public string? DiscountCode { get; set; }

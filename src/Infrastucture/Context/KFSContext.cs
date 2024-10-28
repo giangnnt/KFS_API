@@ -40,6 +40,7 @@ namespace KFS.src.Infrastucture.Context
         public DbSet<PaymentConsignment> PaymentConsignments { get; set; }
         public DbSet<Feedback> Feedbacks { get; set; }
         public DbSet<Credential> Credentials { get; set; }
+        public DbSet<Address> Addresses { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -109,8 +110,19 @@ namespace KFS.src.Infrastucture.Context
                     RoleId = RoleConst.ADMIN_ID,
                     Password = BCrypt.Net.BCrypt.HashPassword("123456"),
                     Phone = "0123456789",
-                    Address = "HCM",
                     CreatedAt = DateTime.Parse("2024-10-11"),
+                }
+            );
+            // Seed Address
+            modelBuilder.Entity<Address>().HasData(
+                new Address
+                {
+                    Id = Guid.Parse("00000000-0000-0000-0000-000000000001"),
+                    Street = "77c Huynh Thi Tuoi",
+                    WardCode = "440504",
+                    DistrictId = 1540,
+                    ProvinceId = 205,
+                    UserId = Guid.Parse("00000000-0000-0000-0000-000000000001")
                 }
             );
 
@@ -149,6 +161,7 @@ namespace KFS.src.Infrastucture.Context
                     Name = "Batch 1",
                     ProductId = Guid.Parse("2a9394e2-52b3-46d5-8a33-af4d6020e440"),
                     Quantity = 10,
+                    Weight = 10000,
                     Inventory = 10,
                     Price = 10000,
                 },
@@ -159,6 +172,7 @@ namespace KFS.src.Infrastucture.Context
                     ProductId = Guid.Parse("8657ed40-1b9d-44e2-800d-40bb1a20af98"),
                     Quantity = 10,
                     Inventory = 10,
+                    Weight = 20000,
                     Price = 20000,
                     IsForSell = true
                 },
@@ -169,6 +183,7 @@ namespace KFS.src.Infrastucture.Context
                     ProductId = Guid.Parse("f3b3b3b4-1b9d-44e2-800d-40bb1a20af98"),
                     Quantity = 10,
                     Inventory = 10,
+                    Weight = 20000,
                     Price = 30000,
                     IsForSell = true
                 }
@@ -200,6 +215,7 @@ namespace KFS.src.Infrastucture.Context
                     Id = Guid.Parse("2a9394e2-52b3-46d5-8a33-af4d6020e440"),
                     Name = "Product 1",
                     Description = "Description for Product 1",
+                    Weight = 1000,
                     Price = 10000,
                     Inventory = 100,
                     CategoryId = Guid.Parse("5F18BF0C-7199-462C-B023-3CCF1FD9F806"),
@@ -211,6 +227,7 @@ namespace KFS.src.Infrastucture.Context
                     Id = Guid.Parse("8657ed40-1b9d-44e2-800d-40bb1a20af98"),
                     Name = "Product 2",
                     Description = "Description for Product 2",
+                    Weight = 2000,
                     Price = 20000,
                     Inventory = 50,
                     CategoryId = Guid.Parse("3D4FC185-049D-4A96-851B-1D320E7DBBA8"),
@@ -223,6 +240,7 @@ namespace KFS.src.Infrastucture.Context
                     Id = Guid.Parse("f3b3b3b4-1b9d-44e2-800d-40bb1a20af98"),
                     Name = "Product 3",
                     Description = "Description for Product 3",
+                    Weight = 3000,
                     Price = 30000,
                     Inventory = 150,
                     CategoryId = Guid.Parse("9A17DCF5-1426-45EE-A32E-C23EE5FE40D9"),
@@ -317,6 +335,11 @@ namespace KFS.src.Infrastucture.Context
                     .WithOne(s => s.Order)
                     .HasForeignKey<Shipment>(s => s.OrderId)
                     .OnDelete(DeleteBehavior.Cascade); // Potential cascade path
+                
+                entity.HasOne(o => o.Address)
+                    .WithMany(a => a.Orders)
+                    .HasForeignKey(o => o.AddressId)
+                    .OnDelete(DeleteBehavior.Restrict); // Potential cascade path
             });
             //config consignment
             modelBuilder.Entity<Consignment>(entity =>

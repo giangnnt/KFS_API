@@ -17,6 +17,7 @@ namespace KFS.src.Application.Dto.CartDtos
         public Guid UserId { get; set; }
         public decimal TotalPrice { get; set; }
         public int TotalItem { get; set; }
+        public int TotalWeight { get; set; }
         public string Currency { get; set; } = "VND";
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public CartStatusEnum Status { get; set; }
