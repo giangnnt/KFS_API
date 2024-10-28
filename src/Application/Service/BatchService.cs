@@ -65,6 +65,7 @@ namespace KFS.src.Application.Service
                     }
                     
                     var mappedBatch = _mapper.Map<Batch>(batch);
+                    mappedBatch.Weight = product.Weight * batch.Quantity;
                     mappedBatch.ProductId = productId;
                     mappedBatch.Status = ProductStatusEnum.Deactive;
                     mappedBatch.IsForSell = false;

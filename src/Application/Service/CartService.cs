@@ -116,11 +116,13 @@ namespace KFS.src.Application.Service
                     }
                     //update cart item
                     cartItem.Quantity += req.Quantity;
-                    cartItem.Price = batch.Price * cartItem.Quantity;
+                    cartItem.Price += batch.Price * cartItem.Quantity;
+                    cartItem.Weight += batch.Weight * cartItem.Quantity;
                 }
                 // update cart
                 cart.TotalItem += req.Quantity;
                 cart.TotalPrice += batch.Price * req.Quantity;
+                cart.TotalWeight += batch.Weight * req.Quantity;
                 var result = await _cartRepository.AddRemoveCartItem(cart);
                 //check result
                 if (result)
@@ -220,11 +222,13 @@ namespace KFS.src.Application.Service
                     }
                     //update cart item
                     cartItem.Quantity += req.Quantity;
-                    cartItem.Price = product.Price * cartItem.Quantity;
+                    cartItem.Price += product.Price * cartItem.Quantity;
+                    cartItem.Weight += product.Weight * cartItem.Quantity;
                 }
                 //update cart
                 cart.TotalItem += req.Quantity;
                 cart.TotalPrice += product.Price * req.Quantity;
+                cart.TotalWeight += product.Weight * req.Quantity;
                 var result = await _cartRepository.AddRemoveCartItem(cart);
                 //check result
                 if (result)
@@ -529,11 +533,13 @@ namespace KFS.src.Application.Service
                 }
                 //update cart item
                 cartItem.Quantity -= req.Quantity;
-                cartItem.Price = batch.Price * cartItem.Quantity;
+                cartItem.Price -= batch.Price * cartItem.Quantity;
+                cartItem.Weight -= batch.Weight * cartItem.Quantity;
                 await _cartItemRepository.UpdateCartItem(cartItem);
                 //update cart
                 cart.TotalItem -= req.Quantity;
                 cart.TotalPrice -= batch.Price * req.Quantity;
+                cart.TotalWeight -= batch.Weight * req.Quantity;
                 var result = await _cartRepository.UpdateCart(cart);
                 //check result
                 if (result)
@@ -603,10 +609,12 @@ namespace KFS.src.Application.Service
                 //update cart item
                 cartItem.Quantity -= req.Quantity;
                 cartItem.Price = product.Price * cartItem.Quantity;
+                cartItem.Weight = product.Weight * cartItem.Quantity;
                 await _cartItemRepository.UpdateCartItem(cartItem);
                 //update cart
                 cart.TotalItem -= req.Quantity;
                 cart.TotalPrice -= product.Price * req.Quantity;
+                cart.TotalWeight -= product.Weight * req.Quantity;
                 var result = await _cartRepository.UpdateCart(cart);
                 //check result
                 if (result)

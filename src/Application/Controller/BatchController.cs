@@ -46,12 +46,12 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPost]
-        public async Task<IActionResult> CreateBatch(BatchCreate req, Guid productId)
+        [HttpPost("product/{id}")]
+        public async Task<IActionResult> CreateBatch(BatchCreate req, Guid id)
         {
             try
             {
-                var result = await _batchService.CreateBatchFromProduct(req, productId);
+                var result = await _batchService.CreateBatchFromProduct(req, id);
                 return Ok(result);
             }
             catch (Exception ex)

@@ -12,6 +12,7 @@ namespace KFS.src.Domain.Entities
         public Guid UserId { get; set; }
         public decimal TotalPrice { get; set; }
         public int TotalItem { get; set; }
+        public int TotalWeight { get; set; }
         public string Currency { get; set; } = "VND";
         public CartStatusEnum Status { get; set; }
         public DateTime CreatedAt { get; set; }

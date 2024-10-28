@@ -13,6 +13,7 @@ namespace KFS.src.Domain.Entities
         public string? Description { get; set; }
         public int Quantity { get; set; }
         public int Inventory { get; set; }
+        public int Weight { get; set; }
         public decimal Price { get; set; }
         public Guid ProductId { get; set; }
         public ProductStatusEnum Status { get; set; }
