@@ -107,6 +107,7 @@ namespace KFS.src.Infrastucture.Context
                     Id = Guid.Parse("00000000-0000-0000-0000-000000000001"),
                     FullName = "Truong Giang",
                     Email = "giangnnt260703@gmail.com",
+                    IsActive = true,
                     RoleId = RoleConst.ADMIN_ID,
                     Password = BCrypt.Net.BCrypt.HashPassword("123456"),
                     Phone = "0123456789",
@@ -164,6 +165,7 @@ namespace KFS.src.Infrastucture.Context
                     Weight = 10000,
                     Inventory = 10,
                     Price = 10000,
+                    IsForSell = true
                 },
                 new Batch
                 {

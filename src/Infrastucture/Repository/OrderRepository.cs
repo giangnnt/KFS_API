@@ -68,6 +68,8 @@ namespace KFS.src.Infrastucture.Repository
             .Include(x => x.OrderItems)
             .Include(x => x.Payment)
             .Include(x => x.Shipment)
+            .Skip((orderQuery.Page - 1) * orderQuery.PageSize)
+            .Take(orderQuery.PageSize)
             .ToListAsync();
             return new ObjectPaging<Order>
             {

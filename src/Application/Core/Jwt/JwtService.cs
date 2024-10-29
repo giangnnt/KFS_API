@@ -20,7 +20,7 @@ namespace KFS.src.Application.Core.Jwt
         private readonly JwtSecurityTokenHandler _handler;
         public JwtService()
         {
-            var SecretKey = Environment.GetEnvironmentVariable("JWT_SECRET") ?? "Koifarmshop@@";
+            var SecretKey = Environment.GetEnvironmentVariable("JWT_SECRET") ?? "8a21f416ac3c7de71de084e5190bb322456f5739eff177aeb5be84af1a70bc59";
             _key = System.Text.Encoding.ASCII.GetBytes(SecretKey);
             _handler = new JwtSecurityTokenHandler();
         }

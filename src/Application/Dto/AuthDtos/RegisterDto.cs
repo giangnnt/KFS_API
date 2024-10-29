@@ -16,7 +16,7 @@ namespace KFS.src.Application.Dto.AuthDtos
 
         [Required]
         [StringLength(20, ErrorMessage = "Password must be at least 6 characters", MinimumLength = 6)]
-        [RegularExpression(RegexConst.PASSWORD, ErrorMessage = "Password must contain at least 1 uppercase letter, 1 lowercase letter and 1 number")]
+        [RegularExpression(RegexConst.PASSWORD, ErrorMessage = "Password must contain at least 1 uppercase letter, 1 lowercase letter, 1 special character and 1 number")]
         public string Password { get; set; } = null!;
 
         [Required]

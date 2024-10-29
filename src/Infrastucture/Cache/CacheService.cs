@@ -36,7 +36,7 @@ namespace KFS.src.Infrastucture.Cache
 
         public Task ForceLogout(Guid userId)
         {
-            var redisKey = $"ss:{userId}";
+            var redisKey = $"session:{userId}";
             return ClearWithPattern(redisKey);
         }
 
