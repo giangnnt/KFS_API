@@ -63,7 +63,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPost("query")]
+        [HttpPost("admin/query")]
         public async Task<IActionResult> GetShipments(ShipmentQuery shipmentQuery)
         {
             try

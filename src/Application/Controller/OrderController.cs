@@ -24,7 +24,7 @@ namespace KFS.src.Application.Controller
             _orderService = orderService;
         }
         [Protected]
-        [HttpPost("query")]
+        [HttpPost("admin/query")]
         public async Task<IActionResult> GetOrders(OrderQuery req)
         {
             try

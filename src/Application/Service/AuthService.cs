@@ -23,10 +23,10 @@ namespace KFS.src.Application.Service
     {
         private readonly IRoleBaseRepository _roleBaseRepository;
         private readonly IUserRepository _userRepository;
-        private readonly ICrypro _crypto;
+        private readonly ICrypto _crypto;
         private readonly IJwtService _jwtService;
         private readonly ICacheService _cacheService;
-        public AuthService(IRoleBaseRepository roleBaseRepository, IUserRepository userRepository, ICrypro crypro, IJwtService jwtService, ICacheService cacheService)
+        public AuthService(IRoleBaseRepository roleBaseRepository, IUserRepository userRepository, ICrypto crypro, IJwtService jwtService, ICacheService cacheService)
         {
             _roleBaseRepository = roleBaseRepository;
             _userRepository = userRepository;

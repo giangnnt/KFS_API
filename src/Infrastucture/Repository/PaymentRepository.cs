@@ -61,6 +61,7 @@ namespace KFS.src.Infrastucture.Repository
 
             // Kết hợp cả hai loại Payment lại thành một danh sách duy nhất
             var allPayments = new List<Payment>();
+            allPayments.Skip((paymentQuery.Page - 1) * paymentQuery.Page).Take(paymentQuery.PageSize);
             allPayments.AddRange(paymentOrders);
             allPayments.AddRange(paymentConsignments);
 

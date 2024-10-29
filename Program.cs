@@ -64,7 +64,7 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddSingleton<IVNPayService, VNPayService>();
 builder.Services.AddScoped<ICacheService, CacheService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<ICrypro, Crypto>();
+builder.Services.AddScoped<ICrypto, Crypto>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IShipmentService, ShipmentService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
@@ -81,6 +81,7 @@ builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 builder.Services.AddScoped<IOwnerService, OwnerService>();
 builder.Services.AddScoped<IGHNService, GHNService>();
 builder.Services.AddScoped<IAddressService, AddressService>();
+builder.Services.AddScoped<IUserService, UserService>();
 // Add Mapper
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddEndpointsApiExplorer();

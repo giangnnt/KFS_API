@@ -104,7 +104,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPost("admin")]
+        [HttpPost("admin/query")]
         public async Task<IActionResult> GetProductsAdmin(ProductAdminQuery productQuery)
         {
             try
