@@ -56,7 +56,7 @@ namespace KFS.src.Application.Middleware
                     var PermissionRoleCache = await cacheService.Get<List<string>>(redisey);
                     if (PermissionRoleCache == null)
                     {
-                        var PermissionRoles = roleBaseRepository.GetPermissionRoleSlugs(payload.RoleId);
+                        var PermissionRoles = await roleBaseRepository.GetPermissionRoleSlugs(payload.RoleId);
                         if (PermissionRoles != null)
                         {
                             await cacheService.Set(redisey, PermissionRoles);

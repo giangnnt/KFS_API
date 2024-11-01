@@ -17,6 +17,6 @@ namespace KFS.src.Domain.IService
         public Task<ResponseDto> DeleteRole(int roleId);
         public Task<ResponseDto> GetAllRoles();
         public Task<ResponseDto> GetRoleById(int roleId);
-        public Task<ResponseDto> UpdateRole(RoleUpdate role);
+        public Task<ResponseDto> UpdateRole(int id, RoleUpdate role);
     }
 }

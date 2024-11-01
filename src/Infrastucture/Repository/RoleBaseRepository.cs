@@ -23,8 +23,10 @@ namespace KFS.src.Infrastucture.Repository
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> DeleteRole(Role role)
+        public async Task<bool> DeleteRole(int roleId)
         {
+            var role = await _context.Roles.FirstOrDefaultAsync(x => x.RoleId == roleId);
+            if (role == null) throw new Exception("Role not found");
             _context.Roles.Remove(role);
             return await _context.SaveChangesAsync() > 0;
         }
@@ -34,13 +36,13 @@ namespace KFS.src.Infrastucture.Repository
             return await _context.Roles.ToListAsync();
         }
 
-        public IEnumerable<string> GetPermissionRoleSlugs(int roleId)
+        public async Task<IEnumerable<string>> GetPermissionRoleSlugs(int roleId)
         {
-            return _context.Roles.Where(x => x.RoleId == roleId)
+            return await _context.Roles.Where(x => x.RoleId == roleId)
                 .Include(x => x.Permissions)
                 .SelectMany(x => x.Permissions)
                 .Select(x => x.Slug)
-                .ToList();
+                .ToListAsync();
         }
 
         public async Task<Role> GetRoleById(int roleId)

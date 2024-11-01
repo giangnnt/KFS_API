@@ -23,36 +23,71 @@ namespace KFS.src.Application.Controller
         [HttpPost]
         public async Task<IActionResult> CreateAddress([FromBody] AddressCreate addressCreate)
         {
-            var response = await _addressService.CreateAddress(addressCreate);
-            return Ok(response);
+            try
+            {
+                var response = await _addressService.CreateAddress(addressCreate);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         [Protected]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAddress(Guid id)
         {
-            var response = await _addressService.DeleteAddress(id);
-            return Ok(response);
+            try
+            {
+                var response = await _addressService.DeleteAddress(id);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         [Protected]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAddressById(Guid id)
         {
-            var response = await _addressService.GetAddressById(id);
-            return Ok(response);
+            try
+            {
+                var response = await _addressService.GetAddressById(id);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         [Protected]
         [HttpGet("user/{id}")]
         public async Task<IActionResult> GetAddressByUserId(Guid id)
         {
-            var response = await _addressService.GetAddressByUserId(id);
-            return Ok(response);
+            try
+            {
+                var response = await _addressService.GetAddressByUserId(id);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         [Protected]
         [HttpGet("own")]
         public async Task<IActionResult> GetAddressOwn()
         {
-            var response = await _addressService.GetAddressOwn();
-            return Ok(response);
+            try
+            {
+                var response = await _addressService.GetAddressOwn();
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
