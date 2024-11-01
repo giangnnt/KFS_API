@@ -62,7 +62,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpGet("permission/{id}")]
+        [HttpGet("{id}/permissions")]
         public async Task<IActionResult> GetPermissionRoleSlugs(int id)
         {
             try
@@ -90,7 +90,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpGet("user/{id}")]
+        [HttpGet("{id}/users")]
         public async Task<IActionResult> GetUsersByRole(int id)
         {
             try
@@ -118,7 +118,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [HttpPut("permission/{id}")]
+        [HttpPut("{id}/permissions")]
         public async Task<IActionResult> UpdatePermissionRole(int id, [FromBody] List<string> permissionSlug)
         {
             try
