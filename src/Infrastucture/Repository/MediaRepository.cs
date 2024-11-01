@@ -42,7 +42,7 @@ namespace KFS.src.Infrastucture.Repository
             return await _context.Medias.FindAsync(mediaId) ?? throw new Exception("Media not found");
         }
 
-        public  async Task<bool> UpdateMediaProduct(Product product, List<Media> medias)
+        public async Task<bool> UpdateMediaProduct(Product product, List<Media> medias)
         {
             // get and remove media
             for (int i = 0; i < product.Medias.Count; i++)

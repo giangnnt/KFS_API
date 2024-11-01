@@ -44,7 +44,7 @@ namespace KFS.src.Application.Middleware
                 var payload = _jwtService.ValidateToken(token);
                 context.HttpContext.Items["payload"] = payload;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 // Token không hợp lệ
                 context.Result = new JsonResult(new ResponseDto

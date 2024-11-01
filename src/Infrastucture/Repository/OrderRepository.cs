@@ -41,7 +41,7 @@ namespace KFS.src.Infrastucture.Repository
             .Include(x => x.OrderItems)
             .Include(x => x.Payment)
             .Include(x => x.Shipment)
-            .FirstOrDefaultAsync(x => x.Id == orderId) ?? throw new Exception("Order not found");   
+            .FirstOrDefaultAsync(x => x.Id == orderId) ?? throw new Exception("Order not found");
         }
 
         public async Task<IEnumerable<Order>> GetOrderByUserId(Guid userId)

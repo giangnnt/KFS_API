@@ -83,7 +83,7 @@ namespace KFS.src.Application.Controller
         }
         [Protected]
         [HttpPost("user/{id}/query")]
-        public async Task<IActionResult> GetConsignmentByUserId(ConsignmentQuery consignmentQuery,Guid id)
+        public async Task<IActionResult> GetConsignmentByUserId(ConsignmentQuery consignmentQuery, Guid id)
         {
             var response = await _consignmentService.GetConsignmentByUserId(consignmentQuery, id);
             return Ok(response);

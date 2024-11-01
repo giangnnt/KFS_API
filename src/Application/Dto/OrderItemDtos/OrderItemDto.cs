@@ -30,7 +30,7 @@ namespace KFS.src.Application.Dto.OrderItemDtos
             .ForMember(dest => dest.OrderId, opt => opt.Ignore())
             .ForMember(dest => dest.Order, opt => opt.Ignore())
             .ForMember(dest => dest.ProductId, opt => opt.MapFrom(src => src.ProductId))
-            .ForMember(dest => dest.BatchId, opt => opt.MapFrom(src => src.BatchId))   
+            .ForMember(dest => dest.BatchId, opt => opt.MapFrom(src => src.BatchId))
             .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity))
             .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price))
             .ForMember(dest => dest.IsBatch, opt => opt.MapFrom(src => src.IsBatch))

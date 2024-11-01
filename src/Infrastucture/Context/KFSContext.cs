@@ -48,28 +48,28 @@ namespace KFS.src.Infrastucture.Context
             modelBuilder.Entity<Role>().HasData(
                 new Role
                 {
-                    RoleId = RoleConst.ADMIN_ID,
-                    Name = RoleConst.ADMIN
+                    RoleId = 1,
+                    Name = "ADMIN"
                 },
                 new Role
                 {
-                    RoleId = RoleConst.MANAGER_ID,
-                    Name = RoleConst.MANAGER
+                    RoleId = 2,
+                    Name = "MANAGER"
                 },
                 new Role
                 {
-                    RoleId = RoleConst.STAFF_ID,
-                    Name = RoleConst.STAFF
+                    RoleId = 3,
+                    Name = "STAFF"
                 },
                 new Role
                 {
-                    RoleId = RoleConst.CUSTOMER_ID,
-                    Name = RoleConst.CUSTOMER
+                    RoleId = 4,
+                    Name = "CUSTOMER"
                 },
                 new Role
                 {
-                    RoleId = RoleConst.GUEST_ID,
-                    Name = RoleConst.GUEST
+                    RoleId = 5,
+                    Name = "GUEST"
                 }
             );
             //seed permission
@@ -90,15 +90,15 @@ namespace KFS.src.Infrastucture.Context
                 .WithMany(p => p.Roles)
                 .UsingEntity(j => j
                 .HasData(
-                    new { RolesRoleId = RoleConst.ADMIN_ID, PermissionsSlug = PermissionSlug.MANAGE_USER },
-                    new { RolesRoleId = RoleConst.ADMIN_ID, PermissionsSlug = PermissionSlug.MANAGE_OWN_USER },
-                    new { RolesRoleId = RoleConst.ADMIN_ID, PermissionsSlug = PermissionSlug.MANAGE_PERMISSION },
-                    new { RolesRoleId = RoleConst.ADMIN_ID, PermissionsSlug = PermissionSlug.MANAGE_ROLE },
-                    new { RolesRoleId = RoleConst.ADMIN_ID, PermissionsSlug = PermissionSlug.MANAGE_PRODUCT },
-                    new { RolesRoleId = RoleConst.ADMIN_ID, PermissionsSlug = PermissionSlug.MANAGE_ORDER },
-                    new { RolesRoleId = RoleConst.ADMIN_ID, PermissionsSlug = PermissionSlug.MANAGE_CATEGORY },
-                    new { RolesRoleId = RoleConst.ADMIN_ID, PermissionsSlug = PermissionSlug.MANAGE_FEEDBACK },
-                    new { RolesRoleId = RoleConst.ADMIN_ID, PermissionsSlug = PermissionSlug.MANAGE_OWN_FEEDBACK })
+                    new { RolesRoleId = 1, PermissionsSlug = PermissionSlug.MANAGE_USER },
+                    new { RolesRoleId = 1, PermissionsSlug = PermissionSlug.MANAGE_OWN_USER },
+                    new { RolesRoleId = 1, PermissionsSlug = PermissionSlug.MANAGE_PERMISSION },
+                    new { RolesRoleId = 1, PermissionsSlug = PermissionSlug.MANAGE_ROLE },
+                    new { RolesRoleId = 1, PermissionsSlug = PermissionSlug.MANAGE_PRODUCT },
+                    new { RolesRoleId = 1, PermissionsSlug = PermissionSlug.MANAGE_ORDER },
+                    new { RolesRoleId = 1, PermissionsSlug = PermissionSlug.MANAGE_CATEGORY },
+                    new { RolesRoleId = 1, PermissionsSlug = PermissionSlug.MANAGE_FEEDBACK },
+                    new { RolesRoleId = 1, PermissionsSlug = PermissionSlug.MANAGE_OWN_FEEDBACK })
 );
             // Seed user
             modelBuilder.Entity<User>().HasData(
@@ -108,7 +108,7 @@ namespace KFS.src.Infrastucture.Context
                     FullName = "Truong Giang",
                     Email = "giangnnt260703@gmail.com",
                     IsActive = true,
-                    RoleId = RoleConst.ADMIN_ID,
+                    RoleId = 1,
                     Password = BCrypt.Net.BCrypt.HashPassword("123456"),
                     Phone = "0123456789",
                     CreatedAt = DateTime.Parse("2024-10-11"),
@@ -337,7 +337,7 @@ namespace KFS.src.Infrastucture.Context
                     .WithOne(s => s.Order)
                     .HasForeignKey<Shipment>(s => s.OrderId)
                     .OnDelete(DeleteBehavior.Cascade); // Potential cascade path
-                
+
                 entity.HasOne(o => o.Address)
                     .WithMany(a => a.Orders)
                     .HasForeignKey(o => o.AddressId)
@@ -398,7 +398,6 @@ namespace KFS.src.Infrastucture.Context
             {
                 entity.Property(entity => entity.CreatedAt).HasDefaultValueSql("(SYSDATETIMEOFFSET() AT TIME ZONE 'SE Asia Standard Time')");
                 entity.Property(entity => entity.Id).ValueGeneratedOnAdd();
-                entity.Property(entity => entity.RoleId).HasDefaultValue(RoleConst.CUSTOMER_ID);
                 entity.HasOne(u => u.Role)
                 .WithMany(r => r.Users)
                 .HasForeignKey(u => u.RoleId)

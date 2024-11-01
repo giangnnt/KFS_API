@@ -189,7 +189,7 @@ namespace KFS.src.Application.Service
                         Password = hashedPassword,
                         FullName = registerDto.FullName,
                         Phone = registerDto.PhoneNumber,
-                        RoleId = RoleConst.GetRoleId(RoleConst.CUSTOMER)
+                        RoleId = 6,
                     };
                     var result = await _userRepository.CreateUser(newUser);
                     if (result)

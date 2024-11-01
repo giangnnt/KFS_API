@@ -26,7 +26,7 @@ namespace KFS.src.Infrastucture.Repository
         public async Task<bool> DeleteCartItem(Guid id)
         {
             var cartItem = await _context.CartItems.FirstOrDefaultAsync(x => x.Id == id);
-            if(cartItem == null) throw new Exception("Cart item not found");
+            if (cartItem == null) throw new Exception("Cart item not found");
             _context.CartItems.Remove(cartItem);
             int result = _context.SaveChanges();
             return result > 0;

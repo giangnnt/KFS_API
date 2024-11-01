@@ -14,7 +14,7 @@ namespace KFS.src.Infrastucture.Repository
         private readonly KFSContext _context;
         public OrderItemRepository(KFSContext context)
         {
-            _context = context;   
+            _context = context;
         }
         public Task<bool> CreateOrderItem(OrderItem orderItem)
         {

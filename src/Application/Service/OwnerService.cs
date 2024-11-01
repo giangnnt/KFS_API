@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using KFS.src.Application.Constant;
 using KFS.src.Application.Core.Jwt;
+using KFS.src.Domain.IRepository;
 
 namespace KFS.src.Application.Service
 {
@@ -23,7 +24,7 @@ namespace KFS.src.Application.Service
                 Console.WriteLine("Payload is required");
                 return false;
             }
-            if (payload.RoleId != RoleConst.GetRoleId(RoleConst.ADMIN) && payload.RoleId != RoleConst.GetRoleId(RoleConst.MANAGER))
+            if (payload.RoleId != 1 && payload.RoleId != 2)
             {
                 //check own
                 if (userId != payload.UserId)

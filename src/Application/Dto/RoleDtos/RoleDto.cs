@@ -19,6 +19,16 @@ namespace KFS.src.Application.Dto.RoleDtos
         {
             CreateMap<Role, RoleDto>()
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<RoleCreate, Role>()
+            .ForMember(dest => dest.RoleId, opt => opt.Ignore())
+            .ForMember(dest => dest.Users, opt => opt.Ignore())
+            .ForMember(dest => dest.Permissions, opt => opt.Ignore())
+            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.RoleName));
+            CreateMap<RoleUpdate, Role>()
+            .ForMember(dest => dest.RoleId, opt => opt.Ignore())
+            .ForMember(dest => dest.Users, opt => opt.Ignore())
+            .ForMember(dest => dest.Permissions, opt => opt.Ignore())
+            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
         }
     }
 }

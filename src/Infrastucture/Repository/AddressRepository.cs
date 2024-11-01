@@ -16,7 +16,7 @@ namespace KFS.src.Infrastucture.Repository
         {
             _context = context;
         }
-        
+
         public async Task<bool> AddAddressAsync(Address address)
         {
             _context.Addresses.Add(address);
@@ -43,7 +43,9 @@ namespace KFS.src.Infrastucture.Repository
 
         public async Task<bool> UpdateAddressAsync(Address address)
         {
-            throw new NotImplementedException();
+            _context.Addresses.Update(address);
+            var result = await _context.SaveChangesAsync();
+            return result > 0;
         }
     }
 }
