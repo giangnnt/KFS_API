@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using KFS.src.Application.Constant;
 using KFS.src.Application.Dto.AddressDtos;
 using KFS.src.Application.Middleware;
 using KFS.src.Domain.IService;
@@ -20,6 +21,7 @@ namespace KFS.src.Application.Controller
             _addressService = addressService;
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_ADDRESS, PermissionSlug.MANAGE_OWN_ADDRESS)]
         [HttpPost]
         public async Task<IActionResult> CreateAddress([FromBody] AddressCreate addressCreate)
         {
@@ -34,6 +36,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_ADDRESS, PermissionSlug.MANAGE_OWN_ADDRESS)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAddress(Guid id)
         {
@@ -48,6 +51,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_ADDRESS, PermissionSlug.VIEW_ADDRESS)]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAddressById(Guid id)
         {
@@ -62,6 +66,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_ADDRESS, PermissionSlug.VIEW_ADDRESS)]
         [HttpGet("user/{id}")]
         public async Task<IActionResult> GetAddressByUserId(Guid id)
         {
@@ -76,6 +81,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_ADDRESS, PermissionSlug.MANAGE_OWN_ADDRESS)]
         [HttpGet("own")]
         public async Task<IActionResult> GetAddressOwn()
         {

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using KFS.src.Application.Constant;
 using KFS.src.Application.Dto.ShipmentDtos;
 using KFS.src.Application.Enum;
 using KFS.src.Application.Middleware;
@@ -21,6 +22,7 @@ namespace KFS.src.Application.Controller
             _shipmentService = shipmentService;
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_SHIPMENT)]
         [HttpPost]
         public async Task<IActionResult> CreateShipment(Guid orderId)
         {
@@ -35,6 +37,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_SHIPMENT)]
         [HttpPost("{id}")]
         public async Task<IActionResult> UpdateShipment(UpdateDto updateDto, Guid id)
         {
@@ -49,6 +52,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_SHIPMENT)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteShipment(Guid id)
         {
@@ -63,6 +67,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_SHIPMENT)]
         [HttpPost("admin/query")]
         public async Task<IActionResult> GetShipments(ShipmentQuery shipmentQuery)
         {
@@ -77,6 +82,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_SHIPMENT)]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetShipmentById(Guid id)
         {
@@ -91,6 +97,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_SHIPMENT)]
         [HttpPut("{id}/delivered/is-success")]
         public async Task<IActionResult> ShipmentDelivered(Guid id, [FromQuery] bool IsSuccess)
         {
@@ -105,6 +112,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_SHIPMENT)]
         [HttpPut("{id}/completed/is-success")]
         public async Task<IActionResult> ShipmentCompleted(Guid id, [FromQuery] bool IsSuccess)
         {

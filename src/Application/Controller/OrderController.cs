@@ -24,6 +24,7 @@ namespace KFS.src.Application.Controller
             _orderService = orderService;
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_ORDER, PermissionSlug.VIEW_ORDER)]
         [HttpPost("admin/query")]
         public async Task<IActionResult> GetOrders(OrderQuery req)
         {
@@ -38,6 +39,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_ORDER, PermissionSlug.VIEW_ORDER)]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetOrderById(Guid id)
         {
@@ -52,6 +54,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_ORDER, PermissionSlug.MANAGE_OWN_ORDER)]
         [HttpPost("cart/{id}")]
         public async Task<IActionResult> CreateOrderFromCart(Guid id, OrderCreateFromCart req)
         {
@@ -81,6 +84,7 @@ namespace KFS.src.Application.Controller
         //     }
         // }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_ORDER, PermissionSlug.MANAGE_OWN_ORDER)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteOrder(Guid id)
         {
@@ -108,6 +112,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_ORDER, PermissionSlug.UPDATE_ORDER)]
         [HttpPut("{id}/is-accept")]
         public async Task<IActionResult> AcceptOrder(Guid id, [FromQuery] bool isAccept)
         {
@@ -122,6 +127,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_ORDER, PermissionSlug.VIEW_ORDER)]
         [HttpGet("user/{id}")]
         public async Task<IActionResult> GetOrderByUserId(Guid id)
         {
@@ -136,6 +142,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_ORDER, PermissionSlug.CREATE_ORDER_OFFLINE)]
         [HttpPost("offline")]
         public async Task<IActionResult> CreateOrderOffline(OrderCreateOffline req)
         {
@@ -150,6 +157,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_ORDER, PermissionSlug.MANAGE_OWN_ORDER)]
         [HttpGet("own")]
         public async Task<IActionResult> GetOwnOrder()
         {
@@ -164,6 +172,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_ORDER, PermissionSlug.MANAGE_OWN_ORDER)]
         [HttpPut("{id}/cancel")]
         public async Task<IActionResult> CancelOrder(Guid id)
         {
@@ -178,6 +187,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_ORDER, PermissionSlug.MANAGE_OWN_ORDER)]
         [HttpPut("{id}/return")]
         public async Task<IActionResult> OrderReturn(Guid id)
         {

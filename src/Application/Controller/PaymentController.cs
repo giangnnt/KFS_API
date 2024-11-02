@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using KFS.src.Application.Constant;
 using KFS.src.Application.Dto.PaymentDtos;
 using KFS.src.Application.Middleware;
 using KFS.src.Domain.IService;
@@ -20,6 +21,7 @@ namespace KFS.src.Application.Controller
             _paymentService = paymentService;
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_PAYMENT, PermissionSlug.VIEW_PAYMENT)]
         [HttpPost("admin/query")]
         public async Task<IActionResult> GetPayments(PaymentQuery paymentQuery)
         {
@@ -34,6 +36,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_PAYMENT, PermissionSlug.VIEW_PAYMENT)]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPaymentById(Guid id)
         {
@@ -48,6 +51,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_PAYMENT, PermissionSlug.CREATE_PAYMENT_OFFLINE)]
         [HttpPost("offline-order/{id}")]
         public async Task<IActionResult> CreatePaymentOffline(Guid id)
         {
@@ -62,6 +66,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_PAYMENT)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePayment(Guid id)
         {
@@ -76,8 +81,9 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_PAYMENT, PermissionSlug.CREATE_PAYMENT_OFFLINE)]
         [HttpPost("COD-order/{id}")]
-        public async Task<IActionResult> CreatePaymentByOrderId(Guid id)
+        public async Task<IActionResult> CreatePaymentByOrderIdCOD(Guid id)
         {
             try
             {
@@ -90,6 +96,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_PAYMENT, PermissionSlug.VIEW_PAYMENT)]
         [HttpGet("user/{id}")]
         public async Task<IActionResult> GetPaymentByUser(Guid id)
         {
@@ -104,6 +111,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_PAYMENT, PermissionSlug.MANAGE_OWN_PAYMENT)]
         [HttpGet("own")]
         public async Task<IActionResult> GetOwnPayment()
         {

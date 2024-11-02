@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using KFS.src.Application.Constant;
 using KFS.src.Application.Dto.BatchDtos;
 using KFS.src.Application.Middleware;
 using KFS.src.Domain.IService;
@@ -46,6 +47,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_BATCH)]
         [HttpPost("product/{id}")]
         public async Task<IActionResult> CreateBatch(BatchCreate req, Guid id)
         {
@@ -60,6 +62,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_BATCH)]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateBatch(BatchUpdate req, Guid id)
         {
@@ -74,6 +77,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_BATCH)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBatch(Guid id)
         {

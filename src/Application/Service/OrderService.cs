@@ -862,10 +862,15 @@ namespace KFS.src.Application.Service
                         }
                     }
                 }
+
+                // check shipping address
+                var address = await _addressRepository.GetAddressById(Guid.Parse("00000000-0000-0000-0000-000000000001"));
+
                 // create order
                 var order = new Order
                 {
                     Id = Guid.NewGuid(),
+                    AddressId = address.Id,
                     UserId = payload.UserId,
                     TotalPrice = orderItems.Sum(x => x.Price * x.Quantity),
                     TotalItem = orderItems.Sum(x => x.Quantity),

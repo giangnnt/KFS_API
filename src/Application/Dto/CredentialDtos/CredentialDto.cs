@@ -21,7 +21,7 @@ namespace KFS.src.Application.Dto.CredentialDtos
         {
             CreateMap<Credential, CredentialDto>()
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
-            CreateMap<CreadentialCreate, Credential>()
+            CreateMap<credentialCreate, Credential>()
             .ForMember(dest => dest.Id, opt => opt.Ignore())
             .ForMember(dest => dest.Product, opt => opt.Ignore())
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));

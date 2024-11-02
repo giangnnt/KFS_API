@@ -23,7 +23,7 @@ namespace KFS.src.Application.Service
         }
         public async Task<GHNResponse> CalculateShippingFee(GHNRequest request)
         {
-            var requestMessage = new HttpRequestMessage(HttpMethod.Patch, new Uri(_httpClient.BaseAddress, "shipping-order/fee"))
+            var requestMessage = new HttpRequestMessage(HttpMethod.Patch, new Uri(_httpClient.BaseAddress, "/shiip/public-api/v2/shipping-order/fee"))
             {
                 Content = JsonContent.Create(request)
             };

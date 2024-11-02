@@ -1,4 +1,5 @@
-﻿using KFS.src.Application.Dto.CategoryDtos;
+﻿using KFS.src.Application.Constant;
+using KFS.src.Application.Dto.CategoryDtos;
 using KFS.src.Application.Dto.ProductDtos;
 using KFS.src.Application.Dto.ResponseDtos;
 using KFS.src.Application.Middleware;
@@ -34,6 +35,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_CATEGORY)]
         [HttpPost]
         public async Task<IActionResult> CreateCategory(CategoryCreate req)
         {
@@ -61,6 +63,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_CATEGORY)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteById(Guid id)
         {
@@ -75,6 +78,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_CATEGORY)]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProduct(CategoryUpdate req, Guid id)
         {
@@ -102,6 +106,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_CATEGORY)]
         [HttpPut("{id}/products")]
         public async Task<IActionResult> UpdateProductCategory(Guid categoryId, List<Guid> productId)
         {

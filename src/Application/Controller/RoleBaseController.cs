@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using KFS.src.Application.Constant;
 using KFS.src.Application.Dto.RoleDtos;
 using KFS.src.Application.Middleware;
 using KFS.src.Domain.IService;
@@ -20,6 +21,7 @@ namespace KFS.src.Application.Controller
             _roleBaseService = roleBaseService;
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_ROLE)]
         [HttpPost]
         public async Task<IActionResult> CreateRole([FromBody] RoleCreate role)
         {
@@ -34,6 +36,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_ROLE)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRole(int id)
         {
@@ -48,6 +51,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_ROLE, PermissionSlug.VIEW_ROLE)]
         [HttpGet]
         public async Task<IActionResult> GetAllRoles()
         {
@@ -62,6 +66,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_ROLE, PermissionSlug.VIEW_ROLE)]
         [HttpGet("{id}/permissions")]
         public async Task<IActionResult> GetPermissionRoleSlugs(int id)
         {
@@ -76,6 +81,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_ROLE, PermissionSlug.VIEW_ROLE)]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetRoleById(int id)
         {
@@ -90,6 +96,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_ROLE, PermissionSlug.VIEW_ROLE)]
         [HttpGet("{id}/users")]
         public async Task<IActionResult> GetUsersByRole(int id)
         {
@@ -104,6 +111,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_ROLE)]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateRole([FromBody] RoleUpdate role, int id)
         {
@@ -118,6 +126,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_ROLE)]
         [HttpPut("{id}/permissions")]
         public async Task<IActionResult> UpdatePermissionRole(int id, [FromBody] List<string> permissionSlug)
         {

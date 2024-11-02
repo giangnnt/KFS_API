@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using KFS.src.Application.Constant;
 using KFS.src.Application.Dto.FeedbackDtos;
 using KFS.src.Application.Middleware;
 using KFS.src.Domain.IService;
@@ -19,7 +20,6 @@ namespace KFS.src.Application.Controller
         {
             _feedbackService = feedbackService;
         }
-
         [HttpPost("query")]
         public async Task<IActionResult> GetFeedbacks(FeedbackQuery feedbackQuery)
         {
@@ -34,12 +34,56 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_FEEDBACK, PermissionSlug.MANAGE_OWN_FEEDBACK)]
         [HttpPost("product/{id}")]
         public async Task<IActionResult> CreateFeedback(Guid id, FeedbackCreate feedbackCreate)
         {
             try
             {
                 var result = await _feedbackService.CreateFeedback(id, feedbackCreate);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [Protected]
+        [Permission(PermissionSlug.MANAGE_FEEDBACK, PermissionSlug.MANAGE_OWN_FEEDBACK)]
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateFeedback(Guid id, FeedbackUpdate feedbackUpdate)
+        {
+            try
+            {
+                var result = await _feedbackService.UpdateFeedback(id, feedbackUpdate);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [Protected]
+        [Permission(PermissionSlug.MANAGE_FEEDBACK, PermissionSlug.MANAGE_OWN_FEEDBACK)]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteFeedback(Guid id)
+        {
+            try
+            {
+                var result = await _feedbackService.DeleteFeedback(id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet("product/{id}")]
+        public async Task<IActionResult> GetAverageRating(Guid id)
+        {
+            try
+            {
+                var result = await _feedbackService.GetAverageRating(id);
                 return Ok(result);
             }
             catch (Exception ex)
