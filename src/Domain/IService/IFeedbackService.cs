@@ -13,5 +13,7 @@ namespace KFS.src.Domain.IService
         Task<ResponseDto> GetFeedbacks(FeedbackQuery feedbackQuery);
         Task<ResponseDto> GetAverageRating(Guid productId);
         Task<ResponseDto> CreateFeedback(Guid id, FeedbackCreate req);
+        Task<ResponseDto> UpdateFeedback(Guid id, FeedbackUpdate req);
+        Task<ResponseDto> DeleteFeedback(Guid id);
     }
 }

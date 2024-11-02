@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using KFS.src.Application.Constant;
 using KFS.src.Application.Dto.UserDtos;
 using KFS.src.Application.Middleware;
 using KFS.src.Domain.IRepository;
@@ -22,6 +23,7 @@ namespace KFS.src.Application.Controller
         }
 
         [Protected]
+        [Permission(PermissionSlug.MANAGE_USER, PermissionSlug.VIEW_USER)]
         [HttpGet("admin/query")]
         public async Task<IActionResult> GetUsersAdmin(UserQuery userQuery)
         {
@@ -29,6 +31,7 @@ namespace KFS.src.Application.Controller
             return Ok(users);
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_USER, PermissionSlug.VIEW_USER)]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUserById(Guid id)
         {
@@ -36,6 +39,7 @@ namespace KFS.src.Application.Controller
             return Ok(user);
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_USER)]
         [HttpPost]
         public async Task<IActionResult> CreateUser(UserCreate userCreate)
         {
@@ -43,6 +47,7 @@ namespace KFS.src.Application.Controller
             return Ok(user);
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_USER, PermissionSlug.MANAGE_OWN_USER)]
         [HttpPut("change-password")]
         public async Task<IActionResult> ChangePassword(ChangePasswordDto changePasswordDto, [FromQuery] string token)
         {
@@ -50,6 +55,7 @@ namespace KFS.src.Application.Controller
             return Ok(user);
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_USER, PermissionSlug.VIEW_USER)]
         [HttpPost("get-by-email")]
         public async Task<IActionResult> GetUserByEmail([FromQuery] string email)
         {
@@ -57,6 +63,7 @@ namespace KFS.src.Application.Controller
             return Ok(result);
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_USER)]
         [HttpPut("{id}/status")]
         public async Task<IActionResult> UpdateUserStatus(Guid id, [FromQuery] bool IsActive)
         {

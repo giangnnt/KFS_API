@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using KFS.src.Application.Constant;
 using KFS.src.Application.Dto.CredentialDtos;
 using KFS.src.Application.Middleware;
 using KFS.src.Domain.IService;
@@ -21,6 +22,7 @@ namespace KFS.src.Application.Controller
             _credentialService = credentialService;
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_CREDENTIAL, PermissionSlug.VIEW_CREDENTIAL)]
         [HttpGet]
         public async Task<IActionResult> GetCredentials()
         {
@@ -35,6 +37,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_CREDENTIAL, PermissionSlug.VIEW_CREDENTIAL)]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCredentialById(Guid id)
         {
@@ -49,8 +52,9 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_CREDENTIAL, PermissionSlug.VIEW_CREDENTIAL)]
         [HttpPost]
-        public async Task<IActionResult> CreateCredential(CreadentialCreate req)
+        public async Task<IActionResult> CreateCredential(credentialCreate req)
         {
             try
             {
@@ -63,6 +67,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_CREDENTIAL)]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCredential(CredentialUpdate req, Guid id)
         {
@@ -77,6 +82,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_CREDENTIAL)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCredential(Guid id)
         {
@@ -91,6 +97,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_CREDENTIAL, PermissionSlug.VIEW_CREDENTIAL)]
         [HttpGet("product/{id}")]
         public async Task<IActionResult> GetCredentialsByProductId(Guid id)
         {

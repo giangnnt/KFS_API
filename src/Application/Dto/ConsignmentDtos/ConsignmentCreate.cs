@@ -24,6 +24,6 @@ namespace KFS.src.Application.Dto.ConsignmentDtos
         public float? FilterRate { get; set; }
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public GenderEnum? Gender { get; set; }
-         public Guid CategoryId { get; set; }
+        public Guid CategoryId { get; set; }
     }
 }

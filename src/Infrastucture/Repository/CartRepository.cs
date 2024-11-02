@@ -94,7 +94,7 @@ namespace KFS.src.Infrastucture.Repository
         public async Task<bool> UpdateCart(Cart cart)
         {
             DateTime nowVietnam = TimeZoneInfo.ConvertTime(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
-            cart.UpdatedAt = nowVietnam;;
+            cart.UpdatedAt = nowVietnam; ;
             _context.Carts.Update(cart);
             int result = await _context.SaveChangesAsync();
             return result > 0;

@@ -22,6 +22,7 @@ namespace KFS.src.Application.Controller
         }
 
         [Protected]
+        [Permission(PermissionSlug.MANAGE_CART, PermissionSlug.VIEW_CART)]
         [HttpGet]
         public async Task<IActionResult> GetCarts()
         {
@@ -35,6 +36,8 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
+        [Protected]
+        [Permission(PermissionSlug.MANAGE_CART, PermissionSlug.VIEW_CART)]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCartById(Guid id)
         {
@@ -50,6 +53,7 @@ namespace KFS.src.Application.Controller
         }
 
         [Protected]
+        [Permission(PermissionSlug.MANAGE_CART, PermissionSlug.MANAGE_OWN_CART)]
         [HttpPost]
         public async Task<IActionResult> CreateCart(CartCreate req)
         {
@@ -65,6 +69,7 @@ namespace KFS.src.Application.Controller
         }
 
         [Protected]
+        [Permission(PermissionSlug.MANAGE_CART, PermissionSlug.MANAGE_OWN_CART)]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCart(CartUpdate req, Guid id)
         {
@@ -80,6 +85,7 @@ namespace KFS.src.Application.Controller
         }
 
         [Protected]
+        [Permission(PermissionSlug.MANAGE_CART, PermissionSlug.MANAGE_OWN_CART)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCart(Guid id)
         {
@@ -95,6 +101,7 @@ namespace KFS.src.Application.Controller
         }
 
         [Protected]
+        [Permission(PermissionSlug.MANAGE_CART, PermissionSlug.MANAGE_OWN_CART)]
         [HttpPost("{id}/product/add")]
         public async Task<IActionResult> AddProductToCart(Guid id, CartAddRemoveDto req)
         {
@@ -110,6 +117,7 @@ namespace KFS.src.Application.Controller
         }
 
         [Protected]
+        [Permission(PermissionSlug.MANAGE_CART, PermissionSlug.MANAGE_OWN_CART)]
         [HttpPost("{id}/product/remove")]
         public async Task<IActionResult> RemoveProductFromCart(Guid id, CartAddRemoveDto req)
         {
@@ -124,6 +132,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_CART, PermissionSlug.MANAGE_OWN_CART)]
         [HttpPost("{id}/batch/add")]
         public async Task<IActionResult> AddBatchToCart(Guid id, BatchAddRemoveDto req)
         {
@@ -138,6 +147,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_CART, PermissionSlug.MANAGE_OWN_CART)]
         [HttpPost("{id}/batch/remove")]
         public async Task<IActionResult> RemoveBatchFromCart(Guid id, BatchAddRemoveDto req)
         {
@@ -152,6 +162,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_CART, PermissionSlug.MANAGE_OWN_CART, PermissionSlug.VIEW_CART)]
         [HttpGet("user/{id}")]
         public async Task<IActionResult> GetCartByUserId(Guid id)
         {
@@ -166,6 +177,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_CART, PermissionSlug.MANAGE_OWN_CART)]
         [HttpGet("own")]
         public async Task<IActionResult> GetOwnCart()
         {

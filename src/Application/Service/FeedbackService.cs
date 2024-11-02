@@ -105,6 +105,70 @@ namespace KFS.src.Application.Service
             }
         }
 
+        public async Task<ResponseDto> DeleteFeedback(Guid id)
+        {
+            var response = new ResponseDto();
+            try
+            {
+                var feedback = await _feedbackRepository.GetFeedbackById(id);
+                if (feedback == null)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Feedback not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                var httpContext = _httpContextAccessor.HttpContext;
+                // check httpContext is null
+                if (httpContext == null)
+                {
+                    response.StatusCode = 401;
+                    response.Message = "Unauthorized";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                var payload = httpContext.Items["payload"] as Payload;
+                // check Payload is null
+                if (payload == null)
+                {
+                    response.StatusCode = 401;
+                    response.Message = "Unauthorized";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                var userId = payload.UserId;
+                if (feedback.UserId != userId)
+                {
+                    response.StatusCode = 401;
+                    response.Message = "Unauthorized";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                var result = await _feedbackRepository.DeleteFeedback(id);
+                if (result)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Feedback deleted successfully";
+                    response.IsSuccess = true;
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Feedback not deleted";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
+            }
+        }
+
         public async Task<ResponseDto> GetAverageRating(Guid productId)
         {
             var response = new ResponseDto();
@@ -168,6 +232,72 @@ namespace KFS.src.Application.Service
                 {
                     response.StatusCode = 404;
                     response.Message = "Feedback not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
+            }
+        }
+
+        public async Task<ResponseDto> UpdateFeedback(Guid id, FeedbackUpdate req)
+        {
+            var response = new ResponseDto();
+            try
+            {
+                var feedback = await _feedbackRepository.GetFeedbackById(id);
+                if (feedback == null)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Feedback not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                var httpContext = _httpContextAccessor.HttpContext;
+                // check httpContext is null
+                if (httpContext == null)
+                {
+                    response.StatusCode = 401;
+                    response.Message = "Unauthorized";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                var payload = httpContext.Items["payload"] as Payload;
+                // check Payload is null
+                if (payload == null)
+                {
+                    response.StatusCode = 401;
+                    response.Message = "Unauthorized";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                var userId = payload.UserId;
+                if (feedback.UserId != userId)
+                {
+                    response.StatusCode = 401;
+                    response.Message = "Unauthorized";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                var mappedFeedback = _mapper.Map<Feedback>(req);
+                mappedFeedback.Id = id;
+                var result = await _feedbackRepository.UpdateFeedback(mappedFeedback);
+                if (result)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Feedback updated successfully";
+                    response.IsSuccess = true;
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Feedback not updated";
                     response.IsSuccess = false;
                     return response;
                 }

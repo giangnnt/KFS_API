@@ -180,27 +180,27 @@ namespace KFS.src.Application.Service
             {
                 var promotion = await _promotionRepository.GetPromotionById(promotionId);
                 var batchList = new List<Batch>();
-                
-                    foreach (var id in batchId)
-                    {
-                        var batch = await _batchRepository.GetBatchById(id);
-                        batchList.Add(batch);
-                    }
-                    var result = await _promotionRepository.UpdateBatchPromotion(promotion, batchList);
-                    if (result)
-                    {
-                        response.StatusCode = 200;
-                        response.Message = "Batch added to promotion successfully";
-                        response.IsSuccess = true;
-                        return response;
-                    }
-                    else
-                    {
-                        response.StatusCode = 400;
-                        response.Message = "Batch addition to promotion failed";
-                        response.IsSuccess = false;
-                        return response;
-                    }
+
+                foreach (var id in batchId)
+                {
+                    var batch = await _batchRepository.GetBatchById(id);
+                    batchList.Add(batch);
+                }
+                var result = await _promotionRepository.UpdateBatchPromotion(promotion, batchList);
+                if (result)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Batch added to promotion successfully";
+                    response.IsSuccess = true;
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Batch addition to promotion failed";
+                    response.IsSuccess = false;
+                    return response;
+                }
             }
             catch (Exception ex)
             {

@@ -49,26 +49,14 @@ namespace KFS.src.Infrastucture.Repository
             .FirstOrDefaultAsync(x => x.Id == id) ?? throw new Exception("Promotion not found");
         }
 
-        public async Task<bool> UpdateBatchPromotion(Promotion promotion, List<Batch> batch)
+        public async Task<bool> UpdateBatchPromotion(Promotion promotion, List<Batch> batches)
         {
             DateTime nowVietnam = TimeZoneInfo.ConvertTime(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
             promotion.UpdatedAt = nowVietnam;
-            // get and remove batch
-            foreach (var item in promotion.Batches)
-            {
-                if (!batch.Contains(item))
-                {
-                    promotion.Batches.Remove(item);
-                }
-            }
+            // remove old batch
+            promotion.Batches.Clear();
             // add new batch
-            foreach (var item in batch)
-            {
-                if (!promotion.Batches.Contains(item))
-                {
-                    promotion.Batches.Add(item);
-                }
-            }
+            promotion.Batches = batches;
             _context.Promotions.Update(promotion);
             var result = await _context.SaveChangesAsync();
             return result > 0;

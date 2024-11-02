@@ -23,7 +23,7 @@ namespace KFS.src.Application.Service
             _mapper = mapper;
         }
 
-        public async Task<ResponseDto> CreateCredential(CreadentialCreate req)
+        public async Task<ResponseDto> CreateCredential(credentialCreate req)
         {
             var response = new ResponseDto();
             try

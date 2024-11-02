@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using KFS.src.Application.Constant;
 using KFS.src.Application.Dto.PromotionDtos;
 using KFS.src.Application.Middleware;
 using KFS.src.Domain.IService;
@@ -19,7 +20,6 @@ namespace KFS.src.Application.Controller
         {
             _promotionService = promotionService;
         }
-        [Protected]
         [HttpGet]
         public async Task<IActionResult> GetPromotions()
         {
@@ -33,7 +33,6 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
-        [Protected]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPromotionById(Guid id)
         {
@@ -48,6 +47,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_PROMOTION)]
         [HttpPost]
         public async Task<IActionResult> CreatePromotion(PromotionCreate req)
         {
@@ -62,6 +62,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_PROMOTION)]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdatePromotion(PromotionUpdate req, Guid id)
         {
@@ -76,6 +77,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_PROMOTION)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePromotion(Guid id)
         {
@@ -90,6 +92,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_PROMOTION)]
         [HttpPut("{id}/start")]
         public async Task<IActionResult> SetPromotionState(Guid id)
         {
@@ -104,6 +107,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_PROMOTION)]
         [HttpPut("{id}/products")]
         public async Task<IActionResult> ListProductToPromotion(Guid promotionId, PromotionAddRemoveItemDto productId)
         {
@@ -118,6 +122,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_PROMOTION)]
         [HttpPut("{id}/batches")]
         public async Task<IActionResult> ListBatchToPromotion(Guid promotionId, PromotionAddRemoveItemDto batchId)
         {
@@ -132,6 +137,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_PROMOTION)]
         [HttpPut("{id}/categories")]
         public async Task<IActionResult> ListCategoryToPromotion(Guid promotionId, PromotionAddRemoveItemDto categoryId)
         {
@@ -146,6 +152,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_PROMOTION)]
         [HttpPut("{id}/end")]
         public async Task<IActionResult> EndPromotion(Guid promotionId)
         {

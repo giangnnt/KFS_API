@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using KFS.src.Application.Constant;
 using KFS.src.Application.Dto.ProductDtos;
 using KFS.src.Application.Middleware;
 using KFS.src.Domain.Entities;
@@ -48,6 +49,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_PRODUCT)]
         [HttpPost]
         public async Task<IActionResult> CreateProduct([FromBody] ProductCreate req)
         {
@@ -62,6 +64,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_PRODUCT)]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProduct([FromBody] ProductUpdate req, Guid id)
         {
@@ -76,6 +79,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_PRODUCT)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(Guid id)
         {
@@ -90,6 +94,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_PRODUCT)]
         [HttpPut("{id}/is-for-sell")]
         public async Task<IActionResult> UpdateIsForSell(Guid id, [FromQuery] bool isForSell)
         {
@@ -104,6 +109,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_PRODUCT, PermissionSlug.VIEW_PRODUCT)]
         [HttpPost("admin/query")]
         public async Task<IActionResult> GetProductsAdmin(ProductAdminQuery productQuery)
         {

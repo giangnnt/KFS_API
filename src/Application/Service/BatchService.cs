@@ -63,7 +63,7 @@ namespace KFS.src.Application.Service
                         response.IsSuccess = false;
                         return response;
                     }
-                    
+
                     var mappedBatch = _mapper.Map<Batch>(batch);
                     mappedBatch.Weight = product.Weight * batch.Quantity;
                     mappedBatch.ProductId = productId;
@@ -77,7 +77,7 @@ namespace KFS.src.Application.Service
                     batchExists.Inventory += batch.Inventory;
                     result = await _batchRepository.UpdateBatch(batchExists);
                 }
-                
+
                 if (result)
                 {
                     // update product inventory

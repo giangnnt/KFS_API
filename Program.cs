@@ -16,19 +16,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAllOrigins",
-      builder =>
-      {
-          builder.AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader();
-      });
-    options.AddDefaultPolicy(
-      builder =>
-      {
-          builder.AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader();
-      });
+        builder =>
+        {
+            builder.WithOrigins("http://127.0.0.1:5173", "http://localhost:5173")
+                   .AllowAnyHeader()
+                   .AllowAnyMethod()
+                   .AllowCredentials();
+        });
 });
 
 // Add services to the container.
@@ -51,7 +45,7 @@ builder.Services.AddScoped<IConsignmentRepository, ConsignmentRepository>();
 builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>();
 builder.Services.AddScoped<IBatchRepository, BatchRpository>();
 builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
-builder.Services.AddScoped<ICategoryRepository,CategoryRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IWalletRepository, WalletRepository>();
 builder.Services.AddScoped<ICredentialRepositoty, CredentialRepository>();
 builder.Services.AddScoped<IMediaRepository, MediaRepository>();
@@ -70,7 +64,7 @@ builder.Services.AddScoped<IShipmentService, ShipmentService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IConsignmentService, ConsignmentService>();
 builder.Services.AddScoped<IPromotionService, PromotionService>();
-builder.Services.AddScoped<ICategoryService,CategoryService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IBatchService, BatchService>();
 builder.Services.AddScoped<IGCService, GCService>();
 builder.Services.AddScoped<ICredentialService, CredentialService>();
@@ -82,6 +76,7 @@ builder.Services.AddScoped<IOwnerService, OwnerService>();
 builder.Services.AddScoped<IGHNService, GHNService>();
 builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IRoleBaseService, RoleBaseService>();
 // Add Mapper
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddEndpointsApiExplorer();
@@ -122,15 +117,15 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new() { Title = "KFS API", Version = "v1" });
     // Add a bearer token to Swagger
-  c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-  {
-    Description = "JWT Authorization header using the Bearer scheme",
-    Type = SecuritySchemeType.Http,
-    Scheme = "bearer"
-  });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer"
+    });
 
-  // Require the bearer token for all API operations
-  c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    // Require the bearer token for all API operations
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
       {
           new OpenApiSecurityScheme
@@ -151,6 +146,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 
 app.UseSwagger();
+
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
@@ -158,6 +154,10 @@ app.UseSwaggerUI(c =>
 });
 app.UseHangfireDashboard();
 //app.UseHttpsRedirection();
+
+app.UseRouting();
+
+app.UseCors("AllowAllOrigins");
 
 app.UseAuthorization();
 

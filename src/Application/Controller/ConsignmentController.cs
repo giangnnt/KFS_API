@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using KFS.src.Application.Constant;
 using KFS.src.Application.Dto.ConsignmentDtos;
 using KFS.src.Application.Middleware;
 using KFS.src.Domain.IService;
@@ -20,6 +21,7 @@ namespace KFS.src.Application.Controller
             _consignmentService = consignmentService;
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_CONSIGNMENT, PermissionSlug.MANAGE_OWN_CONSIGNMENT)]
         [HttpPost("online")]
         public async Task<IActionResult> CreateConsignmentOnline([FromBody] ConsignmentCreateByOrderItem req)
         {
@@ -27,6 +29,7 @@ namespace KFS.src.Application.Controller
             return Ok(response);
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_CONSIGNMENT, PermissionSlug.MANAGE_OWN_CONSIGNMENT)]
         [HttpPost("offline")]
         public async Task<IActionResult> CreateConsignment([FromBody] ConsignmentCreate req)
         {
@@ -34,6 +37,7 @@ namespace KFS.src.Application.Controller
             return Ok(response);
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_CONSIGNMENT, PermissionSlug.MANAGE_OWN_CONSIGNMENT)]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateConsignment(Guid id)
         {
@@ -41,6 +45,7 @@ namespace KFS.src.Application.Controller
             return Ok(response);
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_CONSIGNMENT, PermissionSlug.MANAGE_OWN_CONSIGNMENT)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteConsignment(Guid id)
         {
@@ -48,6 +53,7 @@ namespace KFS.src.Application.Controller
             return Ok(response);
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_CONSIGNMENT, PermissionSlug.VIEW_CONSIGNMENT)]
         [HttpPost("admin/query")]
         public async Task<IActionResult> GetConsignmentsAdmin(ConsignmentQuery consignmentQuery)
         {
@@ -55,6 +61,7 @@ namespace KFS.src.Application.Controller
             return Ok(response);
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_CONSIGNMENT, PermissionSlug.VIEW_CONSIGNMENT)]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetConsignmentById(Guid id)
         {
@@ -62,6 +69,7 @@ namespace KFS.src.Application.Controller
             return Ok(response);
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_CONSIGNMENT, PermissionSlug.UPDATE_CONSIGNMENT)]
         [HttpPut("{id}/evaluate")]
         public async Task<IActionResult> EvaluateConsignment(bool isApproved, Guid id)
         {
@@ -69,6 +77,7 @@ namespace KFS.src.Application.Controller
             return Ok(response);
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_CONSIGNMENT, PermissionSlug.MANAGE_OWN_CONSIGNMENT)]
         [HttpPut("{id}/pay")]
         public async Task<IActionResult> PayForConsignment(Guid id)
         {
@@ -82,13 +91,15 @@ namespace KFS.src.Application.Controller
             return Ok(response);
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_CONSIGNMENT, PermissionSlug.VIEW_CONSIGNMENT)]
         [HttpPost("user/{id}/query")]
-        public async Task<IActionResult> GetConsignmentByUserId(ConsignmentQuery consignmentQuery,Guid id)
+        public async Task<IActionResult> GetConsignmentByUserId(ConsignmentQuery consignmentQuery, Guid id)
         {
             var response = await _consignmentService.GetConsignmentByUserId(consignmentQuery, id);
             return Ok(response);
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_CONSIGNMENT, PermissionSlug.MANAGE_OWN_CONSIGNMENT)]
         [HttpPost("own/query")]
         public async Task<IActionResult> GetOwnConsignment(ConsignmentQuery consignmentQuery)
         {

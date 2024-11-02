@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using KFS.src.Application.Constant;
 using KFS.src.Application.Dto.AddressDtos;
 using KFS.src.Application.Middleware;
 using KFS.src.Domain.IService;
@@ -20,39 +21,79 @@ namespace KFS.src.Application.Controller
             _addressService = addressService;
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_ADDRESS, PermissionSlug.MANAGE_OWN_ADDRESS)]
         [HttpPost]
         public async Task<IActionResult> CreateAddress([FromBody] AddressCreate addressCreate)
         {
-            var response = await _addressService.CreateAddress(addressCreate);
-            return Ok(response);
+            try
+            {
+                var response = await _addressService.CreateAddress(addressCreate);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_ADDRESS, PermissionSlug.MANAGE_OWN_ADDRESS)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAddress(Guid id)
         {
-            var response = await _addressService.DeleteAddress(id);
-            return Ok(response);
+            try
+            {
+                var response = await _addressService.DeleteAddress(id);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_ADDRESS, PermissionSlug.VIEW_ADDRESS)]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAddressById(Guid id)
         {
-            var response = await _addressService.GetAddressById(id);
-            return Ok(response);
+            try
+            {
+                var response = await _addressService.GetAddressById(id);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_ADDRESS, PermissionSlug.VIEW_ADDRESS)]
         [HttpGet("user/{id}")]
         public async Task<IActionResult> GetAddressByUserId(Guid id)
         {
-            var response = await _addressService.GetAddressByUserId(id);
-            return Ok(response);
+            try
+            {
+                var response = await _addressService.GetAddressByUserId(id);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_ADDRESS, PermissionSlug.MANAGE_OWN_ADDRESS)]
         [HttpGet("own")]
         public async Task<IActionResult> GetAddressOwn()
         {
-            var response = await _addressService.GetAddressOwn();
-            return Ok(response);
+            try
+            {
+                var response = await _addressService.GetAddressOwn();
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

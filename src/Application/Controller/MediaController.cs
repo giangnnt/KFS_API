@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using KFS.src.Application.Constant;
 using KFS.src.Application.Dto.MediaDtos;
 using KFS.src.Application.Middleware;
 using KFS.src.Domain.IService;
@@ -21,6 +22,7 @@ namespace KFS.src.Application.Controller
             _mediaService = mediaService;
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_MEDIA)]
         [HttpPost("upload")]
         public async Task<IActionResult> UploadMedia([FromForm] IFormFile file, [FromForm] string type)
         {
@@ -35,6 +37,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_MEDIA)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMedia(Guid mediaId)
         {
@@ -49,6 +52,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_MEDIA, PermissionSlug.VIEW_MEDIA)]
         [HttpGet("product/{id}")]
         public async Task<IActionResult> GetMediaByProductId(Guid productId)
         {
@@ -63,6 +67,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_MEDIA)]
         [HttpPut("product/{id}")]
         public async Task<IActionResult> UpdateMediaProduct(Guid productId, [FromBody] List<Guid> mediaIds)
         {
@@ -77,6 +82,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
+        [Permission(PermissionSlug.MANAGE_MEDIA)]
         [HttpPost]
         public async Task<IActionResult> CreateMedia([FromBody] MediaCreate mediaCreate)
         {
@@ -90,6 +96,6 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
-        
+
     }
 }

@@ -1,14 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using KFS.src.Application.Constant;
 using KFS.src.Application.Core.Jwt;
 using KFS.src.Application.Dto.ResponseDtos;
 using KFS.src.Domain.IRepository;
 using KFS.src.Infrastucture.Cache;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -63,7 +56,7 @@ namespace KFS.src.Application.Middleware
                     var PermissionRoleCache = await cacheService.Get<List<string>>(redisey);
                     if (PermissionRoleCache == null)
                     {
-                        var PermissionRoles = roleBaseRepository.GetPermissionRoleSlugs(payload.RoleId);
+                        var PermissionRoles = await roleBaseRepository.GetPermissionRoleSlugs(payload.RoleId);
                         if (PermissionRoles != null)
                         {
                             await cacheService.Set(redisey, PermissionRoles);
