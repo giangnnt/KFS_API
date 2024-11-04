@@ -1,15 +1,11 @@
 services:
   webapp:
-    image: giangnnt260703/kfs_api:v1.5
+    image: giangnnt260703/kfs_api:v4.5
     ports:
       - "8080:8080"
-    environment:
-      - ASPNETCORE_ENVIRONMENT="Production"
-      - ConnectionStrings__DatabaseConnection=Server=sqlserver,1433;Database=KFS;User Id=sa;Password=giangpro123@;MultipleActiveResultSets=true;TrustServerCertificate=true;
-      - ConnectionStrings__RedisConnection=cache:6379,password=123456,abortConnect=false;
-      - JWT_SECRET=8a21f416ac3c7de71de084e5190bb322456f5739eff177aeb5be84af1a70bc59
-      - TZ=Asia/Ho_Chi_Minh
     restart: on-failure
+    environment:
+      TZ: "Asia/Ho_Chi_Minh"
     depends_on:
       - sqlserver
       - cache
@@ -24,8 +20,10 @@ services:
       SA_PASSWORD: "giangpro123@"
       ACCEPT_EULA: "Y"
       MSSQL_PID: "Evaluation"
+      TZ: "Asia/Ho_Chi_Minh"
     volumes:
       - sql_data:/var/opt/mssql
+      - /etc/sqlbak:/etc/sqlbak
     restart: on-failure
     networks:
       - webnet
