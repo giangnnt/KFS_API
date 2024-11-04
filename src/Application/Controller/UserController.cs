@@ -70,5 +70,13 @@ namespace KFS.src.Application.Controller
             var result = await _userService.UpdateUserStatus(id, IsActive);
             return Ok(result);
         }
+        [Protected]
+        [Permission(PermissionSlug.MANAGE_USER, PermissionSlug.MANAGE_OWN_USER)]
+        [HttpGet("own")]
+        public async Task<IActionResult> GetOwnUser()
+        {
+            var result = await _userService.GetOwnUser(HttpContext);
+            return Ok(result);
+        }
     }
 }

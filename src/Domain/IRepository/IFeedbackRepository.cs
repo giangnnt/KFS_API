@@ -15,6 +15,7 @@ namespace KFS.src.Domain.IRepository
         Task<bool> UpdateFeedback(Feedback feedback);
         Task<bool> DeleteFeedback(Guid id);
         Task<Feedback> GetFeedbackById(Guid id);
+        Task<List<Feedback>> GetFeedbackByUserId(Guid id);
         bool CheckUserBoughtProdcut(Guid userId, Guid productId);
     }
 }

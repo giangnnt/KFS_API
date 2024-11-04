@@ -39,11 +39,11 @@ namespace KFS.src.Application.Controller
         [Protected]
         [Permission(PermissionSlug.MANAGE_MEDIA)]
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteMedia(Guid mediaId)
+        public async Task<IActionResult> DeleteMedia(Guid id)
         {
             try
             {
-                var result = await _mediaService.DeleteMedia(mediaId);
+                var result = await _mediaService.DeleteMedia(id);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -54,11 +54,11 @@ namespace KFS.src.Application.Controller
         [Protected]
         [Permission(PermissionSlug.MANAGE_MEDIA, PermissionSlug.VIEW_MEDIA)]
         [HttpGet("product/{id}")]
-        public async Task<IActionResult> GetMediaByProductId(Guid productId)
+        public async Task<IActionResult> GetMediaByProductId(Guid id)
         {
             try
             {
-                var result = await _mediaService.GetMediaByProductId(productId);
+                var result = await _mediaService.GetMediaByProductId(id);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -69,11 +69,11 @@ namespace KFS.src.Application.Controller
         [Protected]
         [Permission(PermissionSlug.MANAGE_MEDIA)]
         [HttpPut("product/{id}")]
-        public async Task<IActionResult> UpdateMediaProduct(Guid productId, [FromBody] List<Guid> mediaIds)
+        public async Task<IActionResult> UpdateMediaProduct(Guid id, [FromBody] List<Guid> mediaIds)
         {
             try
             {
-                var result = await _mediaService.UpdateMediaProduct(productId, mediaIds);
+                var result = await _mediaService.UpdateMediaProduct(id, mediaIds);
                 return Ok(result);
             }
             catch (Exception ex)

@@ -91,5 +91,18 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
+        [HttpGet("user/{id}")]
+        public async Task<IActionResult> GetFeedbackByUserId(Guid id)
+        {
+            try
+            {
+                var result = await _feedbackService.GetFeedbackByUserId(id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

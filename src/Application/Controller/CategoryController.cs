@@ -108,11 +108,11 @@ namespace KFS.src.Application.Controller
         [Protected]
         [Permission(PermissionSlug.MANAGE_CATEGORY)]
         [HttpPut("{id}/products")]
-        public async Task<IActionResult> UpdateProductCategory(Guid categoryId, List<Guid> productId)
+        public async Task<IActionResult> UpdateProductCategory(Guid id, List<Guid> productId)
         {
             try
             {
-                var result = await _categoryService.UpdateProductCategory(categoryId, productId);
+                var result = await _categoryService.UpdateProductCategory(id, productId);
                 return Ok(result);
             }
             catch (Exception ex)

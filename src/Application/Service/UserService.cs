@@ -152,6 +152,57 @@ namespace KFS.src.Application.Service
             }
         }
 
+        public async Task<ResponseDto> GetOwnUser(HttpContext httpContext)
+        {
+            var response = new ResponseDto();
+            try
+            {
+                // check http context
+                if (httpContext == null)
+                {
+                    response.StatusCode = 500;
+                    response.Message = "Internal Server Error";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                var payload = httpContext.Items["payload"] as Payload;
+                if (payload == null)
+                {
+                    response.StatusCode = 401;
+                    response.Message = "Unauthorized";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                var user = await _userRepository.GetUserById(payload.UserId);
+                var mappedUser = _mapper.Map<UserDto>(user);
+                if (user == null)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "User not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Get user successfully";
+                    response.Result = new ResultDto
+                    {
+                        Data = mappedUser
+                    };
+                    response.IsSuccess = true;
+                    return response;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
+            }
+        }
+
         public async Task<ResponseDto> GetUserByEmail(string email)
         {
             var response = new ResponseDto();

@@ -17,5 +17,6 @@ namespace KFS.src.Domain.IService
         Task<ResponseDto> GetUserById(Guid id);
         Task<ResponseDto> CreateUser(UserCreate req);
         Task<ResponseDto> UpdateUser(UserUpdate req);
+        Task<ResponseDto> GetOwnUser(HttpContext context);
     }
 }

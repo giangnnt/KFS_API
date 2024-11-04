@@ -204,6 +204,40 @@ namespace KFS.src.Application.Service
             }
         }
 
+        public async Task<ResponseDto> GetFeedbackByUserId(Guid id)
+        {
+            var response = new ResponseDto();
+            try
+            {
+                var feedbackList = await _feedbackRepository.GetFeedbackByUserId(id);
+                if (feedbackList != null && feedbackList.Count() > 0)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Feedback found";
+                    response.IsSuccess = false;
+                    response.Result = new ResultDto
+                    {
+                        Data = feedbackList
+                    };
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Feedback not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
+            }
+        }
+
         public async Task<ResponseDto> GetFeedbacks(FeedbackQuery feedbackQuery)
         {
             var response = new ResponseDto();

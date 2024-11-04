@@ -7,6 +7,7 @@ using KFS.src.Application.Dto.Pagination;
 using KFS.src.Domain.Entities;
 using KFS.src.Domain.IRepository;
 using KFS.src.Infrastucture.Context;
+using Microsoft.EntityFrameworkCore;
 
 namespace KFS.src.Infrastucture.Repository
 {
@@ -47,6 +48,11 @@ namespace KFS.src.Infrastucture.Repository
         public async Task<Feedback> GetFeedbackById(Guid id)
         {
             return await _context.Feedbacks.FindAsync(id) ?? throw new Exception("Feedback not found");
+        }
+
+        public async Task<List<Feedback>> GetFeedbackByUserId(Guid id)
+        {
+            return await _context.Feedbacks.Where(x => x.UserId == id).ToListAsync();
         }
 
         public Task<Pagination.ObjectPaging<Feedback>> GetFeedbacks(FeedbackQuery feedbackQuery)
