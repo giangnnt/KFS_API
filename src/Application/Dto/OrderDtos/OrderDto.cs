@@ -27,6 +27,7 @@ namespace KFS.src.Application.Dto.OrderDtos
         public string ContactName { get; set; } = null!;
         public int ShippingFee { get; set; }
         public float Discount { get; set; }
+        public bool IsUsePoint { get; set; }
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public PaymentMethodEnum PaymentMethod { get; set; }
         public string? EstimatedDeliveryDate { get; set; }
@@ -34,6 +35,7 @@ namespace KFS.src.Application.Dto.OrderDtos
         public string Currency { get; set; } = "VND";
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public OrderStatusEnum Status { get; set; }
+        public bool IsReBuy { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public List<OrderItemDto> OrderItems { get; set; } = new List<OrderItemDto>();

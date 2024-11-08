@@ -40,7 +40,8 @@ namespace KFS.src.Application.Service
         private readonly IAddressRepository _addressRepository;
         private readonly IGHNService _ghnService;
         private readonly IMapper _mapper;
-        public OrderService(IOrderRepository orderRepository, IMapper mapper, IUserRepository userRepository, ICartRepository cartRepository, IVNPayService vNPayService, IHttpContextAccessor httpContextAccessor, IProductRepository productRepository, IPaymentRepository paymentRepository, IWalletRepository walletRepository, IPromotionRepository promotionRepository, IBatchRepository batchRepository, IOwnerService ownerService, IShipmentRepository shipmentRepository, IAddressRepository addressRepository, IGHNService ghnService)
+        private readonly IConfiguration _configuration;
+        public OrderService(IOrderRepository orderRepository, IMapper mapper, IUserRepository userRepository, ICartRepository cartRepository, IVNPayService vNPayService, IHttpContextAccessor httpContextAccessor, IProductRepository productRepository, IPaymentRepository paymentRepository, IWalletRepository walletRepository, IPromotionRepository promotionRepository, IBatchRepository batchRepository, IOwnerService ownerService, IShipmentRepository shipmentRepository, IAddressRepository addressRepository, IGHNService ghnService, IConfiguration configuration)
         {
             _orderRepository = orderRepository;
             _mapper = mapper;
@@ -56,6 +57,7 @@ namespace KFS.src.Application.Service
             _shipmentRepository = shipmentRepository;
             _addressRepository = addressRepository;
             _ghnService = ghnService;
+            _configuration = configuration;
 
             // http context
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
@@ -89,12 +91,16 @@ namespace KFS.src.Application.Service
                     return response;
                 }
                 //check if cart is active
-                if (cart.Status != CartStatusEnum.Active)
+                if (cart.Status != CartStatusEnum.Active && cart.Status != CartStatusEnum.Completed)
                 {
                     response.StatusCode = 400;
-                    response.Message = "Cart is not active";
+                    response.Message = "Cart is not active or completed";
                     response.IsSuccess = false;
                     return response;
+                }
+                if (cart.Status == CartStatusEnum.Completed)
+                {
+                    mappedOrder.IsReBuy = true;
                 }
                 //check if cart is empty
                 if (cart.CartItems.Count() == 0)
@@ -181,6 +187,7 @@ namespace KFS.src.Application.Service
                 // Use point from wallet
                 if (req.UsePoint == true)
                 {
+                    mappedOrder.IsUsePoint = true;
                     var wallet = await _walletRepository.GetWalletByUserId(cart.UserId);
                     mappedOrder.TotalPrice = cart.TotalPrice + mappedOrder.ShippingFee - (cart.TotalPrice * mappedOrder.Discount / 100) - wallet.Point;
                     await _walletRepository.UsePoint(wallet.Id, wallet.Point);
@@ -290,36 +297,15 @@ namespace KFS.src.Application.Service
                 var collection = httpContext.Request.Query;
                 //get response from vnpay
                 var vnPayResponseModel = _vNPayService.GetResponse(collection);
+
                 //check response
                 if (vnPayResponseModel.Success == false || vnPayResponseModel.VnPayResponseCode != "00" || vnPayResponseModel.TransactionStatus != "00")
                 {
-                    var payment = new PaymentOrder
-                    {
-                        Id = Guid.NewGuid(),
-                        Amount = decimal.Parse(vnPayResponseModel.Amount) / 100,
-                        CreatedAt = DateTime.Now,
-                        Currency = "VND",
-                        OrderId = Guid.Parse(vnPayResponseModel.OrderId),
-                        PaymentMethod = PaymentMethodEnum.VNPAY,
-                        Status = PaymentStatusEnum.Failed,
-                        TransactionId = vnPayResponseModel.PaymentId,
-                        UserId = _orderRepository.GetOrderById(Guid.Parse(vnPayResponseModel.OrderId)).Result.UserId
-                    };
-                    var result = await _paymentRepository.CreatePayment(payment);
-                    if (result)
-                    {
-                        response.StatusCode = 400;
-                        response.Message = "Payment created successfully" + vnPayResponseModel.VnPayResponseCode;
-                        response.IsSuccess = false;
-                        return response;
-                    }
-                    else
-                    {
-                        response.StatusCode = 400;
-                        response.Message = "Payment creation failed" + vnPayResponseModel.VnPayResponseCode;
-                        response.IsSuccess = false;
-                        return response;
-                    }
+
+                    response.StatusCode = 400;
+                    response.Message = "Payment creation failed" + vnPayResponseModel.VnPayResponseCode;
+                    response.IsSuccess = false;
+                    return response;
                 }
                 else
                 {
@@ -341,22 +327,39 @@ namespace KFS.src.Application.Service
                     var carts = await _cartRepository.GetCartByUserId(payment.UserId);
                     var cart = new Cart();
                     var order = await _orderRepository.GetOrderById(payment.OrderId);
-                    var wallet = await _walletRepository.GetWalletByUserId(payment.UserId);
                     //create payment
                     var result = await _paymentRepository.CreatePayment(payment);
                     var listCredential = new List<Credential>();
                     if (result)
                     {
-                        await _walletRepository.AddPoint(wallet.Id, (int)payment.Amount * 5 / 100);
-                        foreach (var c in carts)
+                        if (order.IsUsePoint == true)
                         {
-                            //deactive cart
-                            if (c.Status == CartStatusEnum.Active)
-                            {
-                                c.Status = CartStatusEnum.Completed;
-                                cart = c;
-                            }
+                            var wallet = await _walletRepository.GetWalletByUserId(payment.UserId);
+                            await _walletRepository.AddPoint(wallet.Id, (int)payment.Amount * 5 / 100);
                         }
+                        
+                        // check if order is !re-buy
+                        if (!order.IsReBuy)
+                        {
+                            // deactive cart
+                            foreach (var c in carts)
+                            {
+                                if (c.Status == CartStatusEnum.Active)
+                                {
+                                    c.Status = CartStatusEnum.Completed;
+                                    cart = c;
+                                }
+                            }
+                            // create new active cart
+                            var newCart = new Cart
+                            {
+                                UserId = order.UserId,
+                                Status = CartStatusEnum.Active,
+                            };
+                            await _cartRepository.CreateCart(newCart);
+                        }
+
+                        //update inventory
                         foreach (var orderItem in order.OrderItems)
                         {
                             // order item product
@@ -391,7 +394,7 @@ namespace KFS.src.Application.Service
                         response.Message = "Payment created successfully";
                         response.Result = new ResultDto
                         {
-                            Data = listCredential
+                            Data = _configuration["VNPay:RedirectUrl"]
                         };
                         response.IsSuccess = true;
                     }

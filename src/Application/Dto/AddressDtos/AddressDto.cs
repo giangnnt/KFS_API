@@ -24,6 +24,10 @@ namespace KFS.src.Application.Dto.AddressDtos
             CreateMap<AddressCreate, Address>()
             .ForMember(dest => dest.Id, opt => opt.Ignore())
             .ForMember(dest => dest.User, opt => opt.Ignore())
+            .ForMember(dest => dest.UserId, opt => opt.Ignore())
+            .ForMember(dest => dest.DistrictId, opt => opt.MapFrom(src => src.DistrictId))
+            .ForMember(dest => dest.WardCode, opt => opt.MapFrom(src => src.WardCode))
+            .ForMember(dest => dest.Street, opt => opt.MapFrom(src => src.PhysicsAddress))
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
         }
     }

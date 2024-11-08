@@ -20,11 +20,13 @@ namespace KFS.src.Domain.Entities
         public string? ContactName { get; set; }
         public int ShippingFee { get; set; }
         public int Discount { get; set; }
+        public bool IsUsePoint { get; set; } = false;
         public PaymentMethodEnum PaymentMethod { get; set; }
         public string? EstimatedDeliveryDate { get; set; }
         public string? Note { get; set; }
         public string Currency { get; set; } = "VND";
         public OrderStatusEnum Status { get; set; }
+        public bool IsReBuy { get; set; } = false;
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public User User { get; set; } = null!;

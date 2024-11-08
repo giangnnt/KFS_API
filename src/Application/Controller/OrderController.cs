@@ -104,7 +104,7 @@ namespace KFS.src.Application.Controller
             try
             {
                 var result = await _orderService.GetResponsePaymentUrl();
-                return Ok(result);
+                return Redirect(result.Result.Data.ToString());
             }
             catch (Exception ex)
             {
