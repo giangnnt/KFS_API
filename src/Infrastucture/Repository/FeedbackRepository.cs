@@ -76,6 +76,11 @@ namespace KFS.src.Infrastucture.Repository
             });
 
         }
+        // return true if user have feedback on product
+        public async Task<bool> HaveUserFeedbackOnProduct(Guid userId, Guid productId)
+        {
+            return await _context.Feedbacks.Where(x => x.UserId == userId && x.ProductId == productId).CountAsync() != 0;
+        }
 
         public async Task<bool> UpdateFeedback(Feedback feedback)
         {

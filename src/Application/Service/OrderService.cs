@@ -711,7 +711,7 @@ namespace KFS.src.Application.Service
                 }
                 if (order.PaymentMethod == PaymentMethodEnum.VNPAY && order.Status != OrderStatusEnum.Paid)
                 {
-                    response.StatusCode = 404;
+                    response.StatusCode = 402;
                     response.Message = "Order status is not Paid";
                     response.IsSuccess = false;
                     return response;

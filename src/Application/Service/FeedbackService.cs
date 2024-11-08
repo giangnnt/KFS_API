@@ -76,6 +76,15 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
                     return response;
                 }
+                // check if user already feedback
+                var haveUserFeedbackOnProduct = await _feedbackRepository.HaveUserFeedbackOnProduct(userId, id);
+                if (haveUserFeedbackOnProduct)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "You have already feedback on this product";
+                    response.IsSuccess = false;
+                    return response;
+                }
                 var mappedFeedback = _mapper.Map<Feedback>(req);
                 // check map user
                 mappedFeedback.ProductId = id;
@@ -178,9 +187,9 @@ namespace KFS.src.Application.Service
                 var averageRating = feedbackList.List.Average(x => x.Rating);
                 if (feedbackList != null && feedbackList.List.Count() > 0)
                 {
-                    response.StatusCode = 404;
+                    response.StatusCode = 201;
                     response.Message = "Average rating found";
-                    response.IsSuccess = false;
+                    response.IsSuccess = true;
                     response.Result = new ResultDto
                     {
                         Data = averageRating
@@ -210,14 +219,15 @@ namespace KFS.src.Application.Service
             try
             {
                 var feedbackList = await _feedbackRepository.GetFeedbackByUserId(id);
+                var mappedFeedbacks = _mapper.Map<List<FeedbackDto>>(feedbackList);
                 if (feedbackList != null && feedbackList.Count() > 0)
                 {
-                    response.StatusCode = 404;
+                    response.StatusCode = 201;
                     response.Message = "Feedback found";
-                    response.IsSuccess = false;
+                    response.IsSuccess = true;
                     response.Result = new ResultDto
                     {
-                        Data = feedbackList
+                        Data = mappedFeedbacks
                     };
                     return response;
                 }
@@ -247,9 +257,9 @@ namespace KFS.src.Application.Service
                 var mappedFeedbacks = _mapper.Map<List<FeedbackDto>>(result.List);
                 if (result != null && result.List.Count() > 0)
                 {
-                    response.StatusCode = 404;
+                    response.StatusCode = 201;
                     response.Message = "Feedback found";
-                    response.IsSuccess = false;
+                    response.IsSuccess = true;
                     response.Result = new ResultDto
                     {
                         Data = mappedFeedbacks,
@@ -318,8 +328,7 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
                     return response;
                 }
-                var mappedFeedback = _mapper.Map<Feedback>(req);
-                mappedFeedback.Id = id;
+                var mappedFeedback = _mapper.Map(req, feedback);
                 var result = await _feedbackRepository.UpdateFeedback(mappedFeedback);
                 if (result)
                 {

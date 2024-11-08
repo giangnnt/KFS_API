@@ -17,5 +17,6 @@ namespace KFS.src.Domain.IRepository
         Task<Feedback> GetFeedbackById(Guid id);
         Task<List<Feedback>> GetFeedbackByUserId(Guid id);
         bool CheckUserBoughtProdcut(Guid userId, Guid productId);
+        Task<bool> HaveUserFeedbackOnProduct(Guid userId, Guid productId);
     }
 }
