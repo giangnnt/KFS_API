@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using KFS.src.Application.Constant;
 using KFS.src.Application.Dto.UserDtos;
 using KFS.src.Application.Middleware;
-using KFS.src.Domain.IRepository;
 using KFS.src.Domain.IService;
 using Microsoft.AspNetCore.Mvc;
 

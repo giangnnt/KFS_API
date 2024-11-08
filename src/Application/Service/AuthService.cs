@@ -1,10 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Threading.Tasks;
-using BCrypt.Net;
 using KFS.src.Application.Constant;
 using KFS.src.Application.Core.Crypto;
 using KFS.src.Application.Core.Jwt;
@@ -14,8 +7,8 @@ using KFS.src.Application.Dto.Session;
 using KFS.src.Domain.Entities;
 using KFS.src.Domain.IRepository;
 using KFS.src.Domain.IService;
-using KFS.src.Infrastucture.Cache;
-using Microsoft.AspNetCore.Authentication.OAuth;
+using KFS.src.infrastructure.Cache;
+using System.Security.Cryptography;
 
 namespace KFS.src.Application.Service
 {

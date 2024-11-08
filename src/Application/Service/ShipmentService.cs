@@ -1,16 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
-using KFS.src.Application.Dto.Pagination;
 using KFS.src.Application.Dto.ResponseDtos;
 using KFS.src.Application.Dto.ShipmentDtos;
 using KFS.src.Application.Enum;
 using KFS.src.Domain.Entities;
 using KFS.src.Domain.IRepository;
 using KFS.src.Domain.IService;
-using KFS.src.Infrastucture.Context;
 using static KFS.src.Application.Dto.Pagination.Pagination;
 
 namespace KFS.src.Application.Service

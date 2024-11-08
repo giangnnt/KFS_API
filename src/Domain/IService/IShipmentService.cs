@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using KFS.src.Application.Dto.ResponseDtos;
 using KFS.src.Application.Dto.ShipmentDtos;
-using KFS.src.Application.Enum;
 
 namespace KFS.src.Domain.IService
 {

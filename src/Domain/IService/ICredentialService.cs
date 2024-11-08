@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using KFS.src.Application.Dto.CredentialDtos;
 using KFS.src.Application.Dto.ResponseDtos;
 
@@ -15,5 +11,6 @@ namespace KFS.src.Domain.IService
         Task<ResponseDto> UpdateCredential(CredentialUpdate req, Guid id);
         Task<ResponseDto> DeleteCredential(Guid id);
         Task<ResponseDto> GetCredentialsByProductId(Guid productId);
+        Task<ResponseDto> GetCredentialsByUserOrderHistory(HttpContext context);
     }
 }

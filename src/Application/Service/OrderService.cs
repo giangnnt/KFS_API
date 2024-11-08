@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
 using AutoMapper;
 using KFS.src.Application.Core.Jwt;
 using KFS.src.Application.Dto.BatchDtos;
@@ -15,9 +10,6 @@ using KFS.src.Application.Enum;
 using KFS.src.Domain.Entities;
 using KFS.src.Domain.IRepository;
 using KFS.src.Domain.IService;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.VisualBasic;
 using static KFS.src.Application.Dto.Pagination.Pagination;
 
 namespace KFS.src.Application.Service
@@ -329,7 +321,6 @@ namespace KFS.src.Application.Service
                     var order = await _orderRepository.GetOrderById(payment.OrderId);
                     //create payment
                     var result = await _paymentRepository.CreatePayment(payment);
-                    var listCredential = new List<Credential>();
                     if (result)
                     {
                         if (order.IsUsePoint == true)
@@ -337,7 +328,7 @@ namespace KFS.src.Application.Service
                             var wallet = await _walletRepository.GetWalletByUserId(payment.UserId);
                             await _walletRepository.AddPoint(wallet.Id, (int)payment.Amount * 5 / 100);
                         }
-                        
+
                         // check if order is !re-buy
                         if (!order.IsReBuy)
                         {
@@ -373,8 +364,6 @@ namespace KFS.src.Application.Service
                                     product.Status = ProductStatusEnum.SoldOut;
                                 }
                                 await _productRepository.UpdateProduct(product);
-                                //get credential
-                                listCredential.AddRange(product.Credentials);
                             }
                             // order item batch
                             if (orderItem.IsBatch)

@@ -1,16 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Google.Apis.Auth.OAuth2;
 using KFS.src.Domain.Entities;
 using KFS.src.Domain.IRepository;
-using KFS.src.Infrastucture.Context;
+using KFS.src.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 
-namespace KFS.src.Infrastucture.Repository
+namespace KFS.src.Infrastructure.Repository
 {
-    public class CredentialRepository : ICredentialRepositoty
+    public class CredentialRepository : ICredentialRepository
     {
         private readonly KFSContext _context;
         public CredentialRepository(KFSContext context)
@@ -44,6 +39,20 @@ namespace KFS.src.Infrastucture.Repository
         public async Task<List<Credential>> GetCredentialsByProductId(Guid productId)
         {
             return await _context.Credentials.Where(x => x.Product.Id == productId).ToListAsync();
+        }
+
+        public async Task<List<Credential>> GetCredentialsByUserOrderHistory(Guid userId)
+        {
+            var orders = await _context.Orders
+                .Include(x => x.OrderItems)
+                .ThenInclude(x => x.Product)
+                .ThenInclude(x => x.Credentials)
+                .Where(x => x.UserId == userId)
+                .ToListAsync();
+
+            return orders.SelectMany(order => order.OrderItems)
+                         .SelectMany(orderItem => orderItem.Product.Credentials)
+                         .ToList();
         }
 
         public async Task<bool> UpdateCredential(Credential credential)

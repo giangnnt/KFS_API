@@ -1,15 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using KFS.src.Application.Dto.ShipmentDtos;
 using KFS.src.Domain.Entities;
 using KFS.src.Domain.IRepository;
-using KFS.src.Infrastucture.Context;
+using KFS.src.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using static KFS.src.Application.Dto.Pagination.Pagination;
 
-namespace KFS.src.Infrastucture.Repository
+namespace KFS.src.infrastructure.Repository
 {
     public class ShipmentRepository : IShipmentRepository
     {

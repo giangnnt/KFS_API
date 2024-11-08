@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
-using KFS.src.Application.Constant;
 using KFS.src.Application.Core.Crypto;
 using KFS.src.Application.Core.Jwt;
 using KFS.src.Application.Dto.ResponseDtos;
@@ -12,7 +7,7 @@ using KFS.src.Application.Dto.UserDtos;
 using KFS.src.Domain.Entities;
 using KFS.src.Domain.IRepository;
 using KFS.src.Domain.IService;
-using KFS.src.Infrastucture.Cache;
+using KFS.src.infrastructure.Cache;
 
 namespace KFS.src.Application.Service
 {

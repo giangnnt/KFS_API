@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace KFS.src.Infrastucture.Cache
+namespace KFS.src.infrastructure.Cache
 {
     public interface ICacheService
     {

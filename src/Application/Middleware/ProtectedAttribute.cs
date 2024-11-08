@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Azure;
 using KFS.src.Application.Core.Jwt;
 using KFS.src.Application.Dto.ResponseDtos;
 using Microsoft.AspNetCore.Mvc;

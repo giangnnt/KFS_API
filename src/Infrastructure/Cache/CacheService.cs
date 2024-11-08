@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json;
-using System.Threading.Tasks;
 using StackExchange.Redis;
+using System.Text.Json;
 
-namespace KFS.src.Infrastucture.Cache
+namespace KFS.src.infrastructure.Cache
 {
     public class CacheService : ICacheService
     {

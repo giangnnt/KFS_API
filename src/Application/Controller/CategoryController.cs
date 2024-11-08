@@ -1,12 +1,8 @@
 ﻿using KFS.src.Application.Constant;
 using KFS.src.Application.Dto.CategoryDtos;
-using KFS.src.Application.Dto.ProductDtos;
-using KFS.src.Application.Dto.ResponseDtos;
 using KFS.src.Application.Middleware;
-using KFS.src.Application.Service;
 using KFS.src.Domain.Entities;
 using KFS.src.Domain.IService;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace KFS.src.Application.Controller

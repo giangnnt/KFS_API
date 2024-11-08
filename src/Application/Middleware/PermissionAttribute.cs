@@ -1,7 +1,7 @@
 using KFS.src.Application.Core.Jwt;
 using KFS.src.Application.Dto.ResponseDtos;
 using KFS.src.Domain.IRepository;
-using KFS.src.Infrastucture.Cache;
+using KFS.src.infrastructure.Cache;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 

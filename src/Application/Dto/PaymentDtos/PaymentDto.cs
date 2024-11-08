@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using AutoMapper;
 using KFS.src.Application.Enum;
 using KFS.src.Domain.Entities;
+using System.Text.Json.Serialization;
 
 namespace KFS.src.Application.Dto.PaymentDtos
 {
@@ -13,6 +9,7 @@ namespace KFS.src.Application.Dto.PaymentDtos
     {
         public Guid Id { get; set; }
         public Guid OrderId { get; set; }
+        public Guid ConsignmentId { get; set; }
         public Guid UserId { get; set; }
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public PaymentMethodEnum PaymentMethod { get; set; }
@@ -21,6 +18,7 @@ namespace KFS.src.Application.Dto.PaymentDtos
         public PaymentStatusEnum Status { get; set; }
         public string Currency { get; set; } = "VND";
         public string TransactionId { get; set; } = null!;
+        public string PaymentType { get; set; } = null!;
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
     }
@@ -29,7 +27,15 @@ namespace KFS.src.Application.Dto.PaymentDtos
         public PaymentProfile()
         {
             CreateMap<Payment, PaymentDto>()
-            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+                .Include<PaymentOrder, PaymentDto>()
+                .Include<PaymentConsignment, PaymentDto>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<PaymentOrder, PaymentDto>()
+                .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.OrderId))
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<PaymentConsignment, PaymentDto>()
+                .ForMember(dest => dest.ConsignmentId, opt => opt.MapFrom(src => src.ConsignmentId))
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
         }
     }
 }

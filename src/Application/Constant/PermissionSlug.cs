@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace KFS.src.Application.Constant
 {
     public static class PermissionSlug
@@ -22,6 +17,7 @@ namespace KFS.src.Application.Constant
         public const string MANAGE_OWN_CONSIGNMENT = "CONSIGNMENT.OWN";
         public const string VIEW_CONSIGNMENT = "CONSIGNMENT.VIEW";
         public const string MANAGE_CREDENTIAL = "CREDENTIAL.ALL";
+        public const string MANAGE_OWN_CREDENTIAL = "CREDENTIAL.OWN";
         public const string VIEW_CREDENTIAL = "CREDENTIAL.VIEW";
         public const string MANAGE_OWN_FEEDBACK = "FEEDBACK.OWN";
         public const string MANAGE_FEEDBACK = "FEEDBACK.ALL";

@@ -1,11 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.IO.Pipelines;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using Hangfire;
-using Hangfire.Common;
 using KFS.src.Application.Core.Jwt;
 using KFS.src.Application.Dto.BatchDtos;
 using KFS.src.Application.Dto.ConsignmentDtos;
@@ -15,7 +9,6 @@ using KFS.src.Application.Enum;
 using KFS.src.Domain.Entities;
 using KFS.src.Domain.IRepository;
 using KFS.src.Domain.IService;
-using StackExchange.Redis;
 using static KFS.src.Application.Dto.Pagination.Pagination;
 
 namespace KFS.src.Application.Service

@@ -1,8 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
+using KFS.src.Application.Core.Jwt;
 using KFS.src.Application.Dto.CredentialDtos;
 using KFS.src.Application.Dto.ResponseDtos;
 using KFS.src.Domain.Entities;
@@ -13,10 +10,10 @@ namespace KFS.src.Application.Service
 {
     public class CredentialService : ICredentialService
     {
-        private readonly ICredentialRepositoty _credentialRepositoty;
+        private readonly ICredentialRepository _credentialRepositoty;
         private readonly IProductRepository _productRepository;
         private readonly IMapper _mapper;
-        public CredentialService(ICredentialRepositoty credentialRepositoty, IProductRepository productRepository, IMapper mapper)
+        public CredentialService(ICredentialRepository credentialRepositoty, IProductRepository productRepository, IMapper mapper)
         {
             _credentialRepositoty = credentialRepositoty;
             _productRepository = productRepository;
@@ -180,6 +177,59 @@ namespace KFS.src.Application.Service
             try
             {
                 var result = await _credentialRepositoty.GetCredentialsByProductId(productId);
+                var mappedCredentials = _mapper.Map<List<CredentialDto>>(result);
+                if (result != null && result.Count > 0)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Credentials found";
+                    response.IsSuccess = true;
+                    response.Result = new ResultDto
+                    {
+                        Data = mappedCredentials
+                    };
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Credentials not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
+            }
+        }
+
+        public async Task<ResponseDto> GetCredentialsByUserOrderHistory(HttpContext context)
+        {
+            var response = new ResponseDto();
+            try
+            {
+                // check if context is null
+                if (context == null)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Invalid request";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                // get payload
+                var payload = context.Items["payload"] as Payload;
+                if (payload == null)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Invalid request";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                var userId = payload.UserId;
+                var result = await _credentialRepositoty.GetCredentialsByUserOrderHistory(userId);
                 var mappedCredentials = _mapper.Map<List<CredentialDto>>(result);
                 if (result != null && result.Count > 0)
                 {

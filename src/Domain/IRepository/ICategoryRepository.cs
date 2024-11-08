@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using KFS.src.Application.Dto.CategoryDtos;
 using KFS.src.Domain.Entities;
 
 namespace KFS.src.Domain.IRepository
