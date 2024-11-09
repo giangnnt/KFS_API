@@ -5,19 +5,19 @@ KFS_API is a RESTful API built with C# and the .NET Framework to support data ma
 ## Table of Contents
 - [Getting Started](#getting-started)
 
-- [Prerequisites]
+- [Prerequisites](#Prerequisites)
 
-- [Installation]
+- [Installation](#Installation)
 
-- [Configuration]
+- [Configuration](#Configuration)
 
-- [Usage]
+- [Usage](#Usage)
 
-- [API Documentation]
+- [API Documentation](#API Documentation)
 
-- [Contributing]
+- [Contributing](#contributing)
 
-- [License]
+- [License](#license)
 
 ## Getting Started
 Follow these instructions to set up the project locally for development and testing purposes.
