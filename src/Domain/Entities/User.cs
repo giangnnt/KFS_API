@@ -1,3 +1,5 @@
+using KFS.src.Application.Enum;
+
 namespace KFS.src.Domain.Entities
 {
     public class User
