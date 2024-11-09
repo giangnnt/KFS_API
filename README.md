@@ -3,7 +3,7 @@
 KFS_API is a RESTful API built with C# and the .NET Framework to support data management and operations for Koi Farm Shop management.
 
 ## Table of Contents
-- [Getting Started]
+- [Getting Started](#getting-started)
 
 - [Prerequisites]
 
