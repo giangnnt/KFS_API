@@ -1,6 +1,6 @@
 # KFS_API
 
-KFS_API is a RESTful API built with C# and the .NET Framework to support data management and operations for Koi Fish Show competitions. This API facilitates registration, scoring, and results tracking for koi exhibitions.
+KFS_API is a RESTful API built with C# and the .NET Framework to support data management and operations for Koi Farm Shop management.
 
 ## Table of Contents
 - [Getting Started]
