@@ -1,13 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using AutoMapper;
 using KFS.src.Application.Dto.BatchDtos;
 using KFS.src.Application.Dto.ProductDtos;
 using KFS.src.Application.Enum;
 using KFS.src.Domain.Entities;
+using System.Text.Json.Serialization;
 
 namespace KFS.src.Application.Dto.ConsignmentDtos
 {

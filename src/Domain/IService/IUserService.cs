@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Azure;
 using KFS.src.Application.Dto.ResponseDtos;
 using KFS.src.Application.Dto.UserDtos;
 
@@ -17,5 +12,6 @@ namespace KFS.src.Domain.IService
         Task<ResponseDto> GetUserById(Guid id);
         Task<ResponseDto> CreateUser(UserCreate req);
         Task<ResponseDto> UpdateUser(UserUpdate req);
+        Task<ResponseDto> GetOwnUser(HttpContext context);
     }
 }

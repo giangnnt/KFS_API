@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using KFS.src.Application.Dto.FeedbackDtos;
 using KFS.src.Domain.Entities;
 using static KFS.src.Application.Dto.Pagination.Pagination;
@@ -15,6 +11,8 @@ namespace KFS.src.Domain.IRepository
         Task<bool> UpdateFeedback(Feedback feedback);
         Task<bool> DeleteFeedback(Guid id);
         Task<Feedback> GetFeedbackById(Guid id);
+        Task<List<Feedback>> GetFeedbackByUserId(Guid id);
         bool CheckUserBoughtProdcut(Guid userId, Guid productId);
+        Task<bool> HaveUserFeedbackOnProduct(Guid userId, Guid productId);
     }
 }

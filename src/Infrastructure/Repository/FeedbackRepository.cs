@@ -1,14 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using KFS.src.Application.Dto.FeedbackDtos;
 using KFS.src.Application.Dto.Pagination;
 using KFS.src.Domain.Entities;
 using KFS.src.Domain.IRepository;
-using KFS.src.Infrastucture.Context;
+using KFS.src.Infrastructure.Context;
+using Microsoft.EntityFrameworkCore;
 
-namespace KFS.src.Infrastucture.Repository
+namespace KFS.src.infrastructure.Repository
 {
     public class FeedbackRepository : IFeedbackRepository
     {
@@ -49,6 +46,11 @@ namespace KFS.src.Infrastucture.Repository
             return await _context.Feedbacks.FindAsync(id) ?? throw new Exception("Feedback not found");
         }
 
+        public async Task<List<Feedback>> GetFeedbackByUserId(Guid id)
+        {
+            return await _context.Feedbacks.Where(x => x.UserId == id).ToListAsync();
+        }
+
         public Task<Pagination.ObjectPaging<Feedback>> GetFeedbacks(FeedbackQuery feedbackQuery)
         {
             var query = _context.Feedbacks.AsQueryable();
@@ -69,6 +71,11 @@ namespace KFS.src.Infrastucture.Repository
                 Total = total
             });
 
+        }
+        // return true if user have feedback on product
+        public async Task<bool> HaveUserFeedbackOnProduct(Guid userId, Guid productId)
+        {
+            return await _context.Feedbacks.Where(x => x.UserId == userId && x.ProductId == productId).CountAsync() != 0;
         }
 
         public async Task<bool> UpdateFeedback(Feedback feedback)

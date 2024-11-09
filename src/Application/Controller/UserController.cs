@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using KFS.src.Application.Constant;
 using KFS.src.Application.Dto.UserDtos;
 using KFS.src.Application.Middleware;
-using KFS.src.Domain.IRepository;
 using KFS.src.Domain.IService;
 using Microsoft.AspNetCore.Mvc;
 
@@ -68,6 +63,14 @@ namespace KFS.src.Application.Controller
         public async Task<IActionResult> UpdateUserStatus(Guid id, [FromQuery] bool IsActive)
         {
             var result = await _userService.UpdateUserStatus(id, IsActive);
+            return Ok(result);
+        }
+        [Protected]
+        [Permission(PermissionSlug.MANAGE_USER, PermissionSlug.MANAGE_OWN_USER)]
+        [HttpGet("own")]
+        public async Task<IActionResult> GetOwnUser()
+        {
+            var result = await _userService.GetOwnUser(HttpContext);
             return Ok(result);
         }
     }

@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using KFS.src.Application.Constant;
 using KFS.src.Application.Dto.CredentialDtos;
 using KFS.src.Application.Middleware;
@@ -52,7 +48,7 @@ namespace KFS.src.Application.Controller
             }
         }
         [Protected]
-        [Permission(PermissionSlug.MANAGE_CREDENTIAL, PermissionSlug.VIEW_CREDENTIAL)]
+        [Permission(PermissionSlug.MANAGE_CREDENTIAL)]
         [HttpPost]
         public async Task<IActionResult> CreateCredential(credentialCreate req)
         {
@@ -104,6 +100,21 @@ namespace KFS.src.Application.Controller
             try
             {
                 var result = await _credentialService.GetCredentialsByProductId(id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [Protected]
+        [Permission(PermissionSlug.MANAGE_CREDENTIAL, PermissionSlug.VIEW_CREDENTIAL, PermissionSlug.MANAGE_OWN_CREDENTIAL)]
+        [HttpGet("own")]
+        public async Task<IActionResult> GetCredentialsByUserOrderHistory()
+        {
+            try
+            {
+                var result = await _credentialService.GetCredentialsByUserOrderHistory(HttpContext);
                 return Ok(result);
             }
             catch (Exception ex)

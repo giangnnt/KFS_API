@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using KFS.src.Application.Constant;
 using KFS.src.Application.Dto.FeedbackDtos;
 using KFS.src.Application.Middleware;
@@ -84,6 +80,19 @@ namespace KFS.src.Application.Controller
             try
             {
                 var result = await _feedbackService.GetAverageRating(id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet("user/{id}")]
+        public async Task<IActionResult> GetFeedbackByUserId(Guid id)
+        {
+            try
+            {
+                var result = await _feedbackService.GetFeedbackByUserId(id);
                 return Ok(result);
             }
             catch (Exception ex)

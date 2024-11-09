@@ -1,16 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
-using KFS.src.Application.Dto.Pagination;
 using KFS.src.Application.Dto.ResponseDtos;
 using KFS.src.Application.Dto.ShipmentDtos;
 using KFS.src.Application.Enum;
 using KFS.src.Domain.Entities;
 using KFS.src.Domain.IRepository;
 using KFS.src.Domain.IService;
-using KFS.src.Infrastucture.Context;
 using static KFS.src.Application.Dto.Pagination.Pagination;
 
 namespace KFS.src.Application.Service
@@ -36,6 +30,7 @@ namespace KFS.src.Application.Service
                 var order = await _orderRepository.GetOrderById(shipment.OrderId);
                 if (shipment == null)
                 {
+                    response.StatusCode = 404;
                     response.Message = "Shipment not found";
                     response.IsSuccess = false;
                     return response;
@@ -48,6 +43,7 @@ namespace KFS.src.Application.Service
                     var result1 = await _shipmentRepository.UpdateShipment(shipment);
                     if (result1)
                     {
+                        response.StatusCode = 400;
                         await _orderRepository.UpdateOrder(order);
                         response.Message = "Shipment failed";
                         response.IsSuccess = true;
@@ -55,7 +51,8 @@ namespace KFS.src.Application.Service
                     }
                     else
                     {
-                        response.Message = "Shipment failed failed";
+                        response.StatusCode = 400;
+                        response.Message = "Shipment failed";
                         response.IsSuccess = false;
                         return response;
                     }
@@ -63,6 +60,7 @@ namespace KFS.src.Application.Service
                 // Check order status
                 if (order.Status != OrderStatusEnum.Delivering)
                 {
+                    response.StatusCode = 401;
                     response.Message = "Order is not Delivering";
                     response.IsSuccess = false;
                     return response;
@@ -72,6 +70,7 @@ namespace KFS.src.Application.Service
                 var result = await _shipmentRepository.UpdateShipment(shipment);
                 if (result)
                 {
+                    response.StatusCode = 200;
                     await _orderRepository.UpdateOrder(order);
                     response.Message = "Shipment Delivered successfully";
                     response.IsSuccess = true;
@@ -79,6 +78,7 @@ namespace KFS.src.Application.Service
                 }
                 else
                 {
+                    response.StatusCode = 400;
                     response.Message = "Shipment Delivered failed";
                     response.IsSuccess = false;
                     return response;
@@ -101,6 +101,7 @@ namespace KFS.src.Application.Service
                 var order = await _orderRepository.GetOrderById(orderId);
                 if (order == null)
                 {
+                    response.StatusCode = 404;
                     response.Message = "Order not found";
                     response.IsSuccess = false;
                     return response;
@@ -108,6 +109,7 @@ namespace KFS.src.Application.Service
 
                 if (order.PaymentMethod != PaymentMethodEnum.COD && order.PaymentMethod != PaymentMethodEnum.VNPAY)
                 {
+                    response.StatusCode = 400;
                     response.Message = "Invalid payment method";
                     response.IsSuccess = false;
                     return response;
@@ -116,6 +118,7 @@ namespace KFS.src.Application.Service
                 // Check order payment method
                 if (order.Status != OrderStatusEnum.Accepted)
                 {
+                    response.StatusCode = 401;
                     response.Message = "Order is not Accepted";
                     response.IsSuccess = false;
                     return response;
@@ -133,10 +136,12 @@ namespace KFS.src.Application.Service
                 var result = await _shipmentRepository.CreateShipment(shipment);
                 if (result)
                 {
+                    response.StatusCode = 200;
                     response.Message = "Shipment created successfully";
                     response.IsSuccess = true;
                     return response;
                 }
+                response.StatusCode = 400;
                 response.Message = "Shipment creation failed";
                 response.IsSuccess = false;
                 return response;
@@ -159,6 +164,7 @@ namespace KFS.src.Application.Service
                 var shipment = await _shipmentRepository.GetShipmentById(id);
                 if (shipment == null)
                 {
+                    response.StatusCode = 404;
                     response.Message = "Shipment not found";
                     response.IsSuccess = false;
                     return response;
@@ -166,6 +172,7 @@ namespace KFS.src.Application.Service
                 var result = await _shipmentRepository.DeleteShipment(id);
                 if (result)
                 {
+                    response.StatusCode = 200;
                     response.Message = "Shipment deleted successfully";
                     response.IsSuccess = true;
                     return response;
@@ -202,6 +209,7 @@ namespace KFS.src.Application.Service
                 }
                 else
                 {
+                    response.StatusCode = 404;
                     response.Message = "Shipment not found";
                     response.IsSuccess = false;
                     return response;
@@ -243,6 +251,7 @@ namespace KFS.src.Application.Service
                 }
                 else
                 {
+                    response.StatusCode = 404;
                     response.Message = "No shipments found";
                     response.IsSuccess = false;
                     return response;
@@ -265,6 +274,7 @@ namespace KFS.src.Application.Service
                 var shipment = await _shipmentRepository.GetShipmentById(id);
                 if (shipment == null)
                 {
+                    response.StatusCode = 404;
                     response.Message = "Shipment not found";
                     response.IsSuccess = false;
                     return response;
@@ -278,6 +288,7 @@ namespace KFS.src.Application.Service
                 var result = await _shipmentRepository.UpdateShipment(shipment);
                 if (result)
                 {
+                    response.StatusCode = 200;
                     response.Message = "Shipment updated successfully";
                     response.IsSuccess = true;
                     return response;
@@ -310,6 +321,7 @@ namespace KFS.src.Application.Service
                     var result1 = await _shipmentRepository.UpdateShipment(shipment);
                     if (result1)
                     {
+                        response.StatusCode = 400;
                         await _orderRepository.UpdateOrder(order);
                         response.Message = "Shipment failed";
                         response.IsSuccess = true;
@@ -317,7 +329,8 @@ namespace KFS.src.Application.Service
                     }
                     else
                     {
-                        response.Message = "Shipment failed failed";
+                        response.StatusCode = 400;
+                        response.Message = "Shipment failed";
                         response.IsSuccess = false;
                         return response;
                     }
@@ -334,6 +347,7 @@ namespace KFS.src.Application.Service
                 var result = await _shipmentRepository.UpdateShipment(shipment);
                 if (result)
                 {
+                    response.StatusCode = 200;
                     await _orderRepository.UpdateOrder(order);
                     response.Message = "Shipment completed successfully";
                     response.IsSuccess = true;
@@ -341,6 +355,7 @@ namespace KFS.src.Application.Service
                 }
                 else
                 {
+                    response.StatusCode = 400;
                     response.Message = "Shipment completion failed";
                     response.IsSuccess = false;
                     return response;

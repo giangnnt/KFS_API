@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
-using KFS.src.Application.Constant;
 using KFS.src.Application.Core.Jwt;
 using KFS.src.Application.Dto.BatchDtos;
 using KFS.src.Application.Dto.CartDtos;
@@ -13,7 +8,6 @@ using KFS.src.Application.Enum;
 using KFS.src.Domain.Entities;
 using KFS.src.Domain.IRepository;
 using KFS.src.Domain.IService;
-using KFS.src.Infrastucture.Context;
 
 namespace KFS.src.Application.Service
 {

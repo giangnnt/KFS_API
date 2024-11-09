@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using KFS.src.Application.Constant;
 using KFS.src.Application.Dto.PromotionDtos;
 using KFS.src.Application.Middleware;
@@ -109,11 +105,11 @@ namespace KFS.src.Application.Controller
         [Protected]
         [Permission(PermissionSlug.MANAGE_PROMOTION)]
         [HttpPut("{id}/products")]
-        public async Task<IActionResult> ListProductToPromotion(Guid promotionId, PromotionAddRemoveItemDto productId)
+        public async Task<IActionResult> ListProductToPromotion(Guid id, PromotionAddRemoveItemDto productId)
         {
             try
             {
-                var result = await _promotionService.UpdateProductToPromotion(promotionId, productId.listId);
+                var result = await _promotionService.UpdateProductToPromotion(id, productId.listId);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -124,11 +120,11 @@ namespace KFS.src.Application.Controller
         [Protected]
         [Permission(PermissionSlug.MANAGE_PROMOTION)]
         [HttpPut("{id}/batches")]
-        public async Task<IActionResult> ListBatchToPromotion(Guid promotionId, PromotionAddRemoveItemDto batchId)
+        public async Task<IActionResult> ListBatchToPromotion(Guid id, PromotionAddRemoveItemDto batchId)
         {
             try
             {
-                var result = await _promotionService.UpdateBatchToPromotion(promotionId, batchId.listId);
+                var result = await _promotionService.UpdateBatchToPromotion(id, batchId.listId);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -139,11 +135,11 @@ namespace KFS.src.Application.Controller
         [Protected]
         [Permission(PermissionSlug.MANAGE_PROMOTION)]
         [HttpPut("{id}/categories")]
-        public async Task<IActionResult> ListCategoryToPromotion(Guid promotionId, PromotionAddRemoveItemDto categoryId)
+        public async Task<IActionResult> ListCategoryToPromotion(Guid id, PromotionAddRemoveItemDto categoryId)
         {
             try
             {
-                var result = await _promotionService.UpdateCategoryToPromotion(promotionId, categoryId.listId);
+                var result = await _promotionService.UpdateCategoryToPromotion(id, categoryId.listId);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -154,11 +150,11 @@ namespace KFS.src.Application.Controller
         [Protected]
         [Permission(PermissionSlug.MANAGE_PROMOTION)]
         [HttpPut("{id}/end")]
-        public async Task<IActionResult> EndPromotion(Guid promotionId)
+        public async Task<IActionResult> EndPromotion(Guid id)
         {
             try
             {
-                var result = await _promotionService.EndPromotion(promotionId);
+                var result = await _promotionService.EndPromotion(id);
                 return Ok(result);
             }
             catch (Exception ex)

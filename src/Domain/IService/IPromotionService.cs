@@ -1,11 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Azure;
 using KFS.src.Application.Dto.PromotionDtos;
 using KFS.src.Application.Dto.ResponseDtos;
-using KFS.src.Domain.Entities;
 
 namespace KFS.src.Domain.IService
 {

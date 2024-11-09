@@ -1,14 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using KFS.src.Application.Constant;
 using KFS.src.Application.Enum;
 using KFS.src.Domain.Entities;
-using KFS.src.Infrastucture.Repository;
 using Microsoft.EntityFrameworkCore;
 
-namespace KFS.src.Infrastucture.Context
+namespace KFS.src.Infrastructure.Context
 {
     public class KFSContext : DbContext
     {
@@ -90,6 +85,7 @@ namespace KFS.src.Infrastucture.Context
                 new Permission { Slug = PermissionSlug.MANAGE_OWN_CONSIGNMENT, Name = "Manage Own Consignment" },
                 new Permission { Slug = PermissionSlug.VIEW_CONSIGNMENT, Name = "View Consignment" },
                 new Permission { Slug = PermissionSlug.MANAGE_CREDENTIAL, Name = "Manage Credential" },
+                new Permission { Slug = PermissionSlug.MANAGE_OWN_CREDENTIAL, Name = "Manage Own Credential" },
                 new Permission { Slug = PermissionSlug.VIEW_CREDENTIAL, Name = "View Credential" },
                 new Permission { Slug = PermissionSlug.MANAGE_FEEDBACK, Name = "Manage Feedback" },
                 new Permission { Slug = PermissionSlug.MANAGE_OWN_FEEDBACK, Name = "Manage Own Feedback" },
@@ -142,6 +138,7 @@ namespace KFS.src.Infrastucture.Context
                     new { RolesRoleId = 1, PermissionsSlug = PermissionSlug.MANAGE_OWN_CONSIGNMENT },
                     new { RolesRoleId = 1, PermissionsSlug = PermissionSlug.VIEW_CONSIGNMENT },
                     new { RolesRoleId = 1, PermissionsSlug = PermissionSlug.MANAGE_CREDENTIAL },
+                    new { RolesRoleId = 1, PermissionsSlug = PermissionSlug.MANAGE_OWN_CREDENTIAL },
                     new { RolesRoleId = 1, PermissionsSlug = PermissionSlug.VIEW_CREDENTIAL },
                     new { RolesRoleId = 1, PermissionsSlug = PermissionSlug.MANAGE_FEEDBACK },
                     new { RolesRoleId = 1, PermissionsSlug = PermissionSlug.MANAGE_OWN_FEEDBACK },
@@ -208,14 +205,14 @@ namespace KFS.src.Infrastucture.Context
                     new { RolesRoleId = 4, PermissionsSlug = PermissionSlug.MANAGE_OWN_CART },
                     new { RolesRoleId = 4, PermissionsSlug = PermissionSlug.VIEW_CATEGORY },
                     new { RolesRoleId = 4, PermissionsSlug = PermissionSlug.MANAGE_OWN_CONSIGNMENT },
-                    new { RolesRoleId = 4, PermissionsSlug = PermissionSlug.VIEW_CONSIGNMENT },
+                    new { RolesRoleId = 4, PermissionsSlug = PermissionSlug.MANAGE_OWN_CREDENTIAL },
                     new { RolesRoleId = 4, PermissionsSlug = PermissionSlug.MANAGE_OWN_FEEDBACK },
                     new { RolesRoleId = 4, PermissionsSlug = PermissionSlug.VIEW_MEDIA },
                     new { RolesRoleId = 4, PermissionsSlug = PermissionSlug.MANAGE_OWN_ORDER },
                     new { RolesRoleId = 4, PermissionsSlug = PermissionSlug.MANAGE_OWN_PAYMENT },
                     new { RolesRoleId = 4, PermissionsSlug = PermissionSlug.VIEW_PRODUCT },
                     new { RolesRoleId = 4, PermissionsSlug = PermissionSlug.VIEW_PROMOTION },
-                    new { RolesRoleId = 4, PermissionsSlug = PermissionSlug.MANAGE_OWN_SHIPMENT},
+                    new { RolesRoleId = 4, PermissionsSlug = PermissionSlug.MANAGE_OWN_SHIPMENT },
                     new { RolesRoleId = 4, PermissionsSlug = PermissionSlug.MANAGE_OWN_USER },
                     new { RolesRoleId = 4, PermissionsSlug = PermissionSlug.MANAGE_WALLET }
                     // Guest

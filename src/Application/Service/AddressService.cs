@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using AutoMapper;
 using KFS.src.Application.Core.Jwt;
 using KFS.src.Application.Dto.AddressDtos;
@@ -57,8 +56,9 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
                     return response;
                 }
-                var address = _mapper.Map<Address>(addressCreate);
-                var result = await _addressRepository.AddAddressAsync(address);
+                var mappedAddress = _mapper.Map<Address>(addressCreate);
+                mappedAddress.UserId = user.Id;
+                var result = await _addressRepository.AddAddressAsync(mappedAddress);
                 if (!result)
                 {
                     response.StatusCode = 400;

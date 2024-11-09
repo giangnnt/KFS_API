@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json;
-using System.Threading.Tasks;
 using KFS.src.Application.Dto.GHN;
 using KFS.src.Domain.IService;
+using System.Text.Json;
 
 namespace KFS.src.Application.Service
 {

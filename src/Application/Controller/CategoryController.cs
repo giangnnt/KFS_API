@@ -1,12 +1,8 @@
 ﻿using KFS.src.Application.Constant;
 using KFS.src.Application.Dto.CategoryDtos;
-using KFS.src.Application.Dto.ProductDtos;
-using KFS.src.Application.Dto.ResponseDtos;
 using KFS.src.Application.Middleware;
-using KFS.src.Application.Service;
 using KFS.src.Domain.Entities;
 using KFS.src.Domain.IService;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace KFS.src.Application.Controller
@@ -108,11 +104,11 @@ namespace KFS.src.Application.Controller
         [Protected]
         [Permission(PermissionSlug.MANAGE_CATEGORY)]
         [HttpPut("{id}/products")]
-        public async Task<IActionResult> UpdateProductCategory(Guid categoryId, List<Guid> productId)
+        public async Task<IActionResult> UpdateProductCategory(Guid id, List<Guid> productId)
         {
             try
             {
-                var result = await _categoryService.UpdateProductCategory(categoryId, productId);
+                var result = await _categoryService.UpdateProductCategory(id, productId);
                 return Ok(result);
             }
             catch (Exception ex)
