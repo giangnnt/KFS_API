@@ -13,12 +13,14 @@ namespace KFS.src.Application.Service
     {
         private readonly IShipmentRepository _shipmentRepository;
         private readonly IOrderRepository _orderRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
-        public ShipmentService(IShipmentRepository shipmentRepository, IOrderRepository orderRepository, IMapper mapper)
+        public ShipmentService(IShipmentRepository shipmentRepository, IOrderRepository orderRepository, IMapper mapper, IUserRepository userRepository)
         {
             _orderRepository = orderRepository;
             _shipmentRepository = shipmentRepository;
             _mapper = mapper;
+            _userRepository = userRepository;
         }
 
         public async Task<ResponseDto> ShipmentDelivered(Guid id, bool IsSuccess)
@@ -93,7 +95,7 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public async Task<ResponseDto> CreateShipment(Guid orderId)
+        public async Task<ResponseDto> CreateShipment(Guid orderId, Guid shipperId)
         {
             var response = new ResponseDto();
             try
@@ -103,6 +105,14 @@ namespace KFS.src.Application.Service
                 {
                     response.StatusCode = 404;
                     response.Message = "Order not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                var shipper = await _userRepository.GetUserById(shipperId);
+                if (shipper == null || shipper.RoleId != 3)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Shipper not found";
                     response.IsSuccess = false;
                     return response;
                 }
@@ -130,6 +140,7 @@ namespace KFS.src.Application.Service
                 var shipment = new Shipment
                 {
                     OrderId = orderId,
+                    ShipperId = shipperId,
                     Status = ShipmentStatusEnum.Delivering,
                 };
                 shipment.Order = order;
@@ -357,6 +368,40 @@ namespace KFS.src.Application.Service
                 {
                     response.StatusCode = 400;
                     response.Message = "Shipment completion failed";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
+            }
+        }
+
+        public async Task<ResponseDto> GetShipmentsByShipperId(Guid id)
+        {
+            var response = new ResponseDto();
+            try
+            {
+                var shipments = await _shipmentRepository.GetShipmentsByShipperId(id);
+                var mappedShipments = _mapper.Map<IEnumerable<ShipmentDto>>(shipments);
+                if (shipments != null && shipments.Any())
+                {
+                    response.StatusCode = 200;
+                    response.IsSuccess = true;
+                    response.Result = new ResultDto
+                    {
+                        Data = mappedShipments
+                    };
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 404;
+                    response.Message = "No shipments found";
                     response.IsSuccess = false;
                     return response;
                 }

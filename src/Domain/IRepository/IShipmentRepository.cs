@@ -11,5 +11,6 @@ namespace KFS.src.Domain.IRepository
         Task<bool> CreateShipment(Shipment shipment);
         Task<bool> UpdateShipment(Shipment shipment);
         Task<bool> DeleteShipment(Guid id);
+        Task<IEnumerable<Shipment>> GetShipmentsByShipperId(Guid shipperId);
     }
 }

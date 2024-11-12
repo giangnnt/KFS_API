@@ -214,7 +214,8 @@ namespace KFS.src.Infrastructure.Context
                     new { RolesRoleId = 4, PermissionsSlug = PermissionSlug.VIEW_PROMOTION },
                     new { RolesRoleId = 4, PermissionsSlug = PermissionSlug.MANAGE_OWN_SHIPMENT },
                     new { RolesRoleId = 4, PermissionsSlug = PermissionSlug.MANAGE_OWN_USER },
-                    new { RolesRoleId = 4, PermissionsSlug = PermissionSlug.MANAGE_WALLET }
+                    new { RolesRoleId = 4, PermissionsSlug = PermissionSlug.MANAGE_WALLET },
+                    new { RolesRoleId = 4, PermissionsSlug = PermissionSlug.VIEW_CREDENTIAL}
                     // Guest
                 ));
             // Seed user
@@ -379,6 +380,10 @@ namespace KFS.src.Infrastructure.Context
                 entity.Property(entity => entity.Id).ValueGeneratedOnAdd();
                 entity.Property(entity => entity.Status).HasConversion(v => v.ToString(), v => v != null ? (ShipmentStatusEnum)Enum.Parse(typeof(ShipmentStatusEnum), v) : default)
                 .HasColumnType("nvarchar(20)");
+                entity.HasOne(entity => entity.Shipper)
+                .WithMany(entity => entity.Shipments)
+                .HasForeignKey(entity => entity.ShipperId)
+                .OnDelete(DeleteBehavior.Restrict);
             });
             //seed product
             modelBuilder.Entity<Product>().HasData(

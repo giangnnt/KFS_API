@@ -503,9 +503,69 @@ namespace KFS.src.Application.Service
             }
         }
 
-        public Task<ResponseDto> UpdateConsignment(Guid id)
+        public async Task<ResponseDto> UpdateConsignment(Guid id, ConsignmentUpdate req)
         {
-            throw new NotImplementedException();
+            var response = new ResponseDto();
+            try
+            {
+                var consignment = await _consignmentRepository.GetConsignmentById(id);
+                if (consignment == null)
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Consignment not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                var _httpContext = _httpContextAccessor.HttpContext;
+                if (_httpContext == null)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Unauthorized";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                //check if consignment is authorized
+                var isOwner = _ownerService.CheckEntityOwner(_httpContext, consignment.UserId);
+                if (!isOwner)
+                {
+                    response.StatusCode = 401;
+                    response.Message = "Unauthorized";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                // check consignment status
+                if (consignment.Status != ConsignmentStatusEnum.Pending)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Consignment is not pending";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                // update consignment
+                var mappedConsignment = _mapper.Map(req, consignment);
+                var result = await _consignmentRepository.UpdateConsignment(mappedConsignment);
+                if (result)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Consignment updated successfully";
+                    response.IsSuccess = true;
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Failed to update consignment";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
+            }
         }
         public string GeneratePaymentUrl(Consignment consignment)
         {

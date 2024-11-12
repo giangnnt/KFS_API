@@ -31,7 +31,34 @@ namespace KFS.src.infrastructure.Repository
 
         public async Task<Payment> GetPaymentById(Guid id)
         {
-            return await _context.Payments.FindAsync(id) ?? throw new Exception("Payment not found");
+            var payment = await _context.Payments
+            .Where(p => p.Id == id)
+            .Select(p => new
+            {
+                Payment = p,
+                PaymentOrder = p as PaymentOrder,
+                PaymentConsignment = p as PaymentConsignment
+            })
+            .FirstOrDefaultAsync();
+
+            if (payment == null)
+            {
+                throw new Exception("Payment not found");
+            }
+
+            if (payment.PaymentOrder != null)
+            {
+                await _context.Entry(payment.PaymentOrder).Reference(po => po.Order).LoadAsync();
+                return payment.PaymentOrder;
+            }
+
+            if (payment.PaymentConsignment != null)
+            {
+                await _context.Entry(payment.PaymentConsignment).Reference(pc => pc.Consignment).LoadAsync();
+                return payment.PaymentConsignment;
+            }
+
+            return payment.Payment;
         }
 
         public async Task<ObjectPaging<Payment>> GetPayments(PaymentQuery paymentQuery)

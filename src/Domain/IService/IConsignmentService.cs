@@ -7,7 +7,7 @@ namespace KFS.src.Domain.IService
     {
         Task<ResponseDto> CreateConsignmentOnline(ConsignmentCreateByOrderItem req);
         Task<ResponseDto> CreateConsignment(ConsignmentCreate req);
-        Task<ResponseDto> UpdateConsignment(Guid id);
+        Task<ResponseDto> UpdateConsignment(Guid id, ConsignmentUpdate consignmentUpdate);
         Task<ResponseDto> DeleteConsignment(Guid id);
         Task<ResponseDto> GetConsignmentsAdmin(ConsignmentQuery consignmentQuery);
         Task<ResponseDto> GetConsignmentById(Guid id);

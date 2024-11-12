@@ -1,5 +1,3 @@
-using KFS.src.Application.Enum;
-
 namespace KFS.src.Domain.Entities
 {
     public class User
@@ -22,5 +20,6 @@ namespace KFS.src.Domain.Entities
         public List<Feedback> Feedbacks { get; set; } = new List<Feedback>();
         public Wallet Wallet { get; set; } = null!;
         public List<Address> Address { get; set; } = new List<Address>();
+        public List<Shipment> Shipments { get; set; } = new List<Shipment>();
     }
 }

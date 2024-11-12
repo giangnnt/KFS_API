@@ -297,6 +297,10 @@ namespace KFS.src.Application.Service
                     response.StatusCode = 400;
                     response.Message = "Payment creation failed" + vnPayResponseModel.VnPayResponseCode;
                     response.IsSuccess = false;
+                    response.Result = new ResultDto
+                    {
+                        Data = _configuration["VNPay:FailUrl"]
+                    };
                     return response;
                 }
                 else

@@ -9,6 +9,7 @@ namespace KFS.src.Application.Dto.ShipmentDtos
     {
         public Guid Id { get; set; }
         public Guid OrderId { get; set; }
+        public Guid ShipperId { get; set; }
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public ShipmentStatusEnum Status { get; set; }
         public DateTime CreatedAt { get; set; }

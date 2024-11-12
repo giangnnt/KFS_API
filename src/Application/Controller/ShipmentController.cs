@@ -19,11 +19,11 @@ namespace KFS.src.Application.Controller
         [Protected]
         [Permission(PermissionSlug.MANAGE_SHIPMENT)]
         [HttpPost]
-        public async Task<IActionResult> CreateShipment(Guid orderId)
+        public async Task<IActionResult> CreateShipment(Guid orderId, Guid shipperId)
         {
             try
             {
-                var result = await _shipmentService.CreateShipment(orderId);
+                var result = await _shipmentService.CreateShipment(orderId, shipperId);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -114,6 +114,21 @@ namespace KFS.src.Application.Controller
             try
             {
                 var result = await _shipmentService.ShipmentCompleted(id, IsSuccess);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [Protected]
+        [Permission(PermissionSlug.MANAGE_SHIPMENT)]
+        [HttpGet("shipper/{id}")]
+        public async Task<IActionResult> GetShipmentsByShipperId(Guid id)
+        {
+            try
+            {
+                var result = await _shipmentService.GetShipmentsByShipperId(id);
                 return Ok(result);
             }
             catch (Exception ex)
