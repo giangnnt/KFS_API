@@ -35,9 +35,9 @@ namespace KFS.src.Application.Controller
         [Protected]
         [Permission(PermissionSlug.MANAGE_CONSIGNMENT, PermissionSlug.MANAGE_OWN_CONSIGNMENT)]
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateConsignment(Guid id)
+        public async Task<IActionResult> UpdateConsignment(Guid id, ConsignmentUpdate consignmentUpdate)
         {
-            var response = await _consignmentService.UpdateConsignment(id);
+            var response = await _consignmentService.UpdateConsignment(id, consignmentUpdate);
             return Ok(response);
         }
         [Protected]

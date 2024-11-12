@@ -34,6 +34,10 @@ namespace KFS.src.Application.Dto.ConsignmentDtos
             .ForMember(dest => dest.Product, opt => opt.Ignore())
             .ForMember(dest => dest.Product, opt => opt.MapFrom(src => src.Product))
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<ConsignmentUpdate, Consignment>()
+                .ForMember(dest => dest.Product, opt => opt.Ignore())
+                .ForMember(dest => dest.UserId, opt => opt.Ignore())
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
         }
     }
 }

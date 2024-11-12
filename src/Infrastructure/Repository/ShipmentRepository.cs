@@ -38,6 +38,14 @@ namespace KFS.src.infrastructure.Repository
             .FirstOrDefaultAsync(x => x.Id == id) ?? throw new Exception("Shipment not found");
         }
 
+        public async Task<IEnumerable<Shipment>> GetShipmentsByShipperId(Guid shipperId)
+        {
+            return await _context.Shipments
+                .Include(x => x.Shipper)
+                .Where(x => x.ShipperId == shipperId)
+                .ToListAsync();
+        }
+
         public async Task<ObjectPaging<Shipment>> GetShipments(ShipmentQuery shipmentQuery)
         {
             var query = _context.Shipments.AsQueryable();
@@ -49,6 +57,7 @@ namespace KFS.src.infrastructure.Repository
             // return
             var shipmentList = await query
             .Include(x => x.Order)
+            .Include(x => x.Shipper)
             .Skip((shipmentQuery.Page - 1) * shipmentQuery.PageSize)
             .Take(shipmentQuery.PageSize)
             .ToListAsync();
