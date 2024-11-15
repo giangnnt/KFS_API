@@ -75,6 +75,7 @@ namespace KFS.src.Application.Service
                     Method = ConsignmentMethodEnum.Offline,
                     CommissionPercentage = req.CommissionPercentage,
                     DealingAmount = req.DealingAmount,
+                    ConsignmentFee = req.ConsignmentFee,
                     Status = ConsignmentStatusEnum.Pending,
                     IsForSell = req.IsForSell,
                     Product = new Product

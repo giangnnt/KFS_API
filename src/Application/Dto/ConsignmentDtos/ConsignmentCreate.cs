@@ -10,6 +10,7 @@ namespace KFS.src.Application.Dto.ConsignmentDtos
         public int Quantity { get; set; }
         public int CommissionPercentage { get; set; }
         public int DealingAmount { get; set; }
+        public int ConsignmentFee { get; set; }
         public bool IsForSell { get; set; }
         public string? Origin { get; set; }
         public int? Age { get; set; }
