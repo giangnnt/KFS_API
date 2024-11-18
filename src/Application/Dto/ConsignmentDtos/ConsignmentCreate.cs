@@ -7,7 +7,6 @@ namespace KFS.src.Application.Dto.ConsignmentDtos
     {
         public string Name { get; set; } = null!;
         public string? Description { get; set; }
-        public int Quantity { get; set; }
         public int CommissionPercentage { get; set; }
         public int DealingAmount { get; set; }
         public int ConsignmentFee { get; set; }
@@ -15,7 +14,6 @@ namespace KFS.src.Application.Dto.ConsignmentDtos
         public string? Origin { get; set; }
         public int? Age { get; set; }
         public float? Length { get; set; }
-        public string? Species { get; set; }
         public string? Color { get; set; }
         public string? FeedingVolumn { get; set; }
         public float? FilterRate { get; set; }

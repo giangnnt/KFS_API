@@ -6,5 +6,6 @@ namespace KFS.src.Application.Enum
         Deactive,
         SoldOut,
         Consignment,
+        InBatch
     }
 }

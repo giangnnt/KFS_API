@@ -313,27 +313,22 @@ namespace KFS.src.Application.Service
                 // set new price for products and batches
                 foreach (var product in promotion.Products)
                 {
-                    product.Price = product.Price - (product.Price * promotion.DiscountPercentage / 100);
+                    if (product.Status != Enum.ProductStatusEnum.InBatch)
+                    {
+                        product.Price = product.Price - (product.Price * promotion.DiscountPercentage / 100);
+                    }
                 }
                 foreach (var batch in promotion.Batches)
                 {
                     batch.Price = batch.Price - (batch.Price * promotion.DiscountPercentage / 100);
                 }
-                // set new price for products and batches in category except the one already in promotion
+                // set new price for products in category except the one already in promotion
                 var productInCategory = promotion.Categories.SelectMany(x => x.Products).ToList();
-                var batchInCategory = productInCategory.SelectMany(x => x.Batches).ToList();
                 foreach (var product in productInCategory)
                 {
                     if (!promotion.Products.Contains(product))
                     {
                         product.Price = product.Price - (product.Price * promotion.DiscountPercentage / 100);
-                    }
-                }
-                foreach (var batch in batchInCategory)
-                {
-                    if (!promotion.Batches.Contains(batch))
-                    {
-                        batch.Price = batch.Price - (batch.Price * promotion.DiscountPercentage / 100);
                     }
                 }
                 // set promotion state
@@ -417,7 +412,10 @@ namespace KFS.src.Application.Service
                 // set new price for products and batches
                 foreach (var product in promotion.Products)
                 {
-                    product.Price = product.Price * 100 / (100 - promotion.DiscountPercentage);
+                    if (product.Status != Enum.ProductStatusEnum.InBatch)
+                    {
+                        product.Price = product.Price * 100 / (100 - promotion.DiscountPercentage);
+                    }
                 }
                 foreach (var batch in promotion.Batches)
                 {
@@ -425,19 +423,11 @@ namespace KFS.src.Application.Service
                 }
                 // set new price for products and batches in category except the one already in promotion
                 var productInCategory = promotion.Categories.SelectMany(x => x.Products).ToList();
-                var batchInCategory = productInCategory.SelectMany(x => x.Batches).ToList();
                 foreach (var product in productInCategory)
                 {
                     if (!promotion.Products.Contains(product))
                     {
                         product.Price = product.Price * 100 / (100 - promotion.DiscountPercentage);
-                    }
-                }
-                foreach (var batch in batchInCategory)
-                {
-                    if (!promotion.Batches.Contains(batch))
-                    {
-                        batch.Price = batch.Price * 100 / (100 - promotion.DiscountPercentage);
                     }
                 }
                 // set promotion state
@@ -475,7 +465,10 @@ namespace KFS.src.Application.Service
                 // set new price for products and batches
                 foreach (var product in promotion.Products)
                 {
-                    product.Price = product.Price - (product.Price * promotion.DiscountPercentage / 100);
+                    if (product.Status != Enum.ProductStatusEnum.InBatch)
+                    {
+                        product.Price = product.Price - (product.Price * promotion.DiscountPercentage / 100);
+                    }
                 }
                 foreach (var batch in promotion.Batches)
                 {
@@ -483,19 +476,11 @@ namespace KFS.src.Application.Service
                 }
                 // set new price for products and batches in category except the one already in promotion
                 var productInCategory = promotion.Categories.SelectMany(x => x.Products).ToList();
-                var batchInCategory = productInCategory.SelectMany(x => x.Batches).ToList();
                 foreach (var product in productInCategory)
                 {
                     if (!promotion.Products.Contains(product))
                     {
                         product.Price = product.Price - (product.Price * promotion.DiscountPercentage / 100);
-                    }
-                }
-                foreach (var batch in batchInCategory)
-                {
-                    if (!promotion.Batches.Contains(batch))
-                    {
-                        batch.Price = batch.Price - (batch.Price * promotion.DiscountPercentage / 100);
                     }
                 }
                 // set promotion state
@@ -536,7 +521,10 @@ namespace KFS.src.Application.Service
                 // set new price for products and batches
                 foreach (var product in promotion.Products)
                 {
-                    product.Price = product.Price * 100 / (100 - promotion.DiscountPercentage);
+                    if (product.Status != Enum.ProductStatusEnum.InBatch)
+                    {
+                        product.Price = product.Price * 100 / (100 - promotion.DiscountPercentage);
+                    }
                 }
                 foreach (var batch in promotion.Batches)
                 {
@@ -544,19 +532,11 @@ namespace KFS.src.Application.Service
                 }
                 // set new price for products and batches in category except the one already in promotion
                 var productInCategory = promotion.Categories.SelectMany(x => x.Products).ToList();
-                var batchInCategory = productInCategory.SelectMany(x => x.Batches).ToList();
                 foreach (var product in productInCategory)
                 {
                     if (!promotion.Products.Contains(product))
                     {
                         product.Price = product.Price * 100 / (100 - promotion.DiscountPercentage);
-                    }
-                }
-                foreach (var batch in batchInCategory)
-                {
-                    if (!promotion.Batches.Contains(batch))
-                    {
-                        batch.Price = batch.Price * 100 / (100 - promotion.DiscountPercentage);
                     }
                 }
                 // set promotion state

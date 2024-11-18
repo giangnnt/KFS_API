@@ -20,66 +20,51 @@ namespace KFS.src.Application.Service
             _productRepository = productRepository;
         }
 
-        public async Task<ResponseDto> CreateBatchFromProduct(BatchCreate batch, Guid productId)
+        public async Task<ResponseDto> CreateBatch(BatchCreate batch)
         {
             var response = new ResponseDto();
             try
             {
-                var product = await _productRepository.GetProductById(productId);
-                if (product == null)
+                var productList = new List<Product>();
+                if (batch.ProductIds != null && batch.ProductIds.Count != 0)
                 {
-                    response.StatusCode = 400;
-                    response.Message = "Product not found";
-                    response.IsSuccess = false;
-                    return response;
-                }
-                var result = false;
-                // check if batch exists
-                var batchExists = product.Batches.Where(b => b.Quantity == batch.Quantity).FirstOrDefault();
-                if (batchExists == null)
-                {
-                    if (batch.Quantity == 0)
+                    foreach (var productId in batch.ProductIds)
                     {
-                        response.StatusCode = 400;
-                        response.Message = "Batch quantity is required";
-                        response.IsSuccess = false;
-                        return response;
+                        var product = await _productRepository.GetProductById(productId);
+                        if (product == null)
+                        {
+                            response.StatusCode = 400;
+                            response.Message = "Product not found";
+                            response.IsSuccess = false;
+                            return response;
+                        }
+                        if (product.Status != ProductStatusEnum.Active && product.Status != ProductStatusEnum.Deactive && product.Status != ProductStatusEnum.Consignment)
+                        {
+                            response.StatusCode = 400;
+                            response.Message = "Can not add product";
+                            response.IsSuccess = false;
+                            return response;
+                        }
+                        productList.Add(product);
                     }
-                    if (batch.Inventory == 0)
-                    {
-                        response.StatusCode = 400;
-                        response.Message = "Batch inventory is required";
-                        response.IsSuccess = false;
-                        return response;
-                    }
-                    if (batch.Inventory * batch.Quantity > product.Inventory)
-                    {
-                        response.StatusCode = 400;
-                        response.Message = "Batch quantity is greater than product quantity";
-                        response.IsSuccess = false;
-                        return response;
-                    }
-
-                    var mappedBatch = _mapper.Map<Batch>(batch);
-                    mappedBatch.Weight = product.Weight * batch.Quantity;
-                    mappedBatch.ProductId = productId;
-                    mappedBatch.Status = ProductStatusEnum.Deactive;
-                    mappedBatch.IsForSell = false;
-
-                    result = await _batchRepository.CreateBatch(mappedBatch);
-                }
-                else
-                {
-                    batchExists.Inventory += batch.Inventory;
-                    result = await _batchRepository.UpdateBatch(batchExists);
                 }
 
+                // create batch
+                var mappedBatch = _mapper.Map<Batch>(batch);
+                mappedBatch.IsForSell = true;
+                mappedBatch.Products = productList;
+
+                // update product status and batch weight
+                foreach (var product in mappedBatch.Products)
+                {
+                    product.Status = ProductStatusEnum.InBatch;
+                    await _productRepository.UpdateProduct(product);
+                    mappedBatch.Weight += product.Weight;
+                }
+
+                var result = await _batchRepository.CreateBatch(mappedBatch);
                 if (result)
                 {
-                    // update product inventory
-                    product.Inventory -= batch.Inventory * batch.Quantity;
-                    await _productRepository.UpdateProduct(product);
-
                     response.StatusCode = 201;
                     response.Message = "Batch created successfully";
                     response.IsSuccess = true;
@@ -107,6 +92,13 @@ namespace KFS.src.Application.Service
             var response = new ResponseDto();
             try
             {
+                var batchToDelete = await _batchRepository.GetBatchById(id);
+                // update product status
+                foreach (var product in batchToDelete.Products)
+                {
+                    product.Status = ProductStatusEnum.Deactive;
+                    await _productRepository.UpdateProduct(product);
+                }
                 var result = await _batchRepository.DeleteBatch(id);
                 if (result)
                 {
@@ -215,7 +207,41 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
                     return response;
                 }
+                // get list of products
+                var productList = new List<Product>();
+                if (req.ProductIds != null && req.ProductIds.Count > 0)
+                {
+                    foreach (var productId in req.ProductIds)
+                    {
+                        productList.Add(await _productRepository.GetProductById(productId));
+                    }
 
+                    // update product status deactive and remove old product from batch
+                    for (var i = batchToUpdate.Products.Count - 1; i >= 0; i--)
+                    {
+                        if (!productList.Contains(batchToUpdate.Products[i]))
+                        {
+                            batchToUpdate.Products[i].Status = ProductStatusEnum.Deactive;
+                            await _productRepository.UpdateProduct(batchToUpdate.Products[i]);
+                            batchToUpdate.Weight -= batchToUpdate.Products[i].Weight;
+                            batchToUpdate.Products.RemoveAt(i);
+                        }
+                    }
+
+                    // update product status active and add new product to batch
+                    foreach (var product in productList)
+                    {
+                        if (batchToUpdate.Products.Contains(product) == false)
+                        {
+                            product.Status = ProductStatusEnum.InBatch;
+                            await _productRepository.UpdateProduct(product);
+                            batchToUpdate.Products.Add(product);
+                            batchToUpdate.Weight += product.Weight;
+                        }
+                    }
+                }
+
+                // update batch
                 var mappedBatch = _mapper.Map(req, batchToUpdate);
                 var result = await _batchRepository.UpdateBatch(mappedBatch);
                 if (result)
@@ -229,6 +255,39 @@ namespace KFS.src.Application.Service
                 {
                     response.StatusCode = 400;
                     response.Message = "Batch update failed";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
+            }
+        }
+
+        public async Task<ResponseDto> UpdateBatchIsActive(bool isActive, Guid id)
+        {
+            var response = new ResponseDto();
+            try
+            {
+                // get batch
+                var batch = await _batchRepository.GetBatchById(id);
+                batch.Status = isActive ? ProductStatusEnum.Active : ProductStatusEnum.Deactive;
+                var result = await _batchRepository.UpdateBatch(batch);
+                if (result)
+                {
+                    response.StatusCode = 200;
+                    response.Message = "Batch status updated successfully";
+                    response.IsSuccess = true;
+                    return response;
+                }
+                else
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Batch status update failed";
                     response.IsSuccess = false;
                     return response;
                 }

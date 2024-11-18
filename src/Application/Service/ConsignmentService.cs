@@ -88,11 +88,9 @@ namespace KFS.src.Application.Service
                         CategoryId = req.CategoryId,
                         Age = req.Age,
                         Length = req.Length,
-                        Species = req.Species,
                         Color = req.Color,
                         FeedingVolumn = req.FeedingVolumn,
                         FilterRate = req.FilterRate,
-                        Inventory = req.Quantity,
                         CreatedAt = DateTime.Now,
                     }
                 };
@@ -128,7 +126,13 @@ namespace KFS.src.Application.Service
             {
                 var orderItem = await _orderItemRepository.GetOrderItemById(req.OrderItemId);
                 var order = await _orderRepository.GetOrderById(req.OrderId);
-                var product = orderItem.Product;
+                if(orderItem is not OrderItemProduct productItem)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Order item is not product";
+                    response.IsSuccess = false;
+                    return response;
+                }
                 if (order == null)
                 {
                     response.StatusCode = 404;
@@ -166,81 +170,34 @@ namespace KFS.src.Application.Service
                     req.CommissionPercentage = 0;
                     req.DealingAmount = 0;
                 }
-                // check if order item is batch
-                var consignment = new Consignment();
-                if (orderItem.IsBatch)
+                var consignment = new Consignment
                 {
-                    var batch = await _batchRepository.GetBatchById(orderItem.BatchId);
-                    consignment.UserId = order.UserId;
-                    consignment.Method = ConsignmentMethodEnum.Online;
-                    consignment.CommissionPercentage = req.CommissionPercentage;
-                    consignment.ConsignmentFee = req.ConsignmentFee;
-                    consignment.ExpiryDate = req.ExpiryDate;
-                    consignment.DealingAmount = req.DealingAmount;
-                    consignment.Status = ConsignmentStatusEnum.Pending;
-                    consignment.IsForSell = req.IsForSell;
-                    consignment.User = order.User;
-                    consignment.IsBatch = true;
-                    consignment.Product = new Product
-                    {
-                        IsForSell = false,
-                        Name = product.Name,
-                        Description = product.Description,
-                        Price = 0,
-                        Origin = product.Origin,
-                        Category = product.Category,
-                        CategoryId = product.CategoryId,
-                        Age = product.Age,
-                        Length = product.Length,
-                        Species = product.Species,
-                        Color = product.Color,
-                        FeedingVolumn = product.FeedingVolumn,
-                        FilterRate = product.FilterRate,
-                        Inventory = 0,
-                        Status = ProductStatusEnum.Consignment,
-                    };
-                    consignment.Product.Batches.Add(new Batch
-                    {
-                        Name = batch.Name,
-                        Description = batch.Description,
-                        Quantity = batch.Quantity,
-                        Inventory = orderItem.Quantity,
-                        Price = req.DealingAmount,
-                        Status = ProductStatusEnum.Consignment,
-                        IsForSell = false
-                    });
-                }
-                else
+                    UserId = order.UserId,
+                    Method = ConsignmentMethodEnum.Online,
+                    CommissionPercentage = req.CommissionPercentage,
+                    DealingAmount = req.DealingAmount,
+                    ConsignmentFee = req.ConsignmentFee,
+                    Status = ConsignmentStatusEnum.Pending,
+                    IsForSell = req.IsForSell,
+                    ExpiryDate = req.ExpiryDate
+                };
+                var product = await _productRepository.GetProductById(productItem.ProductId);
+                consignment.Product = new Product
                 {
-                    consignment.UserId = order.UserId;
-                    consignment.Method = ConsignmentMethodEnum.Online;
-                    consignment.CommissionPercentage = req.CommissionPercentage;
-                    consignment.ConsignmentFee = req.ConsignmentFee;
-                    consignment.ExpiryDate = req.ExpiryDate;
-                    consignment.DealingAmount = req.DealingAmount;
-                    consignment.Status = ConsignmentStatusEnum.Pending;
-                    consignment.IsForSell = req.IsForSell;
-                    consignment.User = order.User;
-                    consignment.IsBatch = false;
-                    consignment.Product = new Product
-                    {
-                        IsForSell = false,
-                        Name = product.Name,
-                        Description = product.Description,
-                        Price = req.DealingAmount,
-                        Origin = product.Origin,
-                        Category = product.Category,
-                        CategoryId = product.CategoryId,
-                        Age = product.Age,
-                        Length = product.Length,
-                        Species = product.Species,
-                        Color = product.Color,
-                        FeedingVolumn = product.FeedingVolumn,
-                        FilterRate = product.FilterRate,
-                        Gender = product.Gender,
-                        Inventory = orderItem.Quantity,
-                        Status = ProductStatusEnum.Consignment,
-                    };
+                    IsForSell = false,
+                    Name = product.Name,
+                    Description = product.Description,
+                    Price = req.DealingAmount,
+                    Origin = product.Origin,
+                    Category = product.Category,
+                    CategoryId = product.CategoryId,
+                    Age = product.Age,
+                    Length = product.Length,
+                    Color = product.Color,
+                    FeedingVolumn = product.FeedingVolumn,
+                    FilterRate = product.FilterRate,
+                    Gender = product.Gender,
+                    Status = ProductStatusEnum.Consignment,
                 };
                 var result = await _consignmentRepository.CreateConsignment(consignment);
                 if (result == false)
@@ -378,7 +335,7 @@ namespace KFS.src.Application.Service
             try
             {
                 var consignment = await _consignmentRepository.GetConsignmentById(id);
-                var mappedConsignment = GetConsignmentFormat(consignment);
+                var mappedConsignment = _mapper.Map<ConsignmentDto>(consignment);
                 if (mappedConsignment != null)
                 {
                     response.StatusCode = 200;
@@ -413,7 +370,7 @@ namespace KFS.src.Application.Service
             try
             {
                 var consignments = await _consignmentRepository.GetConsignmentsAdmin(consignmentQuery);
-                var mappedConsignment = GetConsignmentsFormat(consignments.List);
+                var mappedConsignment = _mapper.Map<IEnumerable<ConsignmentDto>>(consignments.List);
                 if (consignments != null && consignments.List.Count() > 0)
                 {
                     response.StatusCode = 200;
@@ -701,28 +658,12 @@ namespace KFS.src.Application.Service
                 {
                     product.IsForSell = true;
                     product.Status = ProductStatusEnum.Consignment;
-                    if (consignment.IsBatch)
-                    {
-                        foreach (var batch in product.Batches)
-                        {
-                            batch.IsForSell = true;
-                            batch.Status = ProductStatusEnum.Consignment;
-                        }
-                    }
                 }
                 else
                 {
                     product.IsForSell = false;
                     product.Status = ProductStatusEnum.Deactive;
                     product.Status = ProductStatusEnum.Deactive;
-                    if (consignment.IsBatch)
-                    {
-                        foreach (var batch in product.Batches)
-                        {
-                            batch.IsForSell = false;
-                            batch.Status = ProductStatusEnum.Deactive;
-                        }
-                    }
                 }
                 var result = await _consignmentRepository.UpdateConsignment(consignment);
                 if (result)
@@ -762,7 +703,7 @@ namespace KFS.src.Application.Service
             try
             {
                 var consignments = await _consignmentRepository.GetConsignmentsByUserId(consignmentQuery, userId);
-                var mappedConsignment = GetConsignmentsFormat(consignments.List);
+                var mappedConsignment = _mapper.Map<IEnumerable<ConsignmentDto>>(consignments.List);
                 if (consignments != null && consignments.List.Count() > 0)
                 {
                     response.StatusCode = 200;
@@ -819,7 +760,7 @@ namespace KFS.src.Application.Service
                     return response;
                 }
                 var consignments = await _consignmentRepository.GetConsignmentsByUserId(consignmentQuery, payload.UserId);
-                var mappedConsignment = GetConsignmentsFormat(consignments.List);
+                var mappedConsignment = _mapper.Map<IEnumerable<ConsignmentDto>>(consignments.List);
                 if (consignments != null && consignments.List.Count() > 0)
                 {
                     response.StatusCode = 200;
@@ -852,43 +793,6 @@ namespace KFS.src.Application.Service
                 response.IsSuccess = false;
                 return response;
             }
-        }
-        public ConsignmentDto GetConsignmentFormat(Consignment consignment)
-        {
-            var mappedConsignment = _mapper.Map<ConsignmentDto>(consignment);
-            if (consignment.IsBatch)
-            {
-                mappedConsignment.Product = null;
-                foreach (var item in consignment.Product.Batches)
-                {
-                    mappedConsignment.Batch = _mapper.Map<BatchDto>(item);
-                }
-            }
-            else
-            {
-                mappedConsignment.Batch = null;
-            }
-            return mappedConsignment;
-        }
-        public List<ConsignmentDto> GetConsignmentsFormat(List<Consignment> consignments)
-        {
-            var mappedConsignmentList = _mapper.Map<List<ConsignmentDto>>(consignments);
-            for (int i = 0; i < consignments.Count; i++)
-            {
-                if (consignments[i].IsBatch)
-                {
-                    mappedConsignmentList[i].Product = null;
-                    foreach (var item in consignments[i].Product.Batches)
-                    {
-                        mappedConsignmentList[i].Batch = _mapper.Map<BatchDto>(item);
-                    }
-                }
-                else
-                {
-                    mappedConsignmentList[i].Batch = null;
-                }
-            }
-            return mappedConsignmentList;
         }
     }
 }

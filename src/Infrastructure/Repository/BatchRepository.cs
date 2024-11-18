@@ -31,6 +31,7 @@ namespace KFS.src.Infrastructure.Repository
         {
             return await _context.Batches
             .Include(x => x.Promotions)
+            .Include(x => x.Products)
             .ToListAsync();
         }
 
@@ -38,6 +39,7 @@ namespace KFS.src.Infrastructure.Repository
         {
             return await _context.Batches
             .Include(x => x.Promotions)
+            .Include(x => x.Products)
             .FirstOrDefaultAsync(x => x.Id == id) ?? throw new Exception("Batch not found");
         }
 

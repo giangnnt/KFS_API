@@ -15,7 +15,6 @@ namespace KFS.src.Domain.Entities
         public DateTime UpdatedAt { get; set; }
         public int ConsignmentFee { get; set; }
         public DateTime ExpiryDate { get; set; }
-        public bool IsBatch { get; set; } = false;
         public User User { get; set; } = null!;
         public Product Product { get; set; } = new();
         public PaymentConsignment? Payment { get; set; }

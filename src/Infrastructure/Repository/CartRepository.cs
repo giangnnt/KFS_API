@@ -62,7 +62,6 @@ namespace KFS.src.infrastructure.Repository
 
             return await _context.Carts
             .Include(x => x.CartItems)
-            .Include(x => x.User)
             .FirstOrDefaultAsync(x => x.Id == id) ?? throw new Exception("Cart not found");
         }
 
@@ -70,7 +69,6 @@ namespace KFS.src.infrastructure.Repository
         {
             return await _context.Carts
             .Include(x => x.CartItems)
-            .ThenInclude(x => x.Product)
             .Where(x => x.UserId == userId)
             .ToListAsync();
         }
@@ -79,11 +77,6 @@ namespace KFS.src.infrastructure.Repository
         {
             return await _context.Carts
                 .Include(c => c.CartItems)
-                .ThenInclude(ci => ci.Product)
-                .Include(c => c.CartItems)
-                .ThenInclude(ci => ci.Product)
-                .ThenInclude(p => p.Batches)
-                .Include(c => c.User)
                 .ToListAsync();
         }
 

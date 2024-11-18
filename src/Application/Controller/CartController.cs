@@ -98,12 +98,12 @@ namespace KFS.src.Application.Controller
 
         [Protected]
         [Permission(PermissionSlug.MANAGE_CART, PermissionSlug.MANAGE_OWN_CART)]
-        [HttpPost("{id}/product/add")]
-        public async Task<IActionResult> AddProductToCart(Guid id, CartAddRemoveDto req)
+        [HttpPost("{id}/product/{productId}/add")]
+        public async Task<IActionResult> AddProductToCart(Guid id, Guid productId)
         {
             try
             {
-                var result = await _cartService.AddProductToCart(id, req);
+                var result = await _cartService.AddProductToCart(id, productId);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -114,12 +114,12 @@ namespace KFS.src.Application.Controller
 
         [Protected]
         [Permission(PermissionSlug.MANAGE_CART, PermissionSlug.MANAGE_OWN_CART)]
-        [HttpPost("{id}/product/remove")]
-        public async Task<IActionResult> RemoveProductFromCart(Guid id, CartAddRemoveDto req)
+        [HttpPost("{id}/cart-item/{itemId}/remove")]
+        public async Task<IActionResult> RemoveItemFromCart(Guid id, Guid itemId)
         {
             try
             {
-                var result = await _cartService.RemoveProductFromCart(id, req);
+                var result = await _cartService.RemoveItemCart(id, itemId);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -129,27 +129,12 @@ namespace KFS.src.Application.Controller
         }
         [Protected]
         [Permission(PermissionSlug.MANAGE_CART, PermissionSlug.MANAGE_OWN_CART)]
-        [HttpPost("{id}/batch/add")]
-        public async Task<IActionResult> AddBatchToCart(Guid id, BatchAddRemoveDto req)
+        [HttpPost("{id}/batch/{batchId}/add")]
+        public async Task<IActionResult> AddBatchToCart(Guid id, Guid batchId)
         {
             try
             {
-                var result = await _cartService.AddBatchToCart(id, req);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-        [Protected]
-        [Permission(PermissionSlug.MANAGE_CART, PermissionSlug.MANAGE_OWN_CART)]
-        [HttpPost("{id}/batch/remove")]
-        public async Task<IActionResult> RemoveBatchFromCart(Guid id, BatchAddRemoveDto req)
-        {
-            try
-            {
-                var result = await _cartService.RemoveBatchFromCart(id, req);
+                var result = await _cartService.AddBatchToCart(id, batchId);
                 return Ok(result);
             }
             catch (Exception ex)

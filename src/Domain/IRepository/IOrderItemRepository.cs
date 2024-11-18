@@ -8,6 +8,5 @@ namespace KFS.src.Domain.IRepository
         Task<bool> UpdateOrderItem(OrderItem orderItem);
         Task<bool> DeleteOrderItem(Guid id);
         Task<OrderItem> GetOrderItemById(Guid id);
-        Task<IEnumerable<OrderItem>> GetOrderItems();
     }
 }
