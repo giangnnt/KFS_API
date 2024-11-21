@@ -119,5 +119,20 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
+        [Protected]
+        [Permission(PermissionSlug.MANAGE_PRODUCT)]
+        [HttpPut("{id}/is-active")]
+        public async Task<IActionResult> UpdateProductIsActive(Guid id, [FromQuery] bool isActive)
+        {
+            try
+            {
+                var result = await _productService.UpdateProductIsActive(isActive, id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

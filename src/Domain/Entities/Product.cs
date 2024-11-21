@@ -12,26 +12,26 @@ namespace KFS.src.Domain.Entities
         public int? Age { get; set; }
         public int Weight { get; set; }
         public float? Length { get; set; }
-        public string? Species { get; set; }
         public string? Color { get; set; }
         public string? FeedingVolumn { get; set; }
         public float? FilterRate { get; set; }
         public GenderEnum? Gender { get; set; }
-        public int Inventory { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public Guid CategoryId { get; set; }
         public Guid? ConsignmentId { get; set; }
+        public Guid? BatchId { get; set; }
         public bool IsForSell { get; set; } = false;
         public ProductStatusEnum Status { get; set; }
+        public string? ImageUrl { get; set; }
         public Category Category { get; set; } = null!;
         public Consignment? Consignment { get; set; }
-        public List<CartItem> CartItems { get; set; } = new List<CartItem>();
-        public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
-        public List<Batch> Batches { get; set; } = new List<Batch>();
+        public List<CartItemProduct> CartItemProducts { get; set; } = new List<CartItemProduct>();
+        public List<OrderItemProduct> OrderItems { get; set; } = new List<OrderItemProduct>();
+        public Batch? Batch { get; set; }
         public List<Promotion> Promotions { get; set; } = new List<Promotion>();
         public List<Media> Medias { get; set; } = new List<Media>();
-        public List<Credential> Credentials { get; set; } = new List<Credential>();
+        public Credential? Credential { get; set; }
         public List<Feedback> Feedbacks { get; set; } = new List<Feedback>();
     }
     public class ProductResponse

@@ -25,15 +25,8 @@ namespace KFS.src.infrastructure.Repository
         public async Task<OrderItem> GetOrderItemById(Guid id)
         {
             return await _context.OrderItems
-            .Include(x => x.Product)
+            //.Include(x => x.Product)
             .FirstOrDefaultAsync(x => x.Id == id) ?? throw new Exception("OrderItem not found");
-        }
-
-        public async Task<IEnumerable<OrderItem>> GetOrderItems()
-        {
-            return await _context.OrderItems
-            .Include(x => x.Product)
-            .ToListAsync();
         }
 
         public async Task<bool> UpdateOrderItem(OrderItem orderItem)

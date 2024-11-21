@@ -103,6 +103,33 @@ namespace KFS.src.Application.Service
                     return response;
                 }
 
+                // validate cart item before checkout
+                foreach (var cartItem in cart.CartItems)
+                {
+                    if (cartItem is CartItemProduct productItem)
+                    {
+                        var product = await _productRepository.GetProductById(productItem.ProductId);
+                        if (product.Status != ProductStatusEnum.Active && product.Status != ProductStatusEnum.Consignment)
+                        {
+                            response.StatusCode = 400;
+                            response.Message = $"Product: {product.Name} is not available";
+                            response.IsSuccess = false;
+                            return response;
+                        }
+                    }
+                    if (cartItem is CartItemBatch batchItem)
+                    {
+                        var batch = await _batchRepository.GetBatchById(batchItem.BatchId);
+                        if (batch.Status != ProductStatusEnum.Active)
+                        {
+                            response.StatusCode = 400;
+                            response.Message = $"Batch: {batch.Name} is not available";
+                            response.IsSuccess = false;
+                            return response;
+                        }
+                    }
+                }
+
                 //set cart to order
                 mappedOrder = _mapper.Map(cart, mappedOrder);
 
@@ -354,31 +381,19 @@ namespace KFS.src.Application.Service
                             await _cartRepository.CreateCart(newCart);
                         }
 
-                        //update inventory
+                        //update status
                         foreach (var orderItem in order.OrderItems)
                         {
-                            // order item product
-                            if (!orderItem.IsBatch)
+                            if (orderItem is OrderItemProduct productItem)
                             {
-                                //update inventory
-                                var product = await _productRepository.GetProductById(orderItem.ProductId);
-                                product.Inventory -= orderItem.Quantity;
-                                if (product.Inventory == 0)
-                                {
-                                    product.Status = ProductStatusEnum.SoldOut;
-                                }
+                                var product = await _productRepository.GetProductById(productItem.ProductId);
+                                product.Status = ProductStatusEnum.SoldOut;
                                 await _productRepository.UpdateProduct(product);
                             }
-                            // order item batch
-                            if (orderItem.IsBatch)
+                            if (orderItem is OrderItemBatch batchItem)
                             {
-                                // update inventory
-                                var batch = await _batchRepository.GetBatchById(orderItem.BatchId);
-                                batch.Inventory -= orderItem.Quantity;
-                                if (batch.Inventory == 0)
-                                {
-                                    batch.Status = ProductStatusEnum.SoldOut;
-                                }
+                                var batch = await _batchRepository.GetBatchById(batchItem.BatchId);
+                                batch.Status = ProductStatusEnum.SoldOut;
                                 await _batchRepository.UpdateBatch(batch);
                             }
                         }
@@ -487,9 +502,6 @@ namespace KFS.src.Application.Service
                 }
 
                 var mappedOrder = _mapper.Map<OrderDto>(order);
-                //map by format
-                await GetCartFormat(mappedOrder);
-
                 response.StatusCode = 200;
                 response.Message = "Order found";
                 response.Result = new ResultDto
@@ -515,10 +527,7 @@ namespace KFS.src.Application.Service
             {
                 var orders = await _orderRepository.GetOrderByUserId(userId);
                 var mappedOrders = _mapper.Map<List<OrderDto>>(orders);
-                //map by format
-                await GetOrdersFormat(mappedOrders);
-
-                if (orders != null && orders.Count() > 0)
+                if (mappedOrders != null && orders.Count() > 0)
                 {
                     response.StatusCode = 200;
                     response.Message = "Orders found";
@@ -545,41 +554,6 @@ namespace KFS.src.Application.Service
                 return response;
             }
         }
-        public async Task GetCartFormat(OrderDto mappedOrder)
-        {
-            foreach (var orderItem in mappedOrder.OrderItems)
-            {
-                if (orderItem.IsBatch == true)
-                {
-                    var batch = await _batchRepository.GetBatchById(orderItem.BatchId);
-                    orderItem.Batch = _mapper.Map<BatchDto>(batch);
-                }
-                else
-                {
-                    var product = await _productRepository.GetProductById(orderItem.ProductId);
-                    orderItem.Product = _mapper.Map<ProductDtoNoBatch>(product);
-                }
-            }
-        }
-        public async Task GetOrdersFormat(List<OrderDto> mappedOrders)
-        {
-            foreach (var order in mappedOrders)
-            {
-                foreach (var orderItem in order.OrderItems)
-                {
-                    if (orderItem.IsBatch == true)
-                    {
-                        var batch = await _batchRepository.GetBatchById(orderItem.BatchId);
-                        orderItem.Batch = _mapper.Map<BatchDto>(batch);
-                    }
-                    else
-                    {
-                        var product = await _productRepository.GetProductById(orderItem.ProductId);
-                        orderItem.Product = _mapper.Map<ProductDtoNoBatch>(product);
-                    }
-                }
-            }
-        }
 
         public async Task<ResponseDto> GetOrders(OrderQuery req)
         {
@@ -588,10 +562,7 @@ namespace KFS.src.Application.Service
             {
                 var orders = await _orderRepository.GetOrders(req);
                 var mappedOrders = _mapper.Map<List<OrderDto>>(orders.List);
-                //map by format
-                await GetOrdersFormat(mappedOrders);
-
-                if (orders != null && orders.List.Count() > 0)
+                if (mappedOrders != null && mappedOrders.Count() > 0)
                 {
                     response.StatusCode = 200;
                     response.Message = "Orders found";
@@ -781,81 +752,78 @@ namespace KFS.src.Application.Service
                     return response;
                 }
 
-                // check product and batch empty
-                if ((req.ProductsReq == null || req.ProductsReq.Count() == 0) && (req.BatchesReq == null || req.BatchesReq.Count() == 0))
+                // check if product is available
+                if (req.ProductIds != null && req.ProductIds.Count() > 0)
                 {
-                    response.StatusCode = 400;
-                    response.Message = "Product or Batch is required";
-                    response.IsSuccess = false;
-                    return response;
-                }
-
-                // create order items product
-                if (req.ProductsReq != null && req.ProductsReq.Count() > 0)
-                {
-                    foreach (var productReq in req.ProductsReq)
+                    foreach (var productId in req.ProductIds)
                     {
-                        if (productReq.Quantity == 0)
+                        var product = await _productRepository.GetProductById(productId);
+                        if (product == null)
                         {
-                            response.StatusCode = 400;
-                            response.Message = "Quantity must be greater than 0";
+                            response.StatusCode = 404;
+                            response.Message = "Product not found";
                             response.IsSuccess = false;
                             return response;
                         }
-                        var product = await _productRepository.GetProductById(productReq.ProductId);
-                        var orderItem = new OrderItem
+                        if (product.Status != ProductStatusEnum.Active && product.Status != ProductStatusEnum.Consignment)
+                        {
+                            response.StatusCode = 400;
+                            response.Message = "Product is not available";
+                            response.IsSuccess = false;
+                            return response;
+                        }
+                        if (product.IsForSell == false)
+                        {
+                            response.StatusCode = 400;
+                            response.Message = "Product is not available";
+                            response.IsSuccess = false;
+                            return response;
+                        }
+                        // add order item
+                        var orderItem = new OrderItemProduct
                         {
                             Id = Guid.NewGuid(),
                             ProductId = product.Id,
-                            Quantity = productReq.Quantity,
                             Price = product.Price,
-                            IsBatch = false,
-                            IsConsignment = false
                         };
-                        products.Add(product);
                         orderItems.Add(orderItem);
                     }
                 }
-
-                // create order items batch
-                if (req.BatchesReq != null && req.BatchesReq.Count() > 0)
+                // check if batch is available
+                if (req.BatchIds != null && req.BatchIds.Count() > 0)
                 {
-                    foreach (var batchReq in req.BatchesReq)
+                    foreach (var batchId in req.BatchIds)
                     {
-                        if (batchReq.Quantity == 0)
+                        var batch = await _batchRepository.GetBatchById(batchId);
+                        if (batch == null)
                         {
-                            response.StatusCode = 400;
-                            response.Message = "Quantity must be greater than 0";
+                            response.StatusCode = 404;
+                            response.Message = "Batch not found";
                             response.IsSuccess = false;
                             return response;
                         }
-                        var batch = await _batchRepository.GetBatchById(batchReq.BatchId);
-                        var orderItem = new OrderItem
+                        if (batch.Status != ProductStatusEnum.Active)
+                        {
+                            response.StatusCode = 400;
+                            response.Message = "Batch is not available";
+                            response.IsSuccess = false;
+                            return response;
+                        }
+                        if (batch.IsForSell == false)
+                        {
+                            response.StatusCode = 400;
+                            response.Message = "Batch is not available";
+                            response.IsSuccess = false;
+                            return response;
+                        }
+                        // add order item
+                        var orderItem = new OrderItemBatch
                         {
                             Id = Guid.NewGuid(),
                             BatchId = batch.Id,
-                            ProductId = batch.ProductId,
-                            Quantity = batchReq.Quantity,
                             Price = batch.Price,
-                            IsBatch = true,
-                            IsConsignment = false
                         };
-                        batches.Add(batch);
                         orderItems.Add(orderItem);
-                    }
-                }
-                // check product and batch duplicate
-                if (req.ProductsReq != null && req.BatchesReq != null)
-                {
-                    foreach (var batch in batches)
-                    {
-                        if (products.Any(x => x.Id == batch.ProductId))
-                        {
-                            response.StatusCode = 400;
-                            response.Message = "You can only choose one out of two: product or cart";
-                            response.IsSuccess = false;
-                            return response;
-                        }
                     }
                 }
 
@@ -868,8 +836,8 @@ namespace KFS.src.Application.Service
                     Id = Guid.NewGuid(),
                     AddressId = address.Id,
                     UserId = payload.UserId,
-                    TotalPrice = orderItems.Sum(x => x.Price * x.Quantity),
-                    TotalItem = orderItems.Sum(x => x.Quantity),
+                    TotalPrice = orderItems.Sum(x => x.Price),
+                    TotalItem = orderItems.Count(),
                     TotalWeight = 0,
                     OrderItems = orderItems,
                     Status = OrderStatusEnum.Processing,
@@ -944,10 +912,8 @@ namespace KFS.src.Application.Service
                 var userId = payload.UserId;
                 var orders = await _orderRepository.GetOrderByUserId(userId);
                 var mappedOrders = _mapper.Map<List<OrderDto>>(orders);
-                //map by format
-                await GetOrdersFormat(mappedOrders);
 
-                if (orders != null && orders.Count() > 0)
+                if (mappedOrders != null && mappedOrders.Count() > 0)
                 {
                     response.StatusCode = 200;
                     response.Message = "Orders found";

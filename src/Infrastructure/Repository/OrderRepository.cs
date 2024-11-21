@@ -66,6 +66,7 @@ namespace KFS.src.infrastructure.Repository
             .Include(x => x.Shipment)
             .Skip((orderQuery.Page - 1) * orderQuery.PageSize)
             .Take(orderQuery.PageSize)
+            .OrderByDescending(x => x.CreatedAt)
             .ToListAsync();
             return new ObjectPaging<Order>
             {

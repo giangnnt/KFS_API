@@ -33,6 +33,10 @@ namespace KFS.src.Infrastructure.Context
         public DbSet<Wallet> Wallets { get; set; }
         public DbSet<PaymentOrder> PaymentOrders { get; set; }
         public DbSet<PaymentConsignment> PaymentConsignments { get; set; }
+        public DbSet<CartItemProduct> CartItemProducts { get; set; }
+        public DbSet<CartItemBatch> CartItemBatches { get; set; }
+        public DbSet<OrderItemProduct> OrderItemProducts { get; set; }
+        public DbSet<OrderItemBatch> OrderItemBatches { get; set; }
         public DbSet<Feedback> Feedbacks { get; set; }
         public DbSet<Credential> Credentials { get; set; }
         public DbSet<Address> Addresses { get; set; }
@@ -321,46 +325,46 @@ namespace KFS.src.Infrastructure.Context
                 .HasColumnType("nvarchar(20)");
                 entity.Property(entity => entity.CreatedAt).HasDefaultValueSql("(SYSDATETIMEOFFSET() AT TIME ZONE 'SE Asia Standard Time')");
                 entity.Property(entity => entity.Status).HasConversion(v => v.ToString(), v => v != null ? (ProductStatusEnum)Enum.Parse(typeof(ProductStatusEnum), v) : default);
-                entity.HasMany(p => p.Batches)
-                .WithOne(b => b.Product)
+                entity.HasOne(p => p.Batch)
+                .WithMany(b => b.Products)
                 .OnDelete(DeleteBehavior.Restrict);
             });
-            // seed batch
-            modelBuilder.Entity<Batch>().HasData(
-                new Batch
-                {
-                    Id = Guid.Parse("64141e04-9c9d-4bd1-94d2-84ee359f1e5b"),
-                    Name = "Batch 1",
-                    ProductId = Guid.Parse("2a9394e2-52b3-46d5-8a33-af4d6020e440"),
-                    Quantity = 10,
-                    Weight = 10000,
-                    Inventory = 10,
-                    Price = 10000,
-                    IsForSell = true
-                },
-                new Batch
-                {
-                    Id = Guid.Parse("eb5707d1-1b02-4ad5-8d6b-27a78d00f322"),
-                    Name = "Batch 2",
-                    ProductId = Guid.Parse("8657ed40-1b9d-44e2-800d-40bb1a20af98"),
-                    Quantity = 10,
-                    Inventory = 10,
-                    Weight = 20000,
-                    Price = 20000,
-                    IsForSell = true
-                },
-                new Batch
-                {
-                    Id = Guid.Parse("b6bfe977-ee7e-4e84-a65b-445c36d08d65"),
-                    Name = "Batch 3",
-                    ProductId = Guid.Parse("f3b3b3b4-1b9d-44e2-800d-40bb1a20af98"),
-                    Quantity = 10,
-                    Inventory = 10,
-                    Weight = 20000,
-                    Price = 30000,
-                    IsForSell = true
-                }
-            );
+            //// seed batch
+            //modelBuilder.Entity<Batch>().HasData(
+            //    new Batch
+            //    {
+            //        Id = Guid.Parse("64141e04-9c9d-4bd1-94d2-84ee359f1e5b"),
+            //        Name = "Batch 1",
+            //        ProductId = Guid.Parse("2a9394e2-52b3-46d5-8a33-af4d6020e440"),
+            //        Quantity = 10,
+            //        Weight = 10000,
+            //        Inventory = 10,
+            //        Price = 10000,
+            //        IsForSell = true
+            //    },
+            //    new Batch
+            //    {
+            //        Id = Guid.Parse("eb5707d1-1b02-4ad5-8d6b-27a78d00f322"),
+            //        Name = "Batch 2",
+            //        ProductId = Guid.Parse("8657ed40-1b9d-44e2-800d-40bb1a20af98"),
+            //        Quantity = 10,
+            //        Inventory = 10,
+            //        Weight = 20000,
+            //        Price = 20000,
+            //        IsForSell = true
+            //    },
+            //    new Batch
+            //    {
+            //        Id = Guid.Parse("b6bfe977-ee7e-4e84-a65b-445c36d08d65"),
+            //        Name = "Batch 3",
+            //        ProductId = Guid.Parse("f3b3b3b4-1b9d-44e2-800d-40bb1a20af98"),
+            //        Quantity = 10,
+            //        Inventory = 10,
+            //        Weight = 20000,
+            //        Price = 30000,
+            //        IsForSell = true
+            //    }
+            //);
             //config payment
             modelBuilder.Entity<Payment>(entity =>
             {
@@ -394,7 +398,6 @@ namespace KFS.src.Infrastructure.Context
                     Description = "Description for Product 1",
                     Weight = 1000,
                     Price = 10000,
-                    Inventory = 100,
                     CategoryId = Guid.Parse("5F18BF0C-7199-462C-B023-3CCF1FD9F806"),
                     Gender = GenderEnum.Male,
                     CreatedAt = DateTime.Parse("2024-10-11")
@@ -406,7 +409,6 @@ namespace KFS.src.Infrastructure.Context
                     Description = "Description for Product 2",
                     Weight = 2000,
                     Price = 20000,
-                    Inventory = 50,
                     CategoryId = Guid.Parse("3D4FC185-049D-4A96-851B-1D320E7DBBA8"),
                     Gender = GenderEnum.Female,
                     CreatedAt = DateTime.Parse("2024-10-11"),
@@ -419,7 +421,6 @@ namespace KFS.src.Infrastructure.Context
                     Description = "Description for Product 3",
                     Weight = 3000,
                     Price = 30000,
-                    Inventory = 150,
                     CategoryId = Guid.Parse("9A17DCF5-1426-45EE-A32E-C23EE5FE40D9"),
                     Gender = GenderEnum.Male,
                     CreatedAt = DateTime.Parse("2024-10-11"),
@@ -464,19 +465,11 @@ namespace KFS.src.Infrastructure.Context
             modelBuilder.Entity<CartItem>(entity =>
             {
                 entity.Property(entity => entity.Id).ValueGeneratedOnAdd();
-                entity.HasOne(entity => entity.Product)
-                .WithMany(entity => entity.CartItems)
-                .HasForeignKey(entity => entity.ProductId)
-                .OnDelete(DeleteBehavior.Restrict);
             });
             //config order item
             modelBuilder.Entity<OrderItem>(entity =>
             {
                 entity.Property(entity => entity.Id).ValueGeneratedOnAdd();
-                entity.HasOne(entity => entity.Product)
-                .WithMany(entity => entity.OrderItems)
-                .HasForeignKey(entity => entity.ProductId)
-                .OnDelete(DeleteBehavior.Restrict);
             });
             //config order
             modelBuilder.Entity<Order>(entity =>
@@ -563,9 +556,9 @@ namespace KFS.src.Infrastructure.Context
                 entity.Property(entity => entity.Id).ValueGeneratedOnAdd();
                 entity.Property(entity => entity.IsForSell).HasDefaultValue(false);
                 entity.Property(entity => entity.Status).HasConversion(v => v.ToString(), v => v != null ? (ProductStatusEnum)Enum.Parse(typeof(ProductStatusEnum), v) : default);
-                entity.HasOne(b => b.Product)
-                .WithMany(p => p.Batches)
-                .HasForeignKey(b => b.ProductId)
+                entity.HasMany(b => b.Products)
+                .WithOne(p => p.Batch)
+                .HasForeignKey(p => p.BatchId)
                 .OnDelete(DeleteBehavior.Restrict);
             });
             //config user

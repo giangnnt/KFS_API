@@ -1,6 +1,7 @@
 using AutoMapper;
 using KFS.src.Application.Dto.ProductDtos;
 using KFS.src.Application.Dto.ResponseDtos;
+using KFS.src.Application.Enum;
 using KFS.src.Domain.Entities;
 using KFS.src.Domain.IRepository;
 using KFS.src.Domain.IService;
@@ -29,11 +30,12 @@ namespace KFS.src.Application.Service
             {
                 //map product
                 var mappedProduct = _mapper.Map<Product>(req);
+                mappedProduct.IsForSell = true;
                 //check if category id is empty
                 if (req.CategoryId == Guid.Empty)
                 {
                     response.StatusCode = 400;
-                    response.Message = "Category Id is required";
+                    response.Message = "Category id is required";
                     response.IsSuccess = false;
                     return response;
                 }
@@ -227,10 +229,6 @@ namespace KFS.src.Application.Service
                 if (product != null)
                 {
                     product.IsForSell = isForSell;
-                    foreach (var batch in product.Batches)
-                    {
-                        batch.IsForSell = isForSell;
-                    }
                     var result = _productRepository.UpdateProduct(product);
                     if (result.Result)
                     {
@@ -273,19 +271,6 @@ namespace KFS.src.Application.Service
                 var product = await _productRepository.GetProductById(id);
                 //map product
                 var mappedProduct = _mapper.Map(req, product);
-                if (req.CategoryId != null)
-                {
-                    var Category = await _categoryRepository.GetCategoryById(req.CategoryId.Value);
-                    mappedProduct.CategoryId = req.CategoryId.Value;
-                    mappedProduct.Category = Category;
-                    if (Category == null)
-                    {
-                        response.StatusCode = 404;
-                        response.Message = "Category not found";
-                        response.IsSuccess = false;
-                        return response;
-                    }
-                }
                 //update product
                 var result = await _productRepository.UpdateProduct(product);
                 //check resultF
@@ -300,6 +285,49 @@ namespace KFS.src.Application.Service
                 {
                     response.StatusCode = 400;
                     response.Message = "Product update failed";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
+            }
+        }
+
+        public async Task<ResponseDto> UpdateProductIsActive(bool isActive, Guid id)
+        {
+            var response = new ResponseDto();
+            try
+            {
+                //get product by id
+                var product = _productRepository.GetProductById(id).Result;
+                if (product != null)
+                {
+                    product.Status = isActive == true ? ProductStatusEnum.Active : ProductStatusEnum.Deactive;
+                    var result = await _productRepository.UpdateProduct(product);
+                    if (result)
+                    {
+                        response.StatusCode = 200;
+                        response.Message = "Product updated successfully";
+                        response.IsSuccess = true;
+                        return response;
+                    }
+                    else
+                    {
+                        response.StatusCode = 400;
+                        response.Message = "Product update failed";
+                        response.IsSuccess = false;
+                        return response;
+                    }
+                }
+                else
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Product not found";
                     response.IsSuccess = false;
                     return response;
                 }

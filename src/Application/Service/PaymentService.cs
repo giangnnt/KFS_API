@@ -76,32 +76,19 @@ namespace KFS.src.Application.Service
                     CreatedAt = DateTime.Now
                 };
                 var result = await _paymentRepository.CreatePayment(payment);
+                // update item
                 foreach (var orderItem in order.OrderItems)
                 {
-                    // order item product
-                    if (!orderItem.IsBatch)
+                    if (orderItem is OrderItemProduct productItem)
                     {
-                        //update inventory
-                        var product = await _productRepository.GetProductById(orderItem.ProductId);
-                        product.Inventory -= orderItem.Quantity;
-                        if (product.Inventory == 0)
-                        {
-                            product.Status = ProductStatusEnum.SoldOut;
-                        }
+                        var product = await _productRepository.GetProductById(productItem.ProductId);
+                        product.Status = ProductStatusEnum.SoldOut;
                         await _productRepository.UpdateProduct(product);
-                        //get credential
-                        listCredential.AddRange(product.Credentials);
                     }
-                    // order item batch
-                    if (orderItem.IsBatch)
+                    if (orderItem is OrderItemBatch batchItem)
                     {
-                        // update inventory
-                        var batch = await _batchRepository.GetBatchById(orderItem.BatchId);
-                        batch.Inventory -= orderItem.Quantity;
-                        if (batch.Inventory == 0)
-                        {
-                            batch.Status = ProductStatusEnum.SoldOut;
-                        }
+                        var batch = await _batchRepository.GetBatchById(batchItem.BatchId);
+                        batch.Status = ProductStatusEnum.SoldOut;
                         await _batchRepository.UpdateBatch(batch);
                     }
                 }
@@ -183,30 +170,16 @@ namespace KFS.src.Application.Service
                     }
                     foreach (var orderItem in order.OrderItems)
                     {
-                        // order item product
-                        if (!orderItem.IsBatch)
+                        if (orderItem is OrderItemProduct productItem)
                         {
-                            //update inventory
-                            var product = await _productRepository.GetProductById(orderItem.ProductId);
-                            product.Inventory -= orderItem.Quantity;
-                            if (product.Inventory == 0)
-                            {
-                                product.Status = ProductStatusEnum.SoldOut;
-                            }
+                            var product = await _productRepository.GetProductById(productItem.ProductId);
+                            product.Status = ProductStatusEnum.SoldOut;
                             await _productRepository.UpdateProduct(product);
-                            //get credential
-                            listCredential.AddRange(product.Credentials);
                         }
-                        // order item batch
-                        if (orderItem.IsBatch)
+                        if (orderItem is OrderItemBatch batchItem)
                         {
-                            // update inventory
-                            var batch = await _batchRepository.GetBatchById(orderItem.BatchId);
-                            batch.Inventory -= orderItem.Quantity;
-                            if (batch.Inventory == 0)
-                            {
-                                batch.Status = ProductStatusEnum.SoldOut;
-                            }
+                            var batch = await _batchRepository.GetBatchById(batchItem.BatchId);
+                            batch.Status = ProductStatusEnum.SoldOut;
                             await _batchRepository.UpdateBatch(batch);
                         }
                     }

@@ -12,5 +12,6 @@ namespace KFS.src.Domain.IRepository
         public Task<bool> CreateProduct(Product product);
         public Task<bool> UpdateProduct(Product product);
         public Task<bool> DeleteProduct(Guid id);
+        public Task<IEnumerable<Product>> GetProductsByBatchId(Guid id);
     }
 }

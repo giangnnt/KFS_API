@@ -1,4 +1,5 @@
 using KFS.src.Application.Dto.ProductDtos;
+using KFS.src.Application.Enum;
 using KFS.src.Domain.Entities;
 using KFS.src.Domain.IRepository;
 using KFS.src.Infrastructure.Context;
@@ -20,8 +21,8 @@ namespace KFS.src.infrastructure.Repository
             // search syntax
             query = query.Where(p => EF.Functions.Like(p.Name, $"%{productQuery.Name}%") || string.IsNullOrEmpty(productQuery.Name));
             query = query.Where(p => EF.Functions.Like(p.Origin, $"%{productQuery.Origin}%") || string.IsNullOrEmpty(productQuery.Origin));
-            query = query.Where(p => EF.Functions.Like(p.Species, $"%{productQuery.Species}%") || string.IsNullOrEmpty(productQuery.Species));
             query = query.Where(p => (p.Price >= productQuery.PriceStart && p.Price <= productQuery.PriceEnd) || (productQuery.PriceStart == 0 && productQuery.PriceEnd == 0));
+            query = query.Where(p => p.Status == ProductStatusEnum.Active || p.Status == ProductStatusEnum.Consignment);
             //set total 
             var total = await query.CountAsync();
 
@@ -29,7 +30,6 @@ namespace KFS.src.infrastructure.Repository
             var productList = await query
             .Include(x => x.Category)
             .Include(x => x.Promotions)
-            .Include(x => x.Batches)
             .Include(x => x.Medias)
             .Skip((productQuery.Page - 1) * productQuery.PageSize)
             .Take(productQuery.PageSize)
@@ -45,7 +45,6 @@ namespace KFS.src.infrastructure.Repository
             return await _context.Products
             .Include(x => x.Category)
             .Include(x => x.Promotions)
-            .Include(x => x.Batches)
             .Include(x => x.Medias)
             .FirstOrDefaultAsync(x => x.Id == id) ?? throw new Exception("Product not found");
         }
@@ -79,9 +78,7 @@ namespace KFS.src.infrastructure.Repository
             // search syntax
             query = query.Where(p => EF.Functions.Like(p.Name, $"%{productQuery.Name}%") || string.IsNullOrEmpty(productQuery.Name));
             query = query.Where(p => EF.Functions.Like(p.Origin, $"%{productQuery.Origin}%") || string.IsNullOrEmpty(productQuery.Origin));
-            query = query.Where(p => EF.Functions.Like(p.Species, $"%{productQuery.Species}%") || string.IsNullOrEmpty(productQuery.Species));
             query = query.Where(p => p.IsForSell == productQuery.IsForSell || productQuery.IsForSell == null);
-            query = query.Where(p => p.Inventory <= productQuery.InventoryLowerThan || productQuery.InventoryLowerThan == null);
             query = query.Where(p => (p.Price >= productQuery.PriceStart && p.Price <= productQuery.PriceEnd) || (productQuery.PriceStart == 0 && productQuery.PriceEnd == 0));
             //set total 
             var total = await query.CountAsync();
@@ -90,7 +87,6 @@ namespace KFS.src.infrastructure.Repository
             var productList = await query
             .Include(x => x.Category)
             .Include(x => x.Promotions)
-            .Include(x => x.Batches)
             .Include(x => x.Medias)
             .Skip((productQuery.Page - 1) * productQuery.PageSize)
             .Take(productQuery.PageSize)
@@ -100,6 +96,11 @@ namespace KFS.src.infrastructure.Repository
                 List = productList,
                 Total = total
             };
+        }
+
+        public async Task<IEnumerable<Product>> GetProductsByBatchId(Guid id)
+        {
+            return await _context.Products.Where(x => x.BatchId == id).ToListAsync();
         }
     }
 }

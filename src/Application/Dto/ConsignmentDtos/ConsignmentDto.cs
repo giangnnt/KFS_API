@@ -22,9 +22,9 @@ namespace KFS.src.Application.Dto.ConsignmentDtos
         public DateTime UpdatedAt { get; set; }
         public int ConsignmentFee { get; set; }
         public DateTime ExpiryDate { get; set; }
-        public bool IsBatch { get; set; }
-        public ProductDtoNoBatch? Product { get; set; } = new();
+        public ProductDto? Product { get; set; } = new();
         public BatchDto? Batch { get; set; } = new();
+        public string? ImageUrl { get; set; }
     }
     public class ConsignmentProfile : Profile
     {

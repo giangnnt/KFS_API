@@ -20,7 +20,7 @@ namespace KFS.src.infrastructure.Repository
             var payments = _context.Payments.Where(x => x.UserId == userId);
             var order = payments.OfType<PaymentOrder>().Select(x => x.Order);
             var orderItems = order.Select(x => x.OrderItems);
-            var productIds = orderItems.SelectMany(x => x).Select(x => x.ProductId);
+            var productIds = orderItems.OfType<OrderItemProduct>().Select(x => x.ProductId);
             return productIds.Contains(productId);
         }
 

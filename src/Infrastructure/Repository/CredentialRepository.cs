@@ -43,16 +43,15 @@ namespace KFS.src.Infrastructure.Repository
 
         public async Task<List<Credential>> GetCredentialsByUserOrderHistory(Guid userId)
         {
-            var orders = await _context.Orders
+            var credentials = await _context.Orders
                 .Include(x => x.OrderItems)
-                .ThenInclude(x => x.Product)
-                .ThenInclude(x => x.Credentials)
                 .Where(x => x.UserId == userId)
+                .OfType<OrderItemProduct>()
+                .Include(x => x.Product)
+                .Select(x => x.Product.Credential)
                 .ToListAsync();
 
-            return orders.SelectMany(order => order.OrderItems)
-                         .SelectMany(orderItem => orderItem.Product.Credentials)
-                         .ToList();
+            return credentials;
         }
 
         public async Task<bool> UpdateCredential(Credential credential)

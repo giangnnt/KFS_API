@@ -30,18 +30,7 @@ namespace KFS.src.infrastructure.Repository
 
         public async Task<CartItem> GetCartItemById(Guid id)
         {
-            return await _context.CartItems
-            .Include(x => x.Product)
-            .Include(x => x.Cart)
-            .FirstOrDefaultAsync(x => x.Id == id) ?? throw new Exception("Cart item not found");
-        }
-
-        public async Task<IEnumerable<CartItem>> GetCartItems()
-        {
-            return await _context.CartItems
-            .Include(x => x.Product)
-            .Include(x => x.Cart)
-            .ToListAsync();
+            return await _context.CartItems.FirstOrDefaultAsync(x => x.Id == id) ?? throw new Exception("cart item not found");
         }
 
         public async Task<bool> UpdateCartItem(CartItem cartItem)

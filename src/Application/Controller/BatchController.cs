@@ -44,12 +44,12 @@ namespace KFS.src.Application.Controller
         }
         [Protected]
         [Permission(PermissionSlug.MANAGE_BATCH)]
-        [HttpPost("product/{id}")]
-        public async Task<IActionResult> CreateBatch(BatchCreate req, Guid id)
+        [HttpPost()]
+        public async Task<IActionResult> CreateBatch(BatchCreate req)
         {
             try
             {
-                var result = await _batchService.CreateBatchFromProduct(req, id);
+                var result = await _batchService.CreateBatch(req);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -80,6 +80,21 @@ namespace KFS.src.Application.Controller
             try
             {
                 var result = await _batchService.DeleteBatch(id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [Protected]
+        [Permission(PermissionSlug.MANAGE_BATCH)]
+        [HttpPut("{id}/is-active")]
+        public async Task<IActionResult> UpdateBatchIsActive(bool isActive, Guid id)
+        {
+            try
+            {
+                var result = await _batchService.UpdateBatchIsActive(isActive, id);
                 return Ok(result);
             }
             catch (Exception ex)
