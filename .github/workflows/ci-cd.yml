@@ -44,4 +44,4 @@ jobs:
           script: |
             docker pull ${{ secrets.DOCKER_USERNAME }}/kfs_api:latest
             cd /etc/docker
-            docker compose up --build
+            docker compose up --build -d
