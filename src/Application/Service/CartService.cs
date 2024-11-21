@@ -583,5 +583,72 @@ namespace KFS.src.Application.Service
                 return response;
             }
         }
+
+        public async Task<ResponseDto> GetOwnCartCurrentActive()
+        {
+            var response = new ResponseDto();
+            try
+            {
+                var httpContext = _httpContextAccessor.HttpContext;
+                // check httpContext
+                if (httpContext == null)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Http context is required";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                // get payload
+                var payload = httpContext.Items["payload"] as Payload;
+                // check payload
+                if (payload == null)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Payload is required";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                // get userId
+                var userId = payload.UserId;
+                var carts = await _cartRepository.GetOwnCartCurrentActive(userId);
+                var mappedCarts = _mapper.Map<List<CartDto>>(carts);
+                if (mappedCarts != null && mappedCarts.Count() > 0)
+                {
+                    var cart = mappedCarts.FirstOrDefault(x => x.Status == CartStatusEnum.Active);
+                    if (cart != null)
+                    {
+                        response.StatusCode = 200;
+                        response.Message = "Cart found";
+                        response.IsSuccess = true;
+                        response.Result = new ResultDto
+                        {
+                            Data = cart
+                        };
+                        return response;
+                    }
+                    else
+                    {
+                        response.StatusCode = 404;
+                        response.Message = "Cart not found";
+                        response.IsSuccess = false;
+                        return response;
+                    }
+                }
+                else
+                {
+                    response.StatusCode = 404;
+                    response.Message = "Cart not found";
+                    response.IsSuccess = false;
+                    return response;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                response.IsSuccess = false;
+                return response;
+            }
+        }
     }
 }

@@ -1,4 +1,5 @@
 using KFS.src.Application.Dto.ProductDtos;
+using KFS.src.Application.Enum;
 using KFS.src.Domain.Entities;
 using KFS.src.Domain.IRepository;
 using KFS.src.Infrastructure.Context;
@@ -21,6 +22,7 @@ namespace KFS.src.infrastructure.Repository
             query = query.Where(p => EF.Functions.Like(p.Name, $"%{productQuery.Name}%") || string.IsNullOrEmpty(productQuery.Name));
             query = query.Where(p => EF.Functions.Like(p.Origin, $"%{productQuery.Origin}%") || string.IsNullOrEmpty(productQuery.Origin));
             query = query.Where(p => (p.Price >= productQuery.PriceStart && p.Price <= productQuery.PriceEnd) || (productQuery.PriceStart == 0 && productQuery.PriceEnd == 0));
+            query = query.Where(p => p.Status == ProductStatusEnum.Active || p.Status == ProductStatusEnum.Consignment);
             //set total 
             var total = await query.CountAsync();
 

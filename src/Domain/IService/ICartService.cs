@@ -15,5 +15,6 @@ namespace KFS.src.Domain.IService
         Task<ResponseDto> AddBatchToCart(Guid id, Guid batchId);
         Task<ResponseDto> GetCartByUserId(Guid userId);
         Task<ResponseDto> GetOwnCart();
+        Task<ResponseDto> GetOwnCartCurrentActive();
     }
 }

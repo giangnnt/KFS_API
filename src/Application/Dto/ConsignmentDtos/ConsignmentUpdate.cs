@@ -6,5 +6,6 @@ namespace KFS.src.Application.Dto.ConsignmentDtos
         public int? DealingAmount { get; set; }
         public int ConsignmentFee { get; set; }
         public DateTime ExpiryDate { get; set; }
+        public string? ImageUrl { get; set; }
     }
 }

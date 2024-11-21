@@ -16,5 +16,6 @@ namespace KFS.src.Application.Dto.ProductDtos
         public float? FilterRate { get; set; }
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public GenderEnum? Gender { get; set; }
+        public string? ImageUrl { get; set; }
     }
 }

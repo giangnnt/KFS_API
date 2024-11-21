@@ -72,7 +72,7 @@ namespace KFS.src.Application.Service
                 var consignment = new Consignment
                 {
                     UserId = payload.UserId,
-                    Method = ConsignmentMethodEnum.Offline,
+                    Method = req.Method,
                     CommissionPercentage = req.CommissionPercentage,
                     DealingAmount = req.DealingAmount,
                     ConsignmentFee = req.ConsignmentFee,
@@ -126,13 +126,22 @@ namespace KFS.src.Application.Service
             {
                 var orderItem = await _orderItemRepository.GetOrderItemById(req.OrderItemId);
                 var order = await _orderRepository.GetOrderById(req.OrderId);
-                if(orderItem is not OrderItemProduct productItem)
+                if (orderItem is not OrderItemProduct productItem)
                 {
                     response.StatusCode = 400;
                     response.Message = "Order item is not product";
                     response.IsSuccess = false;
                     return response;
                 }
+                if (orderItem.IsConsignment)
+                {
+                    response.StatusCode = 400;
+                    response.Message = "Order item is already consignment";
+                    response.IsSuccess = false;
+                    return response;
+                }
+                // get product
+                var product = await _productRepository.GetProductById(productItem.ProductId);
                 if (order == null)
                 {
                     response.StatusCode = 404;
@@ -164,30 +173,25 @@ namespace KFS.src.Application.Service
                     response.IsSuccess = false;
                     return response;
                 }
-                // set to 0 if not for sell
-                if (req.IsForSell != true)
-                {
-                    req.CommissionPercentage = 0;
-                    req.DealingAmount = 0;
-                }
                 var consignment = new Consignment
                 {
                     UserId = order.UserId,
-                    Method = ConsignmentMethodEnum.Online,
-                    CommissionPercentage = req.CommissionPercentage,
-                    DealingAmount = req.DealingAmount,
+                    OrderItemId = req.OrderItemId,
+                    Method = ConsignmentMethodEnum.Caring,
+                    CommissionPercentage = 0,
+                    DealingAmount = 0,
                     ConsignmentFee = req.ConsignmentFee,
                     Status = ConsignmentStatusEnum.Pending,
-                    IsForSell = req.IsForSell,
-                    ExpiryDate = req.ExpiryDate
+                    IsForSell = false,
+                    ExpiryDate = req.ExpiryDate,
+                    ImageUrl = product.ImageUrl,
                 };
-                var product = await _productRepository.GetProductById(productItem.ProductId);
                 consignment.Product = new Product
                 {
                     IsForSell = false,
                     Name = product.Name,
                     Description = product.Description,
-                    Price = req.DealingAmount,
+                    Price = 0,
                     Origin = product.Origin,
                     Category = product.Category,
                     CategoryId = product.CategoryId,
@@ -303,7 +307,25 @@ namespace KFS.src.Application.Service
                     return response;
                 }
                 // update consignment status
-                consignment.Status = isApproved ? ConsignmentStatusEnum.Approved : ConsignmentStatusEnum.Rejected;
+                if (!isApproved)
+                {
+                    consignment.Status = ConsignmentStatusEnum.Rejected;
+                    // update product
+                    var product = consignment.Product;
+                    product.Status = ProductStatusEnum.Deactive;
+                    await _productRepository.UpdateProduct(product);
+                    // update order item
+                    if (consignment.OrderItemId != null)
+                    {
+                        var orderItem = await _orderItemRepository.GetOrderItemById(consignment.OrderItemId.Value);
+                        orderItem.IsConsignment = false;
+                        await _orderItemRepository.UpdateOrderItem(orderItem);
+                    }
+                }
+                else
+                {
+                    consignment.Status = ConsignmentStatusEnum.Approved;
+                }
                 var result = await _consignmentRepository.UpdateConsignment(consignment);
                 if (result)
                 {
@@ -570,34 +592,21 @@ namespace KFS.src.Application.Service
                 //check response
                 if (vnPayResponseModel.Success == false || vnPayResponseModel.VnPayResponseCode != "00" || vnPayResponseModel.TransactionStatus != "00")
                 {
-                    var payment = new PaymentConsignment
+                    // get order
+                    var order = await _orderRepository.GetOrderById(Guid.Parse(vnPayResponseModel.OrderId));
+                    //update consignment order item status
+                    foreach (var item in order.OrderItems)
                     {
-                        Id = Guid.NewGuid(),
-                        PaymentType = "Consignment",
-                        Amount = decimal.Parse(vnPayResponseModel.Amount) / 100,
-                        CreatedAt = DateTime.Now,
-                        Currency = "VND",
-                        ConsignmentId = Guid.Parse(vnPayResponseModel.OrderId),
-                        PaymentMethod = PaymentMethodEnum.VNPAY,
-                        Status = PaymentStatusEnum.Failed,
-                        TransactionId = vnPayResponseModel.PaymentId,
-                        UserId = _consignmentRepository.GetConsignmentById(Guid.Parse(vnPayResponseModel.OrderId)).Result.UserId
-                    };
-                    var result = await _paymentRepository.CreatePayment(payment);
-                    if (result)
-                    {
-                        response.StatusCode = 400;
-                        response.Message = "Payment created successfully" + vnPayResponseModel.VnPayResponseCode;
-                        response.IsSuccess = false;
-                        return response;
+                        if (item.IsConsignment)
+                        {
+                            item.IsConsignment = false;
+                            await _orderItemRepository.UpdateOrderItem(item);
+                        }
                     }
-                    else
-                    {
-                        response.StatusCode = 400;
-                        response.Message = "Payment creation failed" + vnPayResponseModel.VnPayResponseCode;
-                        response.IsSuccess = false;
-                        return response;
-                    }
+                    response.StatusCode = 400;
+                    response.Message = "Payment creation failed" + vnPayResponseModel.VnPayResponseCode;
+                    response.IsSuccess = false;
+                    return response;
                 }
                 else
                 {

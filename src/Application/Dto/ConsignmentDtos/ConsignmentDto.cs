@@ -24,6 +24,7 @@ namespace KFS.src.Application.Dto.ConsignmentDtos
         public DateTime ExpiryDate { get; set; }
         public ProductDto? Product { get; set; } = new();
         public BatchDto? Batch { get; set; } = new();
+        public string? ImageUrl { get; set; }
     }
     public class ConsignmentProfile : Profile
     {

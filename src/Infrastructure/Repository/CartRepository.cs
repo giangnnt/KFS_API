@@ -1,3 +1,4 @@
+using KFS.src.Application.Enum;
 using KFS.src.Domain.Entities;
 using KFS.src.Domain.IRepository;
 using KFS.src.Infrastructure.Context;
@@ -59,25 +60,102 @@ namespace KFS.src.infrastructure.Repository
 
         public async Task<Cart> GetCartById(Guid id)
         {
-
-            return await _context.Carts
-            .Include(x => x.CartItems)
-            .FirstOrDefaultAsync(x => x.Id == id) ?? throw new Exception("Cart not found");
+            var cartItemProduct = await _context.CartItems
+                .Where(x => x.CartId == id)
+                .OfType<CartItemProduct>()
+                .Include(x => x.Product)
+                .ToListAsync();
+            var cartItemBatch = await _context.CartItems
+                .Where(x => x.CartId == id)
+                .OfType<CartItemBatch>()
+                .Include(x => x.Batch)
+                .ToListAsync();
+            var cartItems = new List<CartItem>();
+            cartItems.AddRange(cartItemProduct);
+            cartItems.AddRange(cartItemBatch);
+            var cart = await _context.Carts
+                .Include(x => x.CartItems)
+                .FirstOrDefaultAsync(x => x.Id == id) ?? throw new Exception("Cart not found");
+            cart.CartItems = cartItems;
+            return cart;
         }
 
         public async Task<IEnumerable<Cart>> GetCartByUserId(Guid userId)
         {
-            return await _context.Carts
+            var carts =  await _context.Carts
             .Include(x => x.CartItems)
             .Where(x => x.UserId == userId)
             .ToListAsync();
+            foreach (var cart in carts)
+            {
+                var cartItemProduct = await _context.CartItems
+                    .Where(x => x.CartId == cart.Id)
+                    .OfType<CartItemProduct>()
+                    .Include(x => x.Product)
+                    .ToListAsync();
+                var cartItemBatch = await _context.CartItems
+                    .Where(x => x.CartId == cart.Id)
+                    .OfType<CartItemBatch>()
+                    .Include(x => x.Batch)
+                    .ToListAsync();
+                var cartItems = new List<CartItem>();
+                cartItems.AddRange(cartItemProduct);
+                cartItems.AddRange(cartItemBatch);
+                cart.CartItems = cartItems;
+            }
+            return carts;
         }
 
         public async Task<IEnumerable<Cart>> GetCarts()
         {
-            return await _context.Carts
-                .Include(c => c.CartItems)
+            var carts = await _context.Carts.AsQueryable()
+                .Include(x => x.CartItems)
                 .ToListAsync();
+            foreach (var cart in carts)
+            {
+                var cartItemProduct = await _context.CartItems
+                    .Where(x => x.CartId == cart.Id)
+                    .OfType<CartItemProduct>()
+                    .Include(x => x.Product)
+                    .ToListAsync();
+                var cartItemBatch = await _context.CartItems
+                    .Where(x => x.CartId == cart.Id)
+                    .OfType<CartItemBatch>()
+                    .Include(x => x.Batch)
+                    .ToListAsync();
+                var cartItems = new List<CartItem>();
+                cartItems.AddRange(cartItemProduct);
+                cartItems.AddRange(cartItemBatch);
+                cart.CartItems = cartItems;
+            }
+            return carts;
+        }
+
+        public async Task<IEnumerable<Cart>> GetOwnCartCurrentActive(Guid userId)
+        {
+            var carts = await _context.Carts.AsQueryable()
+                .Include(x => x.CartItems)
+                .Where(x => x.UserId == userId)
+                .Where(x => x.Status == CartStatusEnum.Active)
+                .ToListAsync();
+            foreach (var cart in carts)
+            {
+                var cartItemProduct = await _context.CartItems
+                    .Where(x => x.CartId == cart.Id)
+                    .OfType<CartItemProduct>()
+                    .Include(x => x.Product)
+                    .ToListAsync();
+                var cartItemBatch = await _context.CartItems
+                    .Where(x => x.CartId == cart.Id)
+                    .OfType<CartItemBatch>()
+                    .Include(x => x.Batch)
+                    .ToListAsync();
+                var cartItems = new List<CartItem>();
+                cartItems.AddRange(cartItemProduct);
+                cartItems.AddRange(cartItemBatch);
+                cart.CartItems = cartItems;
+            }
+            return carts;
         }
 
         public async Task<bool> UpdateCart(Cart cart)

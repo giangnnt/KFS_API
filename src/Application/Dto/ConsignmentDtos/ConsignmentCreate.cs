@@ -7,6 +7,7 @@ namespace KFS.src.Application.Dto.ConsignmentDtos
     {
         public string Name { get; set; } = null!;
         public string? Description { get; set; }
+        public ConsignmentMethodEnum Method { get; set; }
         public int CommissionPercentage { get; set; }
         public int DealingAmount { get; set; }
         public int ConsignmentFee { get; set; }
@@ -20,5 +21,6 @@ namespace KFS.src.Application.Dto.ConsignmentDtos
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public GenderEnum? Gender { get; set; }
         public Guid CategoryId { get; set; }
+        public string? ImageUrl { get; set; }
     }
 }

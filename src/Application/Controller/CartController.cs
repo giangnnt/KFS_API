@@ -172,5 +172,20 @@ namespace KFS.src.Application.Controller
                 return BadRequest(ex.Message);
             }
         }
+        [Protected]
+        [Permission(PermissionSlug.MANAGE_CART, PermissionSlug.MANAGE_OWN_CART)]
+        [HttpGet("own/current-active")]
+        public async Task<IActionResult> GetOwnCartCurrentActive()
+        {
+            try
+            {
+                var result = await _cartService.GetOwnCartCurrentActive();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

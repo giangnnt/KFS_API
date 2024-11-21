@@ -12,6 +12,8 @@ namespace KFS.src.Application.Dto.CartItemDtos
         public decimal Price { get; set; }
         public Guid? ProductId { get; set; }
         public Guid? BatchId { get; set; }
+        public ProductDto? Product { get; set; }
+        public BatchDto? Batch { get; set; }
     }
     public class CartItemProfile : Profile
     {
@@ -24,10 +26,12 @@ namespace KFS.src.Application.Dto.CartItemDtos
 
             CreateMap<CartItemProduct, CartItemDto>()
                 .ForMember(dest => dest.ProductId, opt => opt.MapFrom(src => src.ProductId))
+                .ForMember(dest => dest.Product, opt => opt.MapFrom(src => src.Product))
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
             CreateMap<CartItemBatch, CartItemDto>()
                 .ForMember(dest => dest.BatchId, opt => opt.MapFrom(src => src.BatchId))
+                .ForMember(dest => dest.Batch, opt => opt.MapFrom(src => src.Batch))
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
         }
     }

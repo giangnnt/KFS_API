@@ -18,5 +18,6 @@ namespace KFS.src.Application.Dto.ProductDtos
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public GenderEnum? Gender { get; set; }
         public Guid CategoryId { get; set; }
+        public string? ImageUrl { get; set; }
     }
 }

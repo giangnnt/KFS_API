@@ -32,6 +32,7 @@ namespace KFS.src.Application.Dto.ProductDtos
         public ProductStatusEnum Status { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+        public string? ImageUrl { get; set; }
         public List<PromotionDto>? Promotions { get; set; }
         public List<MediaDto>? Medias { get; set; }
         public List<FeedbackDto>? Feedbacks { get; set; }
