@@ -62,6 +62,7 @@ namespace KFS.src.infrastructure.Repository
             .Include(x => x.Payment)
             .Include(x => x.Shipment)
             .Where(x => x.UserId == userId)
+            .OrderByDescending(x => x.CreatedAt)
             .ToListAsync();
             foreach (var order in orders)
             {
