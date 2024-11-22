@@ -1,6 +1,6 @@
 services:
   webapp:
-    image: giangnnt260703/kfs_api:v4.5
+    image: giangnnt260703/kfs_api:latest
     ports:
       - "8080:8080"
     restart: on-failure

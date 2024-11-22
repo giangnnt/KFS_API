@@ -33,21 +33,55 @@ namespace KFS.src.infrastructure.Repository
 
         public async Task<Order> GetOrderById(Guid orderId)
         {
-            return await _context.Orders
+            var orderItemProduct = await _context.OrderItems
+                .Where(x => x.OrderId == orderId)
+                .OfType<OrderItemProduct>()
+                .Include(x => x.Product)
+                .ToListAsync();
+            var orderItemBatch = await _context.OrderItems
+                .Where(x => x.OrderId == orderId)
+                .OfType<OrderItemBatch>()
+                .Include(x => x.Batch)
+                .ToListAsync();
+            var orders = await _context.Orders
             .Include(x => x.OrderItems)
             .Include(x => x.Payment)
             .Include(x => x.Shipment)
             .FirstOrDefaultAsync(x => x.Id == orderId) ?? throw new Exception("Order not found");
+            var orderItems = new List<OrderItem>();
+            orderItems.AddRange(orderItemProduct);
+            orderItems.AddRange(orderItemBatch);
+            orders.OrderItems = orderItems;
+            return orders;
         }
 
         public async Task<IEnumerable<Order>> GetOrderByUserId(Guid userId)
         {
-            return await _context.Orders
+            var  orders = await _context.Orders
             .Include(x => x.OrderItems)
             .Include(x => x.Payment)
             .Include(x => x.Shipment)
             .Where(x => x.UserId == userId)
+            .OrderByDescending(x => x.CreatedAt)
             .ToListAsync();
+            foreach (var order in orders)
+            {
+                var orderItemProduct = await _context.OrderItems
+                    .Where(x => x.OrderId == order.Id)
+                    .OfType<OrderItemProduct>()
+                    .Include(x => x.Product)
+                    .ToListAsync();
+                var orderItemBatch = await _context.OrderItems
+                    .Where(x => x.OrderId == order.Id)
+                    .OfType<OrderItemBatch>()
+                    .Include(x => x.Batch)
+                    .ToListAsync();
+                var orderItems = new List<OrderItem>();
+                orderItems.AddRange(orderItemProduct);
+                orderItems.AddRange(orderItemBatch);
+                order.OrderItems = orderItems;
+            }
+            return orders;
         }
 
         public async Task<ObjectPaging<Order>> GetOrders(OrderQuery orderQuery)
@@ -58,6 +92,24 @@ namespace KFS.src.infrastructure.Repository
             query = query.Where(p => p.Status == orderQuery.Status || orderQuery.Status == null);
             //set total
             var total = await query.CountAsync();
+
+            foreach (var order in query)
+            {
+                var orderItemProduct = await _context.OrderItems
+                    .Where(x => x.OrderId == order.Id)
+                    .OfType<OrderItemProduct>()
+                    .Include(x => x.Product)
+                    .ToListAsync();
+                var orderItemBatch = await _context.OrderItems
+                    .Where(x => x.OrderId == order.Id)
+                    .OfType<OrderItemBatch>()
+                    .Include(x => x.Batch)
+                    .ToListAsync();
+                var orderItems = new List<OrderItem>();
+                orderItems.AddRange(orderItemProduct);
+                orderItems.AddRange(orderItemBatch);
+                order.OrderItems = orderItems;
+            }
 
             // return
             var orderList = await query
