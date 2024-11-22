@@ -33,7 +33,7 @@ namespace KFS.src.Application.Controller
         }
         [Protected]
         [Permission(PermissionSlug.MANAGE_SHIPMENT)]
-        [HttpPost("{id}")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> UpdateShipment(UpdateDto updateDto, Guid id)
         {
             try

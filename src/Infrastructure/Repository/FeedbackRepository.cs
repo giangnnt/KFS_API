@@ -1,5 +1,6 @@
 using KFS.src.Application.Dto.FeedbackDtos;
 using KFS.src.Application.Dto.Pagination;
+using KFS.src.Application.Enum;
 using KFS.src.Domain.Entities;
 using KFS.src.Domain.IRepository;
 using KFS.src.Infrastructure.Context;
@@ -15,13 +16,41 @@ namespace KFS.src.infrastructure.Repository
             _context = context;
         }
 
-        public bool CheckUserBoughtProdcut(Guid userId, Guid productId)
+        public async Task<bool> CheckUserBoughtProduct(Guid userId, Guid productId)
         {
-            var payments = _context.Payments.Where(x => x.UserId == userId);
-            var order = payments.OfType<PaymentOrder>().Select(x => x.Order);
-            var orderItems = order.Select(x => x.OrderItems);
-            var productIds = orderItems.OfType<OrderItemProduct>().Select(x => x.ProductId);
-            return productIds.Contains(productId);
+            var orders = await _context.Orders
+                .Where(x => x.UserId == userId && x.Status == OrderStatusEnum.Paid)
+                .Include(x => x.OrderItems)
+                .ToListAsync();
+            var orderItems = _context.OrderItems.AsQueryable();
+            foreach (var order in orders)
+            {
+                foreach (var orderItem in order.OrderItems)
+                {
+                    if (orderItem is OrderItemProduct orderItemProduct)
+                    {
+                        if (orderItemProduct.ProductId == productId)
+                        {
+                            return true;
+                        }
+                    }
+                    if (orderItem is OrderItemBatch orderItemBatch)
+                    {
+                        var batch = await _context.Batches
+                            .Where(x => x.Id == orderItemBatch.BatchId)
+                            .Include(x => x.Products)
+                            .FirstOrDefaultAsync() ?? throw new Exception("batch null");
+                        foreach (var product in batch.Products)
+                        {
+                            if (product.Id == productId)
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
         }
 
         public async Task<bool> CreateFeedback(Feedback feedback)

@@ -42,6 +42,7 @@ namespace KFS.src.infrastructure.Repository
                 .Where(x => x.OrderId == orderId)
                 .OfType<OrderItemBatch>()
                 .Include(x => x.Batch)
+                .ThenInclude(x => x.Products)
                 .ToListAsync();
             var orders = await _context.Orders
             .Include(x => x.OrderItems)
@@ -75,6 +76,7 @@ namespace KFS.src.infrastructure.Repository
                     .Where(x => x.OrderId == order.Id)
                     .OfType<OrderItemBatch>()
                     .Include(x => x.Batch)
+                    .ThenInclude(x => x.Products)
                     .ToListAsync();
                 var orderItems = new List<OrderItem>();
                 orderItems.AddRange(orderItemProduct);
@@ -104,6 +106,7 @@ namespace KFS.src.infrastructure.Repository
                     .Where(x => x.OrderId == order.Id)
                     .OfType<OrderItemBatch>()
                     .Include(x => x.Batch)
+                    .ThenInclude(x => x.Products)
                     .ToListAsync();
                 var orderItems = new List<OrderItem>();
                 orderItems.AddRange(orderItemProduct);
