@@ -69,6 +69,7 @@ namespace KFS.src.infrastructure.Repository
                 .Where(x => x.CartId == id)
                 .OfType<CartItemBatch>()
                 .Include(x => x.Batch)
+                .ThenInclude(x => x.Products)
                 .ToListAsync();
             var cartItems = new List<CartItem>();
             cartItems.AddRange(cartItemProduct);
@@ -97,6 +98,7 @@ namespace KFS.src.infrastructure.Repository
                     .Where(x => x.CartId == cart.Id)
                     .OfType<CartItemBatch>()
                     .Include(x => x.Batch)
+                    .ThenInclude(x => x.Products)
                     .ToListAsync();
                 var cartItems = new List<CartItem>();
                 cartItems.AddRange(cartItemProduct);
@@ -122,6 +124,7 @@ namespace KFS.src.infrastructure.Repository
                     .Where(x => x.CartId == cart.Id)
                     .OfType<CartItemBatch>()
                     .Include(x => x.Batch)
+                    .ThenInclude(x => x.Products)
                     .ToListAsync();
                 var cartItems = new List<CartItem>();
                 cartItems.AddRange(cartItemProduct);
@@ -149,6 +152,7 @@ namespace KFS.src.infrastructure.Repository
                     .Where(x => x.CartId == cart.Id)
                     .OfType<CartItemBatch>()
                     .Include(x => x.Batch)
+                    .ThenInclude(x => x.Products)
                     .ToListAsync();
                 var cartItems = new List<CartItem>();
                 cartItems.AddRange(cartItemProduct);

@@ -63,7 +63,7 @@ namespace KFS.src.Application.Service
                 }
                 var userId = payload.UserId;
                 // check if user buy the product
-                var checkUserBoughtProduct = _feedbackRepository.CheckUserBoughtProdcut(userId, id);
+                var checkUserBoughtProduct = await _feedbackRepository.CheckUserBoughtProduct(userId, id);
                 if (!checkUserBoughtProduct)
                 {
                     response.StatusCode = 400;
