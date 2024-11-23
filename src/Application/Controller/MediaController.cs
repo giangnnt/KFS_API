@@ -17,7 +17,6 @@ namespace KFS.src.Application.Controller
             _mediaService = mediaService;
         }
         [Protected]
-        [Permission(PermissionSlug.MANAGE_MEDIA)]
         [HttpPost("upload")]
         public async Task<IActionResult> UploadMedia([FromForm] IFormFile file, [FromForm] string type)
         {
