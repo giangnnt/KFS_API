@@ -23,7 +23,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Save firebase.json from secret
-        run: echo "${{ secrets.FIREBASE_JSON }}" | jq . > firebase.json
+        run: echo "${{ secrets.FIREBASE_JSON }}" > firebase.json
 
       - name: Validate firebase.json
         run: cat firebase.json
