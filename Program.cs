@@ -12,6 +12,8 @@ using KFS.src.infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.Cookies;
 //test
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
@@ -19,11 +21,20 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAllOrigins",
         builder =>
         {
-            builder.WithOrigins("http://127.0.0.1:5173", "http://localhost:5173")
+            builder.WithOrigins("http://127.0.0.1:5173", "http://localhost:5173", "https://localhost:8080", "https://127.0.0.1:8080", "http://localhost:5000", "http://127.0.0.1:5000")
                    .AllowAnyHeader()
                    .AllowAnyMethod()
                    .AllowCredentials();
         });
+});
+// Session
+builder.Services.AddDistributedMemoryCache();
+
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromSeconds(10);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
 });
 
 // Add services to the container.
@@ -113,6 +124,36 @@ foreach (var provider in configurationRoot.Providers)
         logger.LogInformation("Provider: {Provider}, ConnectionStrings:DatabaseConnection: {Value}", provider, value);
     }
 }
+//try
+//{
+//    var clientId = builder.Configuration["GCP:client_id"];
+//    var clientSecret = builder.Configuration["GCP:client_secret"];
+//    var redirectUri = builder.Configuration["GCP:redirect_uri"];
+
+//    if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(clientSecret))
+//    {
+//        throw new InvalidOperationException("Google Client ID or Client Secret is not configured.");
+//    }
+
+//    builder.Services.AddAuthentication(options =>
+//    {
+//        options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+//        options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+//    })
+//    .AddCookie()
+//    .AddGoogle(GoogleDefaults.AuthenticationScheme, options =>
+//    {
+//        options.ClientId = clientId;
+//        options.ClientSecret = clientSecret;
+//        options.CallbackPath = redirectUri;
+//    });
+//}
+//catch (Exception ex)
+//{
+//    logger.LogError(ex, "An error occurred while configuring Google authentication.");
+//    throw;
+//}
+
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -154,13 +195,16 @@ app.UseSwaggerUI(c =>
     //c.RoutePrefix = "swagger"; // Đặt Swagger UI ở root nếu muốn
 });
 app.UseHangfireDashboard();
-//app.UseHttpsRedirection();
+
+app.UseHttpsRedirection();
 
 app.UseRouting();
 
 app.UseCors("AllowAllOrigins");
 
 app.UseAuthorization();
+
+app.UseSession();
 
 app.MapControllers();
 
