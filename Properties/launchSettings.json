@@ -9,7 +9,7 @@
         "JWT_SECRET": "8a21f416ac3c7de71de084e5190bb322456f5739eff177aeb5be84af1a70bc59"
       },
       "dotnetRunMessages": true,
-      "applicationUrl": "http://localhost:5000"
+      "applicationUrl": "https://localhost:8080"
     },
     "IIS Express": {
       "commandName": "IISExpress",
